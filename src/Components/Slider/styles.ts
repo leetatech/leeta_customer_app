@@ -13,7 +13,7 @@ const createStyles = () =>
       width:'100%'
     },
     title: {
-      fontSize: 18,
+      fontSize: 20,
       fontWeight: '600',
       color: colors.BLACK,
       textAlign:'center',

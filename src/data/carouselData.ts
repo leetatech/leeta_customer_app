@@ -11,7 +11,7 @@ export default [
   {
     id: 2,
     image: HAPPY_GIRL1,
-    title: 'Safer and Convenientway way to order gas',
+    title: 'Safer and Convenient way to order gas',
     description1: 'easily purchase gas anywhere and anytime.',
     // description2: 'address. Click',
   },
