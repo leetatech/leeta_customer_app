@@ -10,13 +10,15 @@ const createStyles = () =>
     input: {
       borderWidth: 1,
       borderRadius: 5,
-      paddingHorizontal: 7,
       fontSize: 16,
       fontWeight: '500',
       borderColor: colors.LGRAY,
-      height: 50,
+      // height: 35,
+      paddingVertical:15,
+      paddingHorizontal:8,
       justifyContent: 'center',
       alignContent: 'center',
+      font:"300"
     },
     error: {
       color: colors.RED,
@@ -26,7 +28,6 @@ const createStyles = () =>
       fontSize: 16,
       fontWeight: '500',
       color: colors.LGRAY,
-      paddingBottom: 10,
     },
 
   });

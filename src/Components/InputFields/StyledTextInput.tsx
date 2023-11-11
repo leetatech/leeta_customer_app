@@ -19,7 +19,7 @@ const StyledTextInput: FC<InputProps> = ({
       <Text style={styles.label}>{label}</Text>
       <View style={styles.input}>
         {icon}
-        <TextInput placeholderTextColor={colors.BLACK} {...props} />
+        <TextInput placeholderTextColor={colors.LGRAY} {...props} />
       </View>
     </View>
   );
