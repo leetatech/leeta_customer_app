@@ -13,7 +13,6 @@ const createStyles = () =>
       fontSize: 16,
       fontWeight: '500',
       borderColor: colors.LGRAY,
-      // height: 35,
       paddingVertical:15,
       paddingHorizontal:8,
       justifyContent: 'center',

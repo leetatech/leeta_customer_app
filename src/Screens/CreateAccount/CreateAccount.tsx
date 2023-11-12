@@ -12,8 +12,8 @@ import {colors} from '../../Constants/Colors';
 import PaddedLayout from '../../Components/Layouts/PaddedLayout';
 import Buttons from '../../Components/Buttons/Buttons';
 import CustomModal from '../../Components/Modal/CustomModal';
-import {SUCCESSS} from '../../Assets/svgImages';
-
+import {SUCCESSS, WARNING_ICON} from '../../Assets/svgImages';
+import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 
 interface IProps {
   navigation: NavigationProp<ParamListBase>;
@@ -23,33 +23,36 @@ const CreateAccount: FC<IProps> = ({navigation}) => {
   const styles = useMemo(() => createStyles(), []);
   const [checked, setChecked] = useState(true);
   const [accountVerification, setAccountVerification] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
 
   const formik = useFormik({
     initialValues: {
-      firstName: '',
-      lastName: '',
+      fullName: '',
       email: '',
+      password: '',
     },
     validationSchema: Yup.object({
-      firstName: Yup.string()
-        .required('First name cannot be empty')
-        .min(3, 'First name is too short')
+      fullName: Yup.string()
+        .required('Full name cannot be empty')
+        .min(5, 'First name is too short')
         .max(20, 'First name is too long'),
-        lastName: Yup.string()
-        .required('Last name cannot be empty')
-        .min(3, 'Last name is too short')
-        .max(20, 'Last name is too long'),
-      email: Yup.string()
+        email: Yup.string()
         .email('invalid email format')
         .required('Email cannot be empty'),
+        password: Yup.string()
+        .required('Password cannot be empty')
+        .max(20, 'Password must not exceed 20 characters')
+        .matches(
+          /^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#$%^&*])(?=.{8,})/,
+          'Minimum of 8 characters with at least 1 Uppercase, Lowercase, Number and Special Character',
+        ),
     }),
     enableReinitialize: false,
     onSubmit: values =>
       console.log(
-        `First Name :${values.firstName}`,
-        `Last Name : ${values.lastName}`,
-        `Email: ${values.email}`,
-        
+        `Full Name :${values.fullName}`,
+        `Email : ${values.email}`,
+        `Password: ${values.password}`,
       ),
   });
 
@@ -62,13 +65,11 @@ const CreateAccount: FC<IProps> = ({navigation}) => {
     formik.handleSubmit();
     if (!Object.keys(formik.errors).length) {
       const payload = {
-        firstName: formik.values.firstName,
-        lastName: formik.values.lastName,
+        fullName: formik.values.fullName,
         email: formik.values.email,
-        
+        password: formik.values.password,
       };
       console.log('Payload', payload);
-      //Call API to send the form to the server
       navigation.navigate('Otp');
     }
   };
@@ -83,90 +84,108 @@ const CreateAccount: FC<IProps> = ({navigation}) => {
           smallText="Let’s get you started"
         />
         <ScrollView showsVerticalScrollIndicator={false}>
-          <View style={styles.mainContainer}>
             <View style={styles.container}>
               <View>
                 <StyledTextInput
                   label=""
-                  placeholder="Enter First  Name"
-                  onChangeText={formik.handleChange('firstName')}
-                  value={formik.values.firstName}
-                  name="firstName"
-                  onBlur={formik.handleBlur('firstName')}
-                  errors={formik.errors.firstName}
+                  placeholder="Enter Full  Name"
+                  onChangeText={formik.handleChange('fullName')}
+                  value={formik.values.fullName}
+                  name="fullName"
+                  onBlur={formik.handleBlur('fullName')}
+                  errors={formik.errors.fullName}
                   helperText={''}
+                  icon={
+                    formik.touched.fullName && formik.errors.fullName ?
+                    <WARNING_ICON  style={styles.passwordIcon} /> :
+                  ""}
+                  inputStyle={formik.touched.fullName && formik.errors.fullName ? {borderColor: colors.RED} : undefined}
                 />
-                {Object.keys(formik.errors).includes('firstName') && (
+
+                {formik.touched.fullName && formik.errors.fullName && (
                   <Text style={{color: colors.RED, paddingTop: 2}}>
-                    {formik.errors['firstName'] ? formik.errors.firstName : ''}
-                    {formik.touched['firstName'] ? formik.touched.firstName : ''}
+                    {formik.errors.fullName}
                   </Text>
                 )}
               </View>
               <View>
                 <StyledTextInput
                   label=""
-                placeholder="Enter Last  Name"
-                  onChangeText={formik.handleChange('lastName')}
-                  value={formik.values.lastName}
-                  name="lastName"
-                  onBlur={formik.handleBlur('lastName')}
-                  errors={formik.errors.lastName}
-                  helperText={''}
-                />
-                {Object.keys(formik.errors).includes('lastName') && (
-                  <Text style={{color: colors.RED, paddingTop: 2}}>
-                    {formik.errors['lastName'] ? formik.errors.lastName : ''}
-                    {formik.touched['lastName'] ? formik.touched.lastName : ''}
-                  </Text>
-                )}
-              </View>
-              <View>
-                <StyledTextInput
-                  label=""
-                placeholder="Enter Email"
+                  placeholder="Enter Email"
                   onChangeText={formik.handleChange('email')}
                   value={formik.values.email}
                   name="email"
                   onBlur={formik.handleBlur('email')}
                   errors={formik.errors.email}
                   helperText={''}
+                  inputStyle={formik.touched.email && formik.errors.email ? {borderColor: colors.RED} : undefined}
+                  icon={
+                    formik.touched.email && formik.errors.email ?
+                    <WARNING_ICON  style={styles.passwordIcon} /> :
+                  ""}
                 />
-                {Object.keys(formik.errors).includes('email') && (
+
+                {formik.touched.email && formik.errors.email && (
                   <Text style={{color: colors.RED, paddingTop: 2}}>
-                    {formik.errors['email'] ? formik.errors.email : ''}
-                    {formik.touched['email'] ? formik.touched.email : ''}
+                    {formik.errors.email}
                   </Text>
                 )}
               </View>
               <View>
-            
-               <View style={styles.checkboxContainer}>
-                <TouchableOpacity>
-                  <Fontisto
-                    name={checked ? 'checkbox-passive' : 'check'}
-                    size={10}
-                    color={colors.ORANGE}
-                    style={{color: colors.ORANGE}}
-                    onPress={() => setChecked(prevState => !prevState)}
-                  />
-                </TouchableOpacity>
-                <Text style={styles.fp}>
-                  I have read and i agree to Leeta’s
-                  <Text style={styles.link}>
-                     Privacy Policy, Terms and conditions.
+              <StyledTextInput
+                label="Password"
+                name="password"
+                value={formik.values.password}
+                onChangeText={formik.handleChange('password')}
+                onBlur={formik.handleBlur('password')}
+                secureTextEntry={!showPassword}
+                isPassword={true}
+                icon={
+                  formik.touched.password && formik.errors.password ?
+                  <WARNING_ICON  style={styles.passwordIcon} /> :
+                  <Icon
+                    name={showPassword ? 'eye' : 'eye-off'}
+                    size={20}
+                    onPress={() => setShowPassword(prevState => !prevState)}
+                    style={styles.passwordIcon} 
+                  /> 
+                }
+                helperText={''}
+                inputStyle={formik.touched.password && formik.errors.password ? {borderColor: colors.RED} : undefined}
+
+              />
+                {formik.touched.password && formik.errors.password && (
+                  <Text style={{color: colors.RED, paddingTop: 2}}>
+                    {formik.errors.password}
                   </Text>
-                </Text>
+                )}
               </View>
+              <View>
+                <View style={styles.checkboxContainer}>
+                  <TouchableOpacity>
+                    <Fontisto
+                      name={checked ? 'checkbox-passive' : 'check'}
+                      size={10}
+                      color={colors.ORANGE}
+                      style={{color: colors.ORANGE}}
+                      onPress={() => setChecked(prevState => !prevState)}
+                    />
+                  </TouchableOpacity>
+                  <Text style={styles.fp}>
+                    I have read and i agree to Leeta’s
+                    <Text style={styles.link}>
+                      Privacy Policy, Terms and conditions.
+                    </Text>
+                  </Text>
+                </View>
               </View>
             </View>
-          </View>
         </ScrollView>
         <View style={styles.buttonContainer}>
           <Buttons
             title="Get Started"
             disabled={
-              (!formik.values.firstName && !formik.values.lastName) ||
+              (!formik.values.fullName && !formik.values.email) ||
               formik.isSubmitting
             }
             onPress={toggleAccountVerification}
