@@ -2,7 +2,6 @@ import React, {FC, useMemo, useState, useEffect} from 'react';
 import {
   Text,
   View,
-  Image,
   TouchableOpacity,
   Animated,
   Easing,
@@ -14,8 +13,7 @@ import Buttons from '../../Components/Buttons/Buttons';
 import {colors} from '../../Constants/Colors';
 import {OtpInput} from 'react-native-otp-entry';
 import CustomLoader from '../../Components/Loader/CustomLoader';
-import {OTP_IMAGE} from '../../Assets/svgImages';
-import {NAVIGATION_ARROW} from '../../Assets';
+import {NAVIGATION_ICON, OTP_IMAGE} from '../../Assets/svgImages';
 import CustomToast from '../../Components/Toast/CustomToast';
 
 interface IOTPInputProps {
@@ -107,7 +105,7 @@ const Otp: FC<IOTPInputProps> = ({navigation}) => {
     <React.Fragment>
       <PaddedLayout>
         <TouchableOpacity onPress={navigation.goBack}>
-          {/* <Image source={NAVIGATION_ARROW} style={{zIndex:40}}/> */}
+          <NAVIGATION_ICON />
         </TouchableOpacity>
 
         <View style={styles.mainContainer}>
