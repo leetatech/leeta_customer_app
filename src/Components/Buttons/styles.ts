@@ -33,6 +33,7 @@ const createStyles = () =>
     },
     coloredText :{
       color:colors.ORANGE,
+      paddingRight:2
     }
   });
 

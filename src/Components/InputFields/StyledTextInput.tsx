@@ -10,6 +10,7 @@ const StyledTextInput: FC<InputProps> = ({
   name,
   errors,
   helperText,
+  inputStyle,
   ...props
 }) => {
   const styles = useMemo(() => createStyles(), []);
@@ -17,9 +18,9 @@ const StyledTextInput: FC<InputProps> = ({
   return (
     <View>
       <Text style={styles.label}>{label}</Text>
-      <View style={styles.input}>
+      <View style={[styles.input, inputStyle]}>
         {icon}
-        <TextInput placeholderTextColor={colors.BLACK} {...props} />
+        <TextInput placeholderTextColor={colors.LGRAY} {...props} />
       </View>
     </View>
   );

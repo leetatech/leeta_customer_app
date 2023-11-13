@@ -1,5 +1,6 @@
 import React, {ReactNode} from 'react';
-import {TextInputProps} from 'react-native';
+import {StyleProp, TextInputProps,  ViewStyle,
+} from 'react-native';
 
 interface ExtraInputProps {
   label: ReactNode;
@@ -8,6 +9,8 @@ interface ExtraInputProps {
   errors?: ReactNode;
   icon?: React.ReactNode;
   helperText: string;
+  inputStyle?: StyleProp<ViewStyle>;
+
 }
 
 export type InputProps = TextInputProps & ExtraInputProps;

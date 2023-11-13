@@ -2,8 +2,8 @@ import React, {FC, ReactNode, useMemo} from 'react';
 import {View, Text} from 'react-native';
 import {colors} from '../../Constants/Colors';
 import createStyles from './style';
-import {CLOSE_INFO, INFO_CIRCLE} from '../../Assets/svgImages';
 import {TouchableOpacity} from 'react-native-gesture-handler';
+import { CLOSE_INFO, INFO_CIRCLE } from '../../Assets/svgImages';
 
 interface CustomModalProps {
   children: ReactNode;
