@@ -3,7 +3,7 @@ import {
   createStackNavigator,
   StackNavigationOptions,
 } from '@react-navigation/stack';
-import Slider from '../Components/Slider/Slider';
+import Slider from '../Screens/OnboardingScreen/Slider/Slider';
 import { InitialScreen,CreateAccount, Otp, EmailVerification} from '../Screens';
 
 type IProps = {
