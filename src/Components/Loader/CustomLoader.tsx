@@ -8,7 +8,7 @@ const styles = useMemo(() => createStyles(), []);
   return (
     <View style={styles.mainContainer}>
       <View style={styles.spinner_container}>
-      <LOADER  />
+      <LOADER  width={50} />
       </View>
     </View>
   );

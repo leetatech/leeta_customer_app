@@ -25,7 +25,7 @@ const EmailVerification: FC<IProps> = ({navigation}) => {
             disabled={false}
             buttonStyle={undefined}
             textStyle={undefined}
-            onPress={() => console.log("go to signin")}
+            onPress={() => navigation.navigate('SignIn')}
           />
         </View>
       </View>
