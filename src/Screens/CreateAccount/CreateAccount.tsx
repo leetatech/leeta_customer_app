@@ -12,7 +12,7 @@ import {colors} from '../../Constants/Colors';
 import PaddedLayout from '../../Components/Layouts/PaddedLayout';
 import Buttons from '../../Components/Buttons/Buttons';
 import CustomModal from '../../Components/Modal/CustomModal';
-import {SUCCESSS, WARNING_ICON} from '../../Assets/svgImages';
+import {SUCCESS, WARNING_ICON} from '../../Assets/svgImages';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 
 interface IProps {
@@ -88,7 +88,7 @@ const CreateAccount: FC<IProps> = ({navigation}) => {
               <View>
                 <StyledTextInput
                   label=""
-                  placeholder="Enter Full  Name"
+                  placeholder="Enter Full Name"
                   onChangeText={formik.handleChange('fullName')}
                   value={formik.values.fullName}
                   name="fullName"
@@ -189,16 +189,17 @@ const CreateAccount: FC<IProps> = ({navigation}) => {
               formik.isSubmitting
             }
             onPress={toggleAccountVerification}
+            onPress2={() => navigation.navigate('SignIn')}
             buttonStyle={undefined}
             textStyle={undefined}
-            text="Already have an account?"
+            text="Already have an account? "
             text2="Sign In"
           />
         </View>
       </PaddedLayout>
       <CustomModal visible={accountVerification}>
         <View style={styles.modal_description_container}>
-          <SUCCESSS />
+          <SUCCESS />
           <Text style={styles.modal_content_title}>
             Verification in Progress
           </Text>

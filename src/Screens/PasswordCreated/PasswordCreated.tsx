@@ -8,19 +8,20 @@ import { SUCCESS } from '../../Assets/svgImages';
 interface IProps {
   navigation: NavigationProp<ParamListBase>;
 }
-const EmailVerification: FC<IProps> = ({navigation}) => {
+const PasswordCreated: FC<IProps> = ({navigation}) => {
   const styles = useMemo(() => createStyles(), []);
   return (
     <React.Fragment>
       <View style={styles.container}>
         <SUCCESS />
-        <Text style={styles.title}>Verification Complete</Text>
+        <Text style={styles.title}>New Password Created</Text>
         <Text style={styles.description}>
-          Your email is all verified, now you're set to move on to the next step
+          Your new password has been successfully created
+          Click below to log in with the new password
         </Text>
         <View style={styles.btn_container}>
           <Buttons
-            title="Got it!"
+            title="Back to Log in!"
             disabled={false}
             buttonStyle={undefined}
             textStyle={undefined}
@@ -32,4 +33,4 @@ const EmailVerification: FC<IProps> = ({navigation}) => {
   );
 };
 
-export default EmailVerification;
+export default PasswordCreated;

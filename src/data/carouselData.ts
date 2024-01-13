@@ -4,9 +4,9 @@ export default [
   {
     id: 1,
     image: SELLER,
-    title: 'Selling gas made easy',
-    description1: 'we have sent a secure reset link to your email',
-    description2: 'address. Click',
+    title: 'Track your gas usage with Leeta',
+    description1: 'Conveniently track usage of gas',
+    // description2: 'address. Click',
   },
   {
     id: 2,
