@@ -12,6 +12,7 @@ import {colors} from '../../Constants/Colors';
 import {useFormik} from 'formik';
 import * as Yup from 'yup';
 import CustomToast from '../../Components/Toast/CustomToast';
+import {NAVIGATION_ICON} from '../../Assets/svgImages';
 
 interface IProps {
   navigation: NavigationProp<ParamListBase>;
@@ -46,7 +47,7 @@ const ForgotPassword: FC<IProps> = ({navigation}) => {
   return (
     <FormMainContainer>
       <TouchableOpacity onPress={navigation.goBack}>
-        <Image source={NAVIGATION_ARROW} />
+        <NAVIGATION_ICON />
       </TouchableOpacity>
       <FormTexts
         bigText="Forgot Password"
