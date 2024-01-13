@@ -167,7 +167,8 @@ const SignIn: FC<IProps> = ({navigation}) => {
                 {formik.errors.password}
               </Text>
             )}
-            <TouchableOpacity>
+            <TouchableOpacity
+            onPress={() => navigation.navigate('ForgotPassword')}>
               <Text style={styles.fp}>I forgot my password</Text>
             </TouchableOpacity>
           </View>

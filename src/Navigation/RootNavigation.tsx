@@ -4,7 +4,17 @@ import {
   StackNavigationOptions,
 } from '@react-navigation/stack';
 import Slider from '../Screens/OnboardingScreen/Slider/Slider';
-import { InitialScreen,CreateAccount, Otp, EmailVerification, SignIn, MarketPlace} from '../Screens';
+import { 
+  InitialScreen,
+  CreateAccount, 
+  Otp, 
+  ForgotPassword, 
+  EmailVerification, 
+  SignIn, 
+  CreateNewPassword,
+  PasswordCreated,
+  MarketPlace,
+} from '../Screens';
 
 type IProps = {
   defaultRoute: string;
@@ -47,6 +57,21 @@ export default function RootNavigation({defaultRoute}: IProps) {
              <RootStack.Screen
               name="EmailVerification"
               component={EmailVerification}
+              options={screenDefaultOptions}
+            />
+            <RootStack.Screen
+              name="ForgotPassword"
+              component={ForgotPassword}
+              options={screenDefaultOptions}
+            />
+            <RootStack.Screen
+              name="CreateNewPassword"
+              component={CreateNewPassword}
+              options={screenDefaultOptions}
+            />
+            <RootStack.Screen
+              name="PasswordCreated"
+              component={PasswordCreated}
               options={screenDefaultOptions}
             />
               <RootStack.Screen
