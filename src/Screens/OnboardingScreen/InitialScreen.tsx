@@ -9,19 +9,23 @@ interface IProps {
   navigation: NavigationProp<ParamListBase>;
 }
 const InitialScreen: FC<IProps> = ({navigation}) => {
-  const getUser = async () => {
-    try {
-      const value = await AsyncStorage.getItem('Slider');
-      if (value != null) {
-        navigation.navigate('CreateAccount');
-      } else {
-        navigation.navigate('Slider', {title: 'Slider'});
-      }
-    } catch (e) {
-    }
+  // TODO: uncomment code to get user data and determine next screen
+  // const getUser = async () => {
+  //   try {
+  //     const value = await AsyncStorage.getItem('Slider');
+  //     if (value != null) {
+  //       navigation.navigate('CreateAccount');
+  //     } else {
+  //       navigation.navigate('Slider', {title: 'Slider'});
+  //     }
+  //   } catch (e) {
+  //   }
+  // };
+  const navigateToSignUp = () => {
+    navigation.navigate('CreateAccount');
   };
   useEffect(() => {
-    setTimeout(getUser, 5000);
+    setTimeout(navigateToSignUp, 2000);
   }, []);
   const styles = useMemo(() => createStyles(), []);
   return (

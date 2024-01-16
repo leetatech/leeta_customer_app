@@ -50,7 +50,7 @@ export default function RootNavigation({defaultRoute}: IProps) {
               options={screenDefaultOptions}
             />
              <RootStack.Screen
-              name="Otp"
+              name="OTPInput"
               component={Otp}
               options={screenDefaultOptions}
             />
