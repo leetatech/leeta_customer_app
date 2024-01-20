@@ -11,6 +11,7 @@ import Fontisto from 'react-native-vector-icons/Fontisto';
 import {useFormik} from 'formik';
 import * as Yup from 'yup';
 import {colors} from '../../Constants/Colors';
+import {NAVIGATION_ARROW} from '../../Assets';
 import CustomModal from '../../Components/Modal/CustomModal';
 import {SUCCESS} from '../../Assets/svgImages';
 import {ScrollView} from 'react-native-gesture-handler';
@@ -18,7 +19,6 @@ import {RootState} from '../../redux/rootReducer';
 import {useDispatch, useSelector} from 'react-redux';
 import {signup} from '../../redux/slices/auth/userServices';
 import CustomLoader from '../../Components/Loader/CustomLoader';
-import CustomToast from '../../Components/Toast/CustomToast';
 import {resetUserState, setemail} from '../../redux/slices/auth/userSlice';
 import { appUserType } from '../../config';
 import { applicationErrorCode } from '../../errors';
@@ -31,13 +31,12 @@ interface IProps {
 const CreateAccount: FC<IProps> = ({navigation}) => {
   const styles = useMemo(() => createStyles(), []);
   const [checked, setChecked] = useState(true);
-  const [showErrorMsg, setShowErrorMsg] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [isAccountCreated, setIsAccountCreated] = useState(false);
   const [isAccountNotCreated, setIsAccountNotCreated] = useState(false);
   const dispatch = useDispatch();
-  dispatch(resetUserState());
-  let {loading, error, userData, errorCode} = useSelector(
+  let {loading, message, error, userData, errorCode} = useSelector(
+
     (state: RootState) => state.user,
   );
   const [displayErrorMsg, setDisplayErrorMsg] = useState(false);
@@ -73,11 +72,11 @@ const CreateAccount: FC<IProps> = ({navigation}) => {
         full_name: formik.values.full_name,
         email: formik.values.email,
         password: formik.values.password,
-        user_type: appUserType,
+        user_type: formik.values.user_type,
       };
       dispatch(setemail(formik.values.email));
 
-      dispatch(signup(payload))
+      dispatch(signup(payload));
     }
   };
 
@@ -91,53 +90,74 @@ const CreateAccount: FC<IProps> = ({navigation}) => {
     navigation.navigate('SignIn');
   };
 
-  const toggleErrMsg = () => {
-    setShowErrorMsg(!showErrorMsg);
-  };
-
   useEffect(() => {
     const storeToken = async () => {
       if (error && errorCode) {
-        setShowErrorMsg(true);
-
-        // TODO: handle more signup error edge cases
+        setDisplayErrorMsg(true);
         switch (errorCode) {
           case applicationErrorCode.DuplicateUserError:
             setErrorMsg("User already exists. Kindly proceed to login");
             break;
           default:
-            setErrorMsg("An error has occurred while trying to sign up. Kindly try again shortly.");
+            setErrorMsg("Unknown error has occurred while trying to sign up. Kindly try again shortly.");
             break;
         }
-
         setIsAccountNotCreated(true);
         setChecked(true);
-        setTimeout(() => {
-          dispatch(resetUserState());
-        }, 3000);
+        dispatch(resetUserState());
         formik.resetForm();
       } else if (!error && Object.keys(userData).length > 0) {
-        formik.resetForm();
         setIsAccountCreated(true);
         setChecked(true);
+        formik.resetForm();
       }
     };
     storeToken();
 
   }, [userData, error, errorCode]);
 
-
-  interface ModalContentProps {
+  interface ModalProps {
+    visible: boolean;
     title: string;
     description: string;
-    buttonTitle: string;
-    onPress: () => void;
+    buttonText: string;
+    onButtonPress: () => void;
   }
-
+  
+  const Modal: React.FC<ModalProps> = ({
+    visible,
+    title,
+    description,
+    buttonText,
+    onButtonPress,
+  }) => {
+    return (
+      <CustomModal visible={visible}>
+        <View style={styles.modal_description_container}>
+          {!visible && <SUCCESS />}
+          <Text style={styles.modal_content_title}>{title}</Text>
+          <Text style={styles.modal_content_description}>{description}</Text>
+        </View>
+        <View style={styles.modal_btn_container}>
+          <Buttons
+            title={buttonText}
+            disabled={false}
+            buttonStyle={undefined}
+            textStyle={undefined}
+            onPress={onButtonPress}
+          />
+        </View>
+      </CustomModal>
+    );
+  };
+  
 
   return (
     <>
       <FormMainContainer>
+        <TouchableOpacity onPress={navigation.goBack}>
+          <Image source={NAVIGATION_ARROW} />
+        </TouchableOpacity>
         {loading && <CustomLoader />}
         <FormTexts
           bigText="Create an account"
@@ -244,12 +264,23 @@ const CreateAccount: FC<IProps> = ({navigation}) => {
             text2="sign In"
           />
         </View>
-        {showErrorMsg && (
-          <CustomToast onPress={toggleErrMsg}>
-            <Text>{errorMsg}</Text>
-          </CustomToast>
-        )}
       </FormMainContainer>
+
+      {displayErrorMsg ? (
+        <Modal
+          visible={isAccountNotCreated}
+          title="OOpps"
+          description={`${errorMsg}`}
+          buttonText="Ok"
+          onButtonPress={toggleErrorModal}
+        />
+      ) : <Modal
+          visible={isAccountCreated}
+          title="Verification in Progress"
+          description="You'll receive an email regarding the status of your verification request."
+          buttonText="Got it!"
+          onButtonPress={toggleCreateAccount}
+        />}
     </>
   );
 };
