@@ -3,18 +3,21 @@ import {colors} from '../../Constants/Colors';
 
 const createStyles = () =>
   StyleSheet.create({
-    mainContainer: {
-      // flex: 1,
-    },
     container: {
       flexDirection: 'column',
       gap: 19,
+    },
+    buttonContainer: {
+      paddingBottom: 20,
     },
     passwordIcon: {
       position: 'absolute',
       right: 15,
       top: 15,
       zIndex: 1,
+    },
+    mainContainer: {
+      flex: 1,
     },
     checkbox: {
       paddingTop: 4,
@@ -40,10 +43,6 @@ const createStyles = () =>
       textDecorationLine: 'underline',
       paddingRight: 4,
     },
-    buttonContainer: {
-      paddingBottom: 40,
-    },
-
     modal_description_container: {
       justifyContent: 'center',
       alignItems: 'center',

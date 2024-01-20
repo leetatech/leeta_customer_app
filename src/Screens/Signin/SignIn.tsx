@@ -1,13 +1,8 @@
 import React, {useMemo, useState, FC, useEffect} from 'react';
-import {
-  View,
-  Text,
-  TouchableOpacity,
-  Animated,
-  Easing,
-} from 'react-native';
+import {View, Text, Image, TouchableOpacity} from 'react-native';
 import createStyles from './styles';
 import FormTexts from '../../Components/FormTexts/FormTexts';
+import FormMainContainer from '../../Components/FormMainContainer/FormMainContainer';
 import Buttons from '../../Components/Buttons/Buttons';
 import StyledTextInput from '../../Components/InputFields/StyledTextInput';
 import Icon from 'react-native-vector-icons/FontAwesome';
@@ -15,41 +10,39 @@ import {NavigationProp, ParamListBase} from '@react-navigation/native';
 import * as Yup from 'yup';
 import {useFormik} from 'formik';
 import {colors} from '../../Constants/Colors';
-import PaddedLayout from '../../Components/Layouts/PaddedLayout';
-import {NAVIGATION_ICON, WARNING_ICON} from '../../Assets/svgImages';
+import {NAVIGATION_ARROW} from '../../Assets';
+import {ScrollView} from 'react-native-gesture-handler';
+import {useDispatch, useSelector} from 'react-redux';
+import { login} from '../../redux/slices/auth/userServices';
+import {SUCCESS} from '../../Assets/svgImages';
+import {RootState} from '../../redux/rootReducer';
+import CustomModal from '../../Components/Modal/CustomModal';
 import CustomLoader from '../../Components/Loader/CustomLoader';
+import { appUserType } from '../../config';
+import {resetUserState} from '../../redux/slices/auth/userSlice';
+import { applicationErrorCode } from '../../errors';
 
 interface IProps {
   navigation: NavigationProp<ParamListBase>;
 }
+
 const SignIn: FC<IProps> = ({navigation}) => {
   const styles = useMemo(() => createStyles(), []);
   const [showPassword, setShowPassword] = useState(false);
-  const [loading, setLoading] = useState(false);
+  const [showErrorMsg, setShowErrorMsg] = useState(false); //
+  const [errorMsg, setErrorMsg] = useState('');
+  const [userNotVerified, setUserNotVerified] = useState(false);
+  const [invalidSigninApp, toggleInvalidSign] = useState(false);
+  let {loading, errorCode, error, userData} = useSelector(
+    (state: RootState) => state.user,
+  );
+  const dispatch = useDispatch();
 
-  const spinAnim = new Animated.Value(0);
-  const interpolateRotation = spinAnim.interpolate({
-    inputRange: [0, 1],
-    outputRange: ['0deg', '360deg'],
-  });
-
-  const animatedStyle = {
-    transform: [{rotate: interpolateRotation}],
-  };
-  useEffect(() => {
-    Animated.loop(
-      Animated.timing(spinAnim, {
-        toValue: 5,
-        duration: 7000,
-        easing: Easing.linear,
-        useNativeDriver: false,
-      }),
-    ).start();
-  });
   const formik = useFormik({
     initialValues: {
       email: '',
       password: '',
+      user_type: appUserType,
     },
     validationSchema: Yup.object({
       email: Yup.string()
@@ -60,137 +53,192 @@ const SignIn: FC<IProps> = ({navigation}) => {
         .max(20, 'Password must not exceed 20 characters')
         .matches(
           /^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#$%^&*])(?=.{8,})/,
-          'Minimum of 8 characters with at least 1 Uppercase, Lowercase, Number and Special Character',
+          'Must contain at least 8 characters with 1 Uppercase, Lowercase, Number and Special Character',
         ),
     }),
     enableReinitialize: false,
     validateOnBlur: false,
-    // validateOnChange:false,
-    onSubmit: values =>
-      console.log(`Email: ${values.email}`, `Password: ${values.password}`),
+    onSubmit: () => {},
   });
 
-  const handeSubmit = () => {
-    formik.handleSubmit();
+  const handleSubmit = () => {
     if (!Object.keys(formik.errors).length) {
       const payload = {
         email: formik.values.email,
         password: formik.values.password,
+        user_type: formik.values.user_type,
       };
-      console.log('Payload', payload);
-      setLoading(true);
-      setTimeout(() => {
-        setLoading(false);
-
-        navigation.navigate('MarketPlace');
-      }, 3000);
+      dispatch(login(payload));
     }
   };
 
-  return (
-    <PaddedLayout>
-      <TouchableOpacity onPress={navigation.goBack}>
-        <NAVIGATION_ICON />
-      </TouchableOpacity>
-      <FormTexts
-        bigText="Welcome Back"
-        smallText="Login to manage your account"
-      />
-      <View style={styles.mainContainer}>
-        {loading && (
-          <Animated.View style={animatedStyle}>
-            <CustomLoader />
-          </Animated.View>
-        )}
-        <View style={styles.container}>
-          <View>
-            <StyledTextInput
-              label=""
-              placeholder="Enter Email"
-              onChangeText={formik.handleChange('email')}
-              value={formik.values.email}
-              name="email"
-              onBlur={formik.handleBlur('email')}
-              errors={formik.errors.email}
-              helperText={''}
-              inputStyle={
-                formik.touched.email && formik.errors.email
-                  ? {borderColor: colors.RED}
-                  : undefined
-              }
-              icon={
-                formik.touched.email && formik.errors.email ? (
-                  <WARNING_ICON style={styles.passwordIcon} />
-                ) : (
-                  ''
-                )
-              }
-            />
-            {formik.touched.email && formik.errors.email && (
-              <Text style={{color: colors.RED, paddingTop: 2}}>
-                {formik.errors.email}
-              </Text>
-            )}
-          </View>
+  const toggleErrorModal = () => {
+    if (userNotVerified) {
+      navigation.navigate('OTPInput');
+    }
+    dispatch(resetUserState());
+    setShowErrorMsg(false)
+  };
+  
 
-          <View>
-            <StyledTextInput
-              label=""
-              placeholder="Enter your password"
-              name="password"
-              value={formik.values.password}
-              onChangeText={formik.handleChange('password')}
-              onBlur={formik.handleBlur('password')}
-              secureTextEntry={!showPassword}
-              isPassword={true}
-              icon={
-                formik.touched.password && formik.errors.password ? (
-                  <WARNING_ICON style={styles.passwordIcon} />
-                ) : (
-                  <Icon
-                    name={showPassword ? 'eye' : 'eye-slash'}
-                    size={20}
-                    onPress={() => setShowPassword(prevState => !prevState)}
-                    style={styles.passwordIcon}
-                  />
-                )
-              }
-              helperText={''}
-              inputStyle={
-                formik.touched.password && formik.errors.password
-                  ? {borderColor: colors.RED}
-                  : undefined
-              }
-            />
-            {formik.touched.password && formik.errors.password && (
-              <Text style={{color: colors.RED, paddingTop: 2}}>
-                {formik.errors.password}
-              </Text>
-            )}
-            <TouchableOpacity
-            onPress={() => navigation.navigate('ForgotPassword')}>
-              <Text style={styles.fp}>I forgot my password</Text>
-            </TouchableOpacity>
-          </View>
+  useEffect(() => {
+    if (error && errorCode) {
+      console.log(errorCode)
+      // TODO: handle more signin error edge cases
+      switch (errorCode) {
+        case applicationErrorCode.InvalidUserRoleError:
+        case applicationErrorCode.UserCategoryError:
+          setErrorMsg("You are trying to log into the wrong LEETA app. kindly sign in with the LEETA Vendor app");
+          break;
+        case applicationErrorCode.CredentialsValidationError:
+        case applicationErrorCode.UserNotFoundError:
+          setErrorMsg("invalid email or password");
+          break;
+        default:
+          setErrorMsg("An error has occurred while trying to sign in. Kindly try again shortly.");
+          break;
+      }
+      setShowErrorMsg(true);
+    } else if (!error && Object.keys(userData).length > 0) {
+      formik.resetForm();
+      const body = (userData as any).body;
+      console.log(body)
+      if(body && typeof body.email === 'object' && body.email.verified === false) {
+        setUserNotVerified(true);
+        setShowErrorMsg(true);
+        setErrorMsg("Your email is not verified. Kindly check email for OTP for email verification");
+      }else if(body && typeof body.email === 'object' && body.email.verified === true) {
+        navigation.navigate('BottomNavigator');
+      }
+    }
+  }, [userData, error, errorCode]);
+
+  interface ModalProps {
+    visible: boolean;
+    title: string;
+    description: string;
+    buttonText: string;
+    onButtonPress: () => void;
+  }
+  
+  const Modal: React.FC<ModalProps> = ({
+    visible,
+    title,
+    description,
+    buttonText,
+    onButtonPress,
+  }) => {
+    return (
+      <CustomModal visible={visible}>
+        <View style={styles.modal_description_container}>
+          {!visible && <SUCCESS />}
+          <Text style={styles.modal_content_title}>{title}</Text>
+          <Text style={styles.modal_content_description}>{description}</Text>
         </View>
-      </View>
-      <View style={styles.buttonContainer}>
-        <Buttons
-          title="Log In"
-          disabled={
-            (!formik.values.email && !formik.values.password) ||
-            formik.isSubmitting
-          }
-          onPress={handeSubmit}
-          onPress2={() => navigation.navigate('CreateAccount')}
-          buttonStyle={undefined}
-          textStyle={undefined}
-          text="Don't have an account?"
-          text2="Sign Up"
+        <View style={styles.modal_btn_container}>
+          <Buttons
+            title={buttonText}
+            disabled={false}
+            buttonStyle={undefined}
+            textStyle={undefined}
+            onPress={onButtonPress}
+          />
+        </View>
+      </CustomModal>
+    );
+  };
+
+  return (
+    <>
+      <FormMainContainer>
+        {loading && <CustomLoader />}
+        <FormTexts
+          bigText="Welcome Back"
+          smallText="Login to manage your account"
         />
-      </View>
-    </PaddedLayout>
-  );
+        <ScrollView>
+          <View style={styles.mainContainer}>
+            <View style={styles.container}>
+              <View>
+                <StyledTextInput
+                  label="Email"
+                  onChangeText={formik.handleChange('email')}
+                  value={formik.values.email}
+                  name="email"
+                  onBlur={formik.handleBlur('email')}
+                  errors={formik.errors.email}
+                  helperText={''}
+                />
+                {formik.touched.email && formik.errors.email && (
+                  <Text style={{color: colors.RED, paddingTop: 2}}>
+                    {formik.errors.email}
+                  </Text>
+                )}
+              </View>
+
+              <View>
+                <StyledTextInput
+                  label="Password"
+                  name="password"
+                  value={formik.values.password}
+                  onChangeText={formik.handleChange('password')}
+                  onBlur={formik.handleBlur('password')}
+                  secureTextEntry={!showPassword}
+                  isPassword={true}
+                  icon={
+                    <Icon
+                      name={showPassword ? 'eye' : 'eye-slash'}
+                      size={20}
+                      onPress={() => setShowPassword(prevState => !prevState)}
+                      style={styles.passwordIcon}
+                    />
+                  }
+                  helperText={''}
+                />
+                {formik.touched.password && formik.errors.password && (
+                  <Text style={{color: colors.RED, paddingTop: 2}}>
+                    {formik.errors.password}
+                  </Text>
+                )}
+                <TouchableOpacity
+                  onPress={() => navigation.navigate('ForgotPassword')}>
+                  <Text style={styles.fp}>I forgot my password</Text>
+                </TouchableOpacity>
+              </View>
+            </View>
+          </View>
+        </ScrollView>
+        <View style={styles.buttonContainer}>
+          <Buttons
+            title="Log In"
+            disabled={
+              !formik.values.email ||
+              !formik.values.password ||
+              Object.keys(formik.errors).length > 0 ||
+              formik.isSubmitting
+            }
+            onPress={handleSubmit}
+            onPress2={() => navigation.navigate('CreateAccount')}
+            buttonStyle={undefined}
+            textStyle={undefined}
+            text="Don't have an account?"
+            text2="Sign Up"
+          />
+        </View>
+      </FormMainContainer>
+
+
+      {showErrorMsg ? (
+        <Modal
+          visible={showErrorMsg}
+          title="OOpps"
+          description={`${errorMsg}`}
+          buttonText="Ok"
+          onButtonPress={toggleErrorModal}
+        />
+      ): null }
+      </>
+    );
 };
 
 export default SignIn;

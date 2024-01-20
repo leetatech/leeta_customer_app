@@ -25,6 +25,27 @@ const createStyles = () =>
       paddingTop: 15,
       textDecorationLine: 'underline',
     },
+    modal_description_container: {
+      justifyContent: 'center',
+      alignItems: 'center',
+      letterSpacing: 30,
+    },
+    modal_content_title: {
+      fontSize: 20,
+      fontWeight: 'bold',
+      color: colors.BLACK,
+      paddingTop: 20,
+    },
+    modal_content_description: {
+      fontSize: 12,
+      fontWeight: '400',
+      color: colors.GRAY,
+      textAlign: 'center',
+      paddingTop: 10,
+    },
+    modal_btn_container: {
+      marginTop: 30,
+    },
   });
 
 export default createStyles;

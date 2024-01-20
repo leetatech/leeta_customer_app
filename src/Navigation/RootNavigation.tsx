@@ -15,6 +15,7 @@ import {
   PasswordCreated,
   MarketPlace,
 } from '../Screens';
+import BottomNavigator from './BottomTab';
 
 type IProps = {
   defaultRoute: string;
@@ -50,7 +51,7 @@ export default function RootNavigation({defaultRoute}: IProps) {
               options={screenDefaultOptions}
             />
              <RootStack.Screen
-              name="Otp"
+              name="OTPInput"
               component={Otp}
               options={screenDefaultOptions}
             />
@@ -85,6 +86,11 @@ export default function RootNavigation({defaultRoute}: IProps) {
               options={screenDefaultOptions}
             />
           </RootStack.Group>
+          <RootStack.Screen
+            name="BottomNavigator"
+            component={BottomNavigator}
+            options={screenDefaultOptions}
+          />
         </RootStack.Navigator>
       )}
     </>

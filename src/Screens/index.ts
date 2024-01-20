@@ -7,4 +7,5 @@ export {default as MarketPlace} from './MarketPlace/MarketPlace';
 export {default as ForgotPassword} from './ForgotPassword/ForgotPassword';
 export {default as CreateNewPassword} from './CreateNewPassword/CreateNewPassword';
 export {default as PasswordCreated} from './PasswordCreated/PasswordCreated';
+export {default as DashboardLayout} from './DashboardLayout/DashboardLayout';
 
