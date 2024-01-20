@@ -35,7 +35,7 @@ const CreateAccount: FC<IProps> = ({navigation}) => {
   const [isAccountCreated, setIsAccountCreated] = useState(false);
   const [isAccountNotCreated, setIsAccountNotCreated] = useState(false);
   const dispatch = useDispatch();
-  let {loading, message, error, userData, errorCode} = useSelector(
+  let {loading, error, userData, errorCode} = useSelector(
 
     (state: RootState) => state.user,
   );
@@ -92,6 +92,7 @@ const CreateAccount: FC<IProps> = ({navigation}) => {
 
   useEffect(() => {
     const storeToken = async () => {
+      console.log(errorCode)
       if (error && errorCode) {
         setDisplayErrorMsg(true);
         switch (errorCode) {
@@ -155,9 +156,6 @@ const CreateAccount: FC<IProps> = ({navigation}) => {
   return (
     <>
       <FormMainContainer>
-        <TouchableOpacity onPress={navigation.goBack}>
-          <Image source={NAVIGATION_ARROW} />
-        </TouchableOpacity>
         {loading && <CustomLoader />}
         <FormTexts
           bigText="Create an account"

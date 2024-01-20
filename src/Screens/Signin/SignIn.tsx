@@ -19,6 +19,7 @@ import {RootState} from '../../redux/rootReducer';
 import CustomModal from '../../Components/Modal/CustomModal';
 import CustomLoader from '../../Components/Loader/CustomLoader';
 import { appUserType } from '../../config';
+import {resetUserState} from '../../redux/slices/auth/userSlice';
 import { applicationErrorCode } from '../../errors';
 
 interface IProps {
@@ -31,6 +32,7 @@ const SignIn: FC<IProps> = ({navigation}) => {
   const [showErrorMsg, setShowErrorMsg] = useState(false); //
   const [errorMsg, setErrorMsg] = useState('');
   const [userNotVerified, setUserNotVerified] = useState(false);
+  const [invalidSigninApp, toggleInvalidSign] = useState(false);
   let {loading, errorCode, error, userData} = useSelector(
     (state: RootState) => state.user,
   );
@@ -71,32 +73,39 @@ const SignIn: FC<IProps> = ({navigation}) => {
   };
 
   const toggleErrorModal = () => {
-    setUserNotVerified(true);
-    navigation.navigate('OTPInput');
+    if (userNotVerified) {
+      navigation.navigate('OTPInput');
+    }
+    dispatch(resetUserState());
+    setShowErrorMsg(false)
   };
+  
 
   useEffect(() => {
     if (error && errorCode) {
       console.log(errorCode)
-      // TODO: handle more signup error edge cases
+      // TODO: handle more signin error edge cases
       switch (errorCode) {
         case applicationErrorCode.InvalidUserRoleError:
-          setErrorMsg("You are logging into the wrong LEETA app. kindly sign in with the LEETA Vendor app");
+        case applicationErrorCode.UserCategoryError:
+          setErrorMsg("You are trying to log into the wrong LEETA app. kindly sign in with the LEETA Vendor app");
+          break;
+        case applicationErrorCode.CredentialsValidationError:
+        case applicationErrorCode.UserNotFoundError:
+          setErrorMsg("invalid email or password");
           break;
         default:
-          setErrorMsg("An error has occurred while trying to sign up. Kindly try again shortly.");
+          setErrorMsg("An error has occurred while trying to sign in. Kindly try again shortly.");
           break;
       }
-
       setShowErrorMsg(true);
-      setTimeout(() => {
-        setShowErrorMsg(false);
-        formik.resetForm();
-      }, 5000);
     } else if (!error && Object.keys(userData).length > 0) {
       formik.resetForm();
       const body = (userData as any).body;
+      console.log(body)
       if(body && typeof body.email === 'object' && body.email.verified === false) {
+        setUserNotVerified(true);
+        setShowErrorMsg(true);
         setErrorMsg("Your email is not verified. Kindly check email for OTP for email verification");
       }else if(body && typeof body.email === 'object' && body.email.verified === true) {
         navigation.navigate('BottomNavigator');
@@ -142,9 +151,6 @@ const SignIn: FC<IProps> = ({navigation}) => {
   return (
     <>
       <FormMainContainer>
-        <TouchableOpacity onPress={navigation.goBack}>
-          <Image source={NAVIGATION_ARROW} />
-        </TouchableOpacity>
         {loading && <CustomLoader />}
         <FormTexts
           bigText="Welcome Back"
@@ -224,7 +230,7 @@ const SignIn: FC<IProps> = ({navigation}) => {
 
       {showErrorMsg ? (
         <Modal
-          visible={userNotVerified}
+          visible={showErrorMsg}
           title="OOpps"
           description={`${errorMsg}`}
           buttonText="Ok"

@@ -14,7 +14,7 @@ interface UserState {
 const initialState: UserState = {
   userData: {},
   loading: false,
-  error: false  ,
+  error: false,
   message:"",
   userEmail:null,
   errorCode: 0, 
@@ -46,7 +46,7 @@ export const userSlice = createSlice({
       .addCase(signup.rejected, (state, action: PayloadAction<any> ) => {
         state.loading = false;
         state.error = true;
-        state.errorCode = (action.payload?.data?.error_code || "unknown");
+        state.errorCode = (action.payload?.data?.error_code || 0);
       })
 
       //verify otp slice
@@ -79,7 +79,7 @@ export const userSlice = createSlice({
         state.loading = false;
         state.error = true;
         state.message = action.payload.data.message
-        state.errorCode = (action.payload?.data?.error_code || "unknown")
+        state.errorCode = (action.payload?.data?.error_code || 0)
       })
 
       //forgot password

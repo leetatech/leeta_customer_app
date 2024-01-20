@@ -29,12 +29,17 @@ You need to have the following technologies setup on you locan environment
 
 - Clone the github repository:
     ```
-    git clone git@github.com:leetatech/leeta_vendor_mobile.git
+    git clone git@github.com:leetatech/leeta_customer_app.git
     ```
 
 - Install application
     ```
-    cd leeta_vendor_mobile && npm install 
+    cd leeta_customer_app && npm install 
+    ```
+
+- Install cocoapods
+    ```
+    sudo gem install cocoapods
     ```
 
 - Install ios pod 

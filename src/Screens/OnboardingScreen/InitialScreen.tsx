@@ -2,7 +2,6 @@ import React, {FC, useEffect, useMemo} from 'react';
 import {View, Image, Text} from 'react-native';
 import createStyles from './styles';
 import {NavigationProp, ParamListBase} from '@react-navigation/native';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import {LOGO} from '../../Assets';
 
 interface IProps {
@@ -22,7 +21,10 @@ const InitialScreen: FC<IProps> = ({navigation}) => {
   //   }
   // };
   const navigateToSignUp = () => {
-    navigation.navigate('CreateAccount');
+    navigation.reset({
+      index: 0, 
+      routes: [{name: "SignIn"}]
+    });
   };
   useEffect(() => {
     setTimeout(navigateToSignUp, 2000);
