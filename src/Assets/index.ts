@@ -5,6 +5,7 @@ const HAPPY_MAN = require('./Images/happy_man.png');
 const NAVIGATION_ARROW = require('./Images/back_button.png');
 const SHOPPING_CART = require('./Images/shopping_cart.png');
 const SETTINGS = require('./Images/settings.png');
+const OTPIMAGE = require('./Images/grouped_otpscreen_image.png');
 const DASHBOARD = require('./Images/home-04.png');
 
 
@@ -15,6 +16,7 @@ export {
   HAPPY_MAN,
   NAVIGATION_ARROW,
   SHOPPING_CART,
+  OTPIMAGE,
   SETTINGS,
   DASHBOARD
 };

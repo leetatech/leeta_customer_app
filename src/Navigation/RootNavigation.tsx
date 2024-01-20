@@ -7,7 +7,7 @@ import Slider from '../Screens/OnboardingScreen/Slider/Slider';
 import { 
   InitialScreen,
   CreateAccount, 
-  Otp, 
+  OTPInput, 
   ForgotPassword, 
   EmailVerification, 
   SignIn, 
@@ -52,7 +52,7 @@ export default function RootNavigation({defaultRoute}: IProps) {
             />
              <RootStack.Screen
               name="OTPInput"
-              component={Otp}
+              component={OTPInput}
               options={screenDefaultOptions}
             />
              <RootStack.Screen

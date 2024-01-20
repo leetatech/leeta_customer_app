@@ -66,14 +66,14 @@ const ForgotPassword: FC<IProps> = ({navigation}) => {
           // Convert to integer
           const errorCode: number = parseInt(errorCodeString, 10);
           setShowErrorMsg(true);
-            switch (errorCode) {
-              case applicationErrorCode.UserNotFoundError:
-                setErrorMsg("This email does not exist");
-                break;
-              default:
-                setErrorMsg("Unknown error has occurred while trying to reset your email. Kindly try again shortly.");
-                break;
-            }
+          switch (errorCode) {
+            case applicationErrorCode.UserNotFoundError:
+              setErrorMsg("This email does not exist");
+              break;
+            default:
+              setErrorMsg("Unknown error has occurred while trying to reset your email. Kindly try again shortly.");
+              break;
+          }
           
         }
       })
