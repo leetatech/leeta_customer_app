@@ -11,8 +11,13 @@ import Buttons from '../../Components/Buttons/Buttons';
 import {colors} from '../../Constants/Colors';
 import {useFormik} from 'formik';
 import * as Yup from 'yup';
+import {useDispatch, useSelector} from 'react-redux';
+import {RootState} from '../../redux/rootReducer';
+import {forgotPassword} from '../../redux/slices/auth/userServices';
+import CustomLoader from '../../Components/Loader/CustomLoader';
 import CustomToast from '../../Components/Toast/CustomToast';
-import {NAVIGATION_ICON} from '../../Assets/svgImages';
+import { setemail } from '../../redux/slices/auth/userSlice';
+import { applicationErrorCode } from '../../errors';
 
 interface IProps {
   navigation: NavigationProp<ParamListBase>;
@@ -22,6 +27,8 @@ const ForgotPassword: FC<IProps> = ({navigation}) => {
   const styles = useMemo(() => createStyles(), []);
   const [showErrorMsg, setShowErrorMsg] = useState(false);
   const [errorMsg, setErrorMsg] = useState('');
+  let {loading, message, errorCode} = useSelector((state: RootState) => state.user);
+  const dispatch = useDispatch();
   const toggleErrMsg = () => {
     setShowErrorMsg(false);
   };
@@ -38,16 +45,47 @@ const ForgotPassword: FC<IProps> = ({navigation}) => {
     enableReinitialize: false,
     onSubmit: () => {},
   });
-  
+
   const handleForgotPassword = async () => {
-    console.log("forgot password");
-    navigation.navigate('Otp');
+    const payload = {
+      email: formik.values.email,
+    };
+    dispatch(setemail(formik.values.email));
+    dispatch(forgotPassword(payload))
+      .then(response => {
+        const result = response.payload as unknown as Record<
+          string,
+          Record<string, string>
+        >;
+        if (response && result && result.data.success) {
+          navigation.navigate('OTPInput', {screenId: 'ForgotPassword'});
+        } else {
+          console.log(result.data.error_code)
+          const errorCodeString: string = result.data.error_code;
+
+          // Convert to integer
+          const errorCode: number = parseInt(errorCodeString, 10);
+          setShowErrorMsg(true);
+            switch (errorCode) {
+              case applicationErrorCode.UserNotFoundError:
+                setErrorMsg("This email does not exist");
+                break;
+              default:
+                setErrorMsg("Unknown error has occurred while trying to reset your email. Kindly try again shortly.");
+                break;
+            }
+          
+        }
+      })
+      .catch(error => {
+        console.error('Error:', error);
+      });
   };
 
   return (
     <FormMainContainer>
       <TouchableOpacity onPress={navigation.goBack}>
-        <NAVIGATION_ICON />
+        <Image source={NAVIGATION_ARROW} />
       </TouchableOpacity>
       <FormTexts
         bigText="Forgot Password"
@@ -57,6 +95,7 @@ const ForgotPassword: FC<IProps> = ({navigation}) => {
         <View style={styles.mainContainer}>
           <View style={styles.container}>
             <View>
+              {loading && <CustomLoader />}
 
               <StyledTextInput
                 label="Email address"
@@ -94,7 +133,7 @@ const ForgotPassword: FC<IProps> = ({navigation}) => {
           <Text>{errorMsg}</Text>
         </CustomToast>
       )}
-      </FormMainContainer>
+    </FormMainContainer>
   );
 };
 
