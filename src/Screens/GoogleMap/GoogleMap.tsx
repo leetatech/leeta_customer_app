@@ -1,5 +1,6 @@
 import React, {FC, useEffect, useState} from 'react';
 import {
+  Alert,
   PermissionsAndroid,
   Platform,
   StyleSheet,
@@ -11,8 +12,8 @@ import GetLocation from 'react-native-get-location';
 import Geolocation from '@react-native-community/geolocation';
 
 interface UserLocation {
-  latitude: number | null;
-  longitude: number | null;
+  latitude: number;
+  longitude: number;
 }
 
 const styles = StyleSheet.create({
@@ -66,16 +67,16 @@ const locationMarkerLists = [
 
 const GoogleMap: FC = () => {
   const [userLocation, setUserLocation] = useState<UserLocation>({
-    latitude: null,
-    longitude: null,
+    latitude: 0,
+    longitude: 0,
   });
 
   useEffect(() => {
-    getLocationPermission();
+    getUserPermission();
   }, []);
 
   //Get user permission
-  const getLocationPermission = async () => {
+  const getUserPermission = async () => {
     if (Platform.OS === 'android') {
       try {
         const granted = await PermissionsAndroid.request(
@@ -96,7 +97,8 @@ const GoogleMap: FC = () => {
       } catch (err) {
         console.warn(err);
       }
-    } else if (Platform.OS === 'ios') {
+    }
+    if (Platform.OS === 'ios') {
       Geolocation.setRNConfiguration({
         authorizationLevel: 'whenInUse',
         skipPermissionRequests: false,
@@ -104,24 +106,27 @@ const GoogleMap: FC = () => {
       Geolocation.requestAuthorization();
       Geolocation.getCurrentPosition(
         position => {
-          const { latitude, longitude } = position.coords;
-          console.log('LATITUDE',latitude, 'longitude', longitude)
-          setUserLocation({ latitude, longitude });
+          const {latitude, longitude} = position.coords;
+          setUserLocation({latitude, longitude});
         },
         error => {
           switch (error.code) {
             case 1:
-              console.log('Permission denied');
+              Alert.alert(
+                'Please grant location permission to use this feature.',
+              );
               break;
             case 2:
-              console.log('Position unavailable');
+              Alert.alert(
+                'Unable to determine your location. Please check your GPS settings.',
+              );
               break;
             case 3:
-              console.log('Timeout');
+              Alert.alert('Location request timed out. Please try again.');
               break;
           }
-        }
-      )      
+        },
+      );
     }
   };
 
@@ -145,8 +150,8 @@ const GoogleMap: FC = () => {
         provider={PROVIDER_GOOGLE}
         style={styles.map}
         region={{
-          latitude: 6.614308,
-          longitude: 3.347376195632642,
+          latitude: userLocation?.latitude || 6.614308,
+          longitude: userLocation.longitude || 3.347376195632642,
           latitudeDelta: 0.015,
           longitudeDelta: 0.0121,
         }}
@@ -156,8 +161,8 @@ const GoogleMap: FC = () => {
         zoomEnabled={true}>
         <Marker
           coordinate={{
-            latitude: userLocation.latitude || 0,
-            longitude: userLocation.longitude || 0,
+            latitude: userLocation.latitude,
+            longitude: userLocation.longitude,
           }}>
           <CustomCustomerLocationMarker />
         </Marker>
