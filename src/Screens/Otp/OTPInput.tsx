@@ -1,6 +1,6 @@
 import React, {FC, useMemo, useState, useEffect} from 'react';
 import {Text, View, Image, TouchableOpacity} from 'react-native';
-import {IOTPInputProps} from './OTPInputPropsType';
+import { IOTPInputProps } from './OTPInputPropsType';
 import createStyles from './styles';
 import FormMainContainer from '../../Components/FormMainContainer/FormMainContainer';
 import {NAVIGATION_ARROW, OTPIMAGE} from '../../Assets';
