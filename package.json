@@ -13,6 +13,7 @@
   "dependencies": {
     "@react-native-async-storage/async-storage": "^1.21.0",
     "@react-native-community/clipboard": "^1.5.1",
+    "@react-native-community/geolocation": "^3.1.0",
     "@react-navigation/bottom-tabs": "^6.0.9",
     "@react-navigation/drawer": "^6.4.4",
     "@react-navigation/native": "^6.1.6",
@@ -27,7 +28,10 @@
     "react-native-app-intro-slider": "^4.0.4",
     "react-native-bouncy-checkbox": "^3.0.7",
     "react-native-config": "^1.5.1",
+    "react-native-geolocation-service": "^5.3.1",
     "react-native-gesture-handler": "^1.10.3",
+    "react-native-get-location": "^4.0.1",
+    "react-native-google-places-autocomplete": "^2.5.6",
     "react-native-maps": "^1.10.0",
     "react-native-modal": "^13.0.1",
     "react-native-otp-entry": "^1.2.0",
