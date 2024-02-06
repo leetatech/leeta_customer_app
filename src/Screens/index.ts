@@ -1,6 +1,6 @@
 export {default as InitialScreen} from './OnboardingScreen/InitialScreen';
 export {default as CreateAccount} from './CreateAccount/CreateAccount';
-export {default as OTPInput} from './Otp/OTPInput';
+export {default as OTPInput} from './OTP/OTPInput';
 export {default as EmailVerification} from './EmailVerification/EmailVerification';
 export {default as SignIn} from './Signin/SignIn';
 export {default as MarketPlace} from './MarketPlace/MarketPlace';
