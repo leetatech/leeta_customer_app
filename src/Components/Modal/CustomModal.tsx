@@ -32,7 +32,7 @@ const CustomModal: FC<CustomModalProps> = ({visible, children}) => {
     <View>
       <Modal isVisible={visible} propagateSwipe={true} style={styles.modal}>
         <KeyboardAvoidingView
-          behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+          behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
           style={styles.container}>
           <View style={styles.children_container}>{children}</View>
         </KeyboardAvoidingView>
