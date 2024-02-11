@@ -11,7 +11,6 @@ interface ExtraInputProps {
   helperText: string;
   inputStyle?: StyleProp<ViewStyle>;
   onFocus?: () => void,
-  onBlur?: () => void,
 }
 
 export type InputProps = TextInputProps & ExtraInputProps;
