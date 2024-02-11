@@ -1,14 +1,7 @@
-import React, {FC,  useMemo, useRef, useState} from 'react';
+import React, {FC, useMemo, useRef, useState} from 'react';
 import {NavigationProp, ParamListBase} from '@react-navigation/native';
 import GoogleMap from '../GoogleMap/GoogleMap';
-import {
-  View,
-  Text,
-  KeyboardAvoidingView,
-  Platform,
-  TextInput,
-  ScrollView,
-} from 'react-native';
+import {View, Text, TextInput} from 'react-native';
 import createStyles from './style';
 import Buttons from '../../Components/Buttons/Buttons';
 import CustomModal from '../../Components/Modal/CustomModal';
@@ -16,6 +9,7 @@ import {SvgIcon} from '../../Components/icons';
 import {TouchableOpacity} from 'react-native-gesture-handler';
 import {CANCEL_ICON} from '../../Assets/svgImages';
 import {colors} from '../../Constants/Colors';
+import KeyboardAvoidingContainer from '../../Components/KeyboardAvoidingContainer';
 
 interface IProps {
   navigation: NavigationProp<ParamListBase>;
@@ -30,7 +24,6 @@ const Home: FC<IProps> = ({navigation}) => {
   const inputRef = useRef<TextInput>(null);
 
   const focusInput = () => {
-    console.log('INPUTREF', inputRef);
     if (inputRef.current) {
       inputRef.current.focus();
     }
@@ -50,21 +43,18 @@ const Home: FC<IProps> = ({navigation}) => {
   };
 
   return (
-    <View style={styles.mainContainer}>
-      <GoogleMap />
-      <View style={styles.button_container}>
-        <Buttons
-          title="Gas refill"
-          disabled={false}
-          buttonStyle={undefined}
-          textStyle={undefined}
-          onPress={handleOpenWeightOptions}
-        />
-      </View>
-      <ScrollView style={{flex: 1}}>
-        <KeyboardAvoidingView
-          behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-          style={{flex: 1}}>
+    <KeyboardAvoidingContainer>
+      <View style={styles.mainContainer}>
+        <GoogleMap />
+        <View style={styles.button_container}>
+          <Buttons
+            title="Gas refill"
+            disabled={false}
+            buttonStyle={undefined}
+            textStyle={undefined}
+            onPress={handleOpenWeightOptions}
+          />
+        </View>
           <CustomModal visible={openGasWeightOptions}>
             <View style={styles.modal_actions}>
               <TouchableOpacity
@@ -75,7 +65,6 @@ const Home: FC<IProps> = ({navigation}) => {
                   pathData="M10.75 4.75C10.75 4.33579 10.4142 4 10 4C9.58579 4 9.25 4.33579 9.25 4.75V9.25H4.75C4.33579 9.25 4 9.58579 4 10C4 10.4142 4.33579 10.75 4.75 10.75L9.25 10.75V15.25C9.25 15.6642 9.58579 16 10 16C10.4142 16 10.75 15.6642 10.75 15.25V10.75L15.25 10.75C15.6642 10.75 16 10.4142 16 10C16 9.58579 15.6642 9.25 15.25 9.25H10.75V4.75Z"
                 />
               </TouchableOpacity>
-
               <Text style={styles.text_color}>
                 {inputWeight ? 'Input Weight' : 'Select Weight'}
               </Text>
@@ -85,18 +74,18 @@ const Home: FC<IProps> = ({navigation}) => {
             </View>
             {inputWeight ? (
               <View style={styles.input_weight_container}>
-                <View>
-                  <TouchableOpacity
-                    style={styles.input_weight_and_unit_container}
-                    onPress={focusInput}>
-                    <TextInput
-                      placeholderTextColor={colors.LGRAY}
-                      ref={inputRef}
-                      style={styles.input_style}
-                    />
-                    <Text style={styles.unit}>Kg</Text>
-                  </TouchableOpacity>
-                </View>
+                <TouchableOpacity
+                  style={styles.input_weight_and_unit_container}
+                  onPress={focusInput}>
+                  <TextInput
+                    placeholderTextColor={colors.LGRAY}
+                    ref={inputRef}
+                    style={styles.input_style}
+                  />
+
+                  <Text style={styles.unit}>Kg</Text>
+                </TouchableOpacity>
+
                 <Buttons
                   title="Continue"
                   disabled={false}
@@ -119,10 +108,9 @@ const Home: FC<IProps> = ({navigation}) => {
               </View>
             )}
           </CustomModal>
-          <View style={{height: 30}} />
-        </KeyboardAvoidingView>
-      </ScrollView>
-    </View>
+        <View />
+      </View>
+    </KeyboardAvoidingContainer>
   );
 };
 export default Home;
