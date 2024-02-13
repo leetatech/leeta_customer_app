@@ -21,7 +21,8 @@ const styles = StyleSheet.create({
     ...StyleSheet.absoluteFillObject,
     justifyContent: 'flex-end',
     alignItems: 'center',
-  },
+// flex:1 
+ },
   map: {
     ...StyleSheet.absoluteFillObject,
   },

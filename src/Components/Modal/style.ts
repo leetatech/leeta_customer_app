@@ -4,17 +4,13 @@ import {colors} from '../../Constants/Colors';
 const createStyles = () =>
   StyleSheet.create({
     container: {
+      flex: 1, justifyContent: 'flex-end'
+    },
+    children_container:{
       backgroundColor: colors.WHITE,
-      paddingHorizontal: 15,
-      paddingVertical: 15,
-      paddingTop: 20,
-      borderTopRightRadius: 10,
       borderTopLeftRadius: 10,
-      position: 'absolute',
-      bottom: 0,
-      left: 0,
-      right: 0,
-      width: '100%',
+      borderTopRightRadius: 10,
+      padding: 20,
     },
     modal: {
       flex: 1,
