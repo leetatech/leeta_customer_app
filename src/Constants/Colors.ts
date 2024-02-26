@@ -18,6 +18,7 @@ export interface ColorValues {
   TRANSPARENT: string;
   LEMON:string;
   LYELLOW: string;
+  SUCCESS: string;
 }
 
 export const colors: ColorValues = {
@@ -39,7 +40,8 @@ export const colors: ColorValues = {
   TRANSPARENT: "transparent",
   LEMON:"#3EAF3F",
   LRED:"#FFFAFB",
-  LYELLOW:"#FFF6DC"
+  LYELLOW:"#FFF6DC",
+  SUCCESS:"#00ff00"
 
 
 };

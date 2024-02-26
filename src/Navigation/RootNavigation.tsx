@@ -14,6 +14,7 @@ import {
   CreateNewPassword,
   PasswordCreated,
   MarketPlace,
+  Cart,
 } from '../Screens';
 import BottomNavigator from './BottomTab';
 
@@ -83,6 +84,11 @@ export default function RootNavigation({defaultRoute}: IProps) {
              <RootStack.Screen
               name="MarketPlace"
               component={MarketPlace}
+              options={screenDefaultOptions}
+            />
+             <RootStack.Screen
+              name="Cart"
+              component={Cart}
               options={screenDefaultOptions}
             />
           </RootStack.Group>
