@@ -9,4 +9,5 @@ export {default as CreateNewPassword} from './CreateNewPassword/CreateNewPasswor
 export {default as PasswordCreated} from './PasswordCreated/PasswordCreated';
 export {default as DashboardLayout} from './DashboardLayout/DashboardLayout';
 export {default as Home} from './Home/Home';
+export {default as Cart} from './Cart/Cart';
 
