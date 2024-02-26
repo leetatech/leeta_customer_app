@@ -7,6 +7,7 @@ const SHOPPING_CART = require('./Images/shopping_cart.png');
 const SETTINGS = require('./Images/settings.png');
 const OTPIMAGE = require('./Images/grouped_otpscreen_image.png');
 const DASHBOARD = require('./Images/home-04.png');
+const LEFT_ARROW = require('./Images/left_arrow.png')
 
 
 export {
@@ -18,5 +19,6 @@ export {
   SHOPPING_CART,
   OTPIMAGE,
   SETTINGS,
-  DASHBOARD
+  DASHBOARD,
+  LEFT_ARROW
 };
