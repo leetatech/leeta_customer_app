@@ -19,10 +19,10 @@ const createStyles = () =>
      alignItems: 'center',
     },
     description: {
-      paddingTop: 20,
       textAlign: 'center',
       color: colors.GRAY,
       fontSize: 17,
+      flex: 1, 
     },
     description_container: {
       paddingVertical: 10,
@@ -31,7 +31,6 @@ const createStyles = () =>
       flexDirection: 'row',
       justifyContent: 'space-between',
       paddingTop: 10,
-
     },
     bold_txt: {
       fontWeight: '800',
@@ -39,8 +38,42 @@ const createStyles = () =>
     gray_txt: {color: colors.GRAY, lineHeight: 20},
     orders_container:{
      flex:1,
-     // height:300
-    }
+     paddingTop:10
+     
+    },
+    navigation_arrow_container: {
+      flexDirection: 'row',
+       alignItems: 'center',
+       paddingVertical: 10
+    },
+    terms_container:{
+      paddingVertical:20,
+      gap: 5
+    },
+    amount_container:{
+      flexDirection:'row',
+       gap:3
+    },
+    cart_item_cta_container :{
+      flexDirection: 'row',
+       gap: 9
+    },
+    modal_container :{
+      backgroundColor:colors.WHITE,
+       paddingHorizontal:15,
+        paddingVertical:15,
+         gap:8
+    },
+    modal_title :{
+      fontSize:20, 
+      fontWeight:'600',
+      color:colors.BLACK
+    },
+     modal_description:{
+      fontSize:18,
+        color:colors.GRAY,
+        paddingTop:10,
+     }
    
   });
 

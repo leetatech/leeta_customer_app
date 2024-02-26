@@ -96,7 +96,7 @@ const Home: FC<IProps> = ({navigation}) => {
               <Buttons
                 title="Continue"
                 disabled={false}
-                buttonStyle={{paddingBottom: 5}}
+                buttonStyle={undefined}
                 textStyle={undefined}
                 onPress={handleNavigation}
               />
