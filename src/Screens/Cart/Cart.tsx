@@ -138,6 +138,7 @@ const Cart: FC<IProps> = ({navigation}) => {
                 disabled={false}
                 textStyle={undefined}
                 buttonStyle={undefined}
+                onPress={()=> navigation.navigate('OrderConfirmation')}
               />
             </View>
           </>
