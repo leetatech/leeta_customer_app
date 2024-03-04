@@ -2,7 +2,9 @@ export interface ColorValues {
   BACKGROUND: string;
   WHITE: string;
   BLACK: string;
+  DGRAY: string;
   GRAY: string;
+  SLGRAY: string;
   LGRAY: string;
   XLGRAY:string;
   XXLGRAY:string;
@@ -25,6 +27,7 @@ export const colors: ColorValues = {
   BACKGROUND: '#F5F5F5',
   WHITE: '#FFFFFF',
   BLACK: '#1D2939',
+  DGRAY:"#454545",
   GRAY: '#475467',
   LGRAY:'#D0D5DD',
   XLGRAY:"#F2F4F7",
@@ -41,7 +44,8 @@ export const colors: ColorValues = {
   LEMON:"#3EAF3F",
   LRED:"#FFFAFB",
   LYELLOW:"#FFF6DC",
-  SUCCESS:"#00ff00"
+  SUCCESS:"#00ff00",
+  SLGRAY : "#828282"
 
 
 };
