@@ -126,7 +126,7 @@ const OrderConfirmation: FC<IProps> = ({ navigation }) => {
             {renderDeliveryAddress()}
             <Fonts type="boldLightGray" style={{paddingTop:15}}>Your Cart</Fonts>
             {orderInformation.map(renderOrder)}
-            <TouchableOpacity>
+            <TouchableOpacity onPress={()=>navigation.navigate('Cart')}>
             <Fonts
               type="boldLightGray"
               style={{ color: colors.ORANGE, textAlign: 'center', paddingVertical: 50 }}>
