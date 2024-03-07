@@ -21,6 +21,7 @@ export interface ColorValues {
   LEMON:string;
   LYELLOW: string;
   SUCCESS: string;
+  LBLUE: string
 }
 
 export const colors: ColorValues = {
@@ -45,7 +46,8 @@ export const colors: ColorValues = {
   LRED:"#FFFAFB",
   LYELLOW:"#FFF6DC",
   SUCCESS:"#00ff00",
-  SLGRAY : "#828282"
+  SLGRAY : "#828282",
+  LBLUE:"#3680F0"
 
 
 };
