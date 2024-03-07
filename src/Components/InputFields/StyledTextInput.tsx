@@ -11,6 +11,7 @@ const StyledTextInput: FC<InputProps> = ({
   errors,
   helperText,
   inputStyle,
+  defaultValueStyle,
   onFocus,
   ...props
 }) => {
@@ -30,6 +31,7 @@ const StyledTextInput: FC<InputProps> = ({
         <TextInput
           onFocus={handleFocus}
           placeholderTextColor={colors.LGRAY}
+          style={defaultValueStyle}
           {...props}
         />
       </View>
