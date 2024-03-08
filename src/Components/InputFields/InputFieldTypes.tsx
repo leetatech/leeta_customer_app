@@ -10,8 +10,10 @@ interface ExtraInputProps {
   icon?: React.ReactNode;
   helperText?: string;
   inputStyle?: StyleProp<ViewStyle>;
+  onFocusStyle?: StyleProp<ViewStyle>;
   defaultValueStyle?: StyleProp<TextStyle>;
   onFocus?: () => void,
+  onBlur?: () => void
 }
 
 export type InputProps = TextInputProps & ExtraInputProps;
