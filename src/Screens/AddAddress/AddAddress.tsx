@@ -10,6 +10,7 @@ import createStyles from './styles';
 import Fontisto from 'react-native-vector-icons/Fontisto';
 import Fonts from '../../Constants/Fonts';
 import {TouchableWithoutFeedback, Keyboard} from 'react-native';
+import { ScrollView } from 'react-native-gesture-handler';
 
 interface IProps {
   navigation: NavigationProp<ParamListBase>;
@@ -39,7 +40,8 @@ const AddAddress: FC<IProps> = ({navigation}) => {
   return (
     <>
       <FormMainContainer>
-        <ScreenTitle screenTitle={screenTitle} onPress={navigation.goBack} />
+      <ScrollView scrollEnabled={true} showsVerticalScrollIndicator={false}>
+      <ScreenTitle screenTitle={screenTitle} onPress={navigation.goBack} />
         <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
           <View>
             <StyledTextInput
@@ -113,6 +115,7 @@ const AddAddress: FC<IProps> = ({navigation}) => {
               }}
               onFocusStyle={{borderBottomColor: colors.ORANGE}}
             />
+            
           </View>
         </TouchableWithoutFeedback>
 
@@ -137,6 +140,9 @@ const AddAddress: FC<IProps> = ({navigation}) => {
             onPress={() => navigation.navigate('OrderConfirmation')}
           />
         </View>
+      </ScrollView>
+
+
       </FormMainContainer>
     </>
   );

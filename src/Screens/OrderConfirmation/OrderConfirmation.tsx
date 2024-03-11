@@ -1,5 +1,5 @@
-import React, {FC, useMemo, useState} from 'react';
-import {TouchableOpacity, View} from 'react-native';
+import React, {FC, useEffect, useMemo, useState} from 'react';
+import {Animated, TouchableOpacity, View} from 'react-native';
 import {NavigationProp, ParamListBase} from '@react-navigation/native';
 import {ScrollView} from 'react-native-gesture-handler';
 import createStyles from './styles';
@@ -42,6 +42,32 @@ const orderInformation = [
 const OrderConfirmation: FC<IProps> = ({navigation}) => {
   const styles = useMemo(() => createStyles(), []);
   const [showModal, setShowModal] = useState(false);
+  const bounceValue = new Animated.Value(1);
+
+  useEffect(() => {
+    const bounceAnimation = Animated.sequence([
+      Animated.timing(bounceValue, {
+        toValue: 1.2,
+        duration: 200,
+        useNativeDriver: false,
+      }),
+      Animated.spring(bounceValue, {
+        toValue: 1,
+        friction: 3,
+        useNativeDriver: false,
+      }),
+    ]);
+
+    Animated.loop(bounceAnimation).start();
+
+    return () => {
+      bounceValue.removeAllListeners();
+    };
+  }, [bounceValue]);
+
+  const animatedStyle = {
+    transform: [{scale: bounceValue}],
+  };
 
   const handleModalVisibility = () => {
     setShowModal(true);
@@ -51,9 +77,9 @@ const OrderConfirmation: FC<IProps> = ({navigation}) => {
   };
 
   const handleNavigateToHomeScreen = () => {
-    setShowModal(false)
-    navigation.navigate('BottomNavigator')
-  }
+    setShowModal(false);
+    navigation.navigate('BottomNavigator');
+  };
 
   const renderPaymentMethod = () => (
     <View>
@@ -193,7 +219,11 @@ const OrderConfirmation: FC<IProps> = ({navigation}) => {
             <CANCEL_ICON />
           </TouchableOpacity>
           <View style={styles.success_msg_container}>
-            <SUCCESS />
+            <View style={styles.iconContainer}>
+              <Animated.View style={[animatedStyle]}>
+                <SUCCESS />
+              </Animated.View>
+            </View>
             <Fonts type="boldBlack" style={{color: colors.LGRAY}}>
               THANKS
             </Fonts>

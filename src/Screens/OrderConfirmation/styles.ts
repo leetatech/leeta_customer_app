@@ -63,6 +63,10 @@ gap:3
   button_container :{
     paddingTop: 15
   },
+   iconContainer: {
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
   });
 
 export default createStyles;
