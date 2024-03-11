@@ -67,6 +67,7 @@ gap:3
     justifyContent: 'center',
     alignItems: 'center',
   },
+
   });
 
 export default createStyles;

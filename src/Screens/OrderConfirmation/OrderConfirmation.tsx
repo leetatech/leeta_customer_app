@@ -19,6 +19,7 @@ import {colors} from '../../Constants/Colors';
 import Buttons from '../../Components/Buttons/Buttons';
 import CustomModal from '../../Components/Modal/CustomModal';
 
+
 interface IProps {
   navigation: NavigationProp<ParamListBase>;
 }
@@ -81,6 +82,7 @@ const OrderConfirmation: FC<IProps> = ({navigation}) => {
     navigation.navigate('BottomNavigator');
   };
 
+
   const renderPaymentMethod = () => (
     <View>
       <Fonts type="boldLightGray">Payment Method</Fonts>
@@ -113,6 +115,7 @@ const OrderConfirmation: FC<IProps> = ({navigation}) => {
           </View>
         </View>
         <TouchableOpacity onPress={() => navigation.navigate('AddAddress')}>
+
           <RIGHT_ICON />
         </TouchableOpacity>
       </View>
@@ -160,6 +163,7 @@ const OrderConfirmation: FC<IProps> = ({navigation}) => {
           </View>
         </View>
       )}
+
     </View>
   );
 
@@ -261,3 +265,4 @@ const OrderConfirmation: FC<IProps> = ({navigation}) => {
 };
 
 export default OrderConfirmation;
+

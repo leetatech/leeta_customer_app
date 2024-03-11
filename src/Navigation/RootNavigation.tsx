@@ -108,6 +108,7 @@ export default function RootNavigation({defaultRoute}: IProps) {
               component={AddAddress}
               options={screenDefaultOptions}
             />
+
           </RootStack.Group>
           <RootStack.Screen
             name="BottomNavigator"
