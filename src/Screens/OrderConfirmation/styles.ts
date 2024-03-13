@@ -49,6 +49,25 @@ gap:3
     terms_container:{
       gap: 5,
     },
+    closeIcon : {
+      position: 'absolute',
+      top: 50, 
+      right: 10,
+    },
+  success_msg_container :{
+    marginTop:30,
+    justifyContent: 'center',
+    alignItems: 'center',
+    gap: 6,
+  },
+  button_container :{
+    paddingTop: 15
+  },
+   iconContainer: {
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+
   });
 
 export default createStyles;

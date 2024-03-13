@@ -1,14 +1,15 @@
 import React, {FC, ReactNode, useEffect, useMemo, useState} from 'react';
-import {Keyboard, KeyboardAvoidingView, Platform, View} from 'react-native';
+import {Keyboard, KeyboardAvoidingView, Platform, StyleProp, ViewStyle,View} from 'react-native';
 import Modal from 'react-native-modal';
 import createStyles from './style';
 
 interface CustomModalProps {
   visible: boolean;
   children: ReactNode;
+  style?:StyleProp<ViewStyle>;
 }
 
-const CustomModal: FC<CustomModalProps> = ({visible, children}) => {
+const CustomModal: FC<CustomModalProps> = ({visible, children,style}) => {
   const styles = useMemo(() => createStyles(), []);
   const [modalPosition, setModalPosition] = useState('bottom');
 
@@ -34,7 +35,7 @@ const CustomModal: FC<CustomModalProps> = ({visible, children}) => {
         <KeyboardAvoidingView
           behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
           style={styles.container}>
-          <View style={styles.children_container}>{children}</View>
+          <View style={[styles.children_container, style]}>{children}</View>
         </KeyboardAvoidingView>
       </Modal>
     </View>

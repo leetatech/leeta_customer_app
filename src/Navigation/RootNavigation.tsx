@@ -16,6 +16,7 @@ import {
   MarketPlace,
   Cart,
   OrderConfirmation,
+  AddAddress,
 } from '../Screens';
 import BottomNavigator from './BottomTab';
 
@@ -37,9 +38,14 @@ export default function RootNavigation({defaultRoute}: IProps) {
       {!!initialRouteName && (
         <RootStack.Navigator initialRouteName={initialRouteName}>
           <RootStack.Group>
-            <RootStack.Screen
+            {/* <RootStack.Screen
               name="InitialScreen"
               component={InitialScreen}
+              options={screenDefaultOptions}
+            /> */}
+              <RootStack.Screen
+              name="InitialScreen"
+              component={BottomNavigator}
               options={screenDefaultOptions}
             />
             <RootStack.Screen
@@ -97,6 +103,12 @@ export default function RootNavigation({defaultRoute}: IProps) {
               component={OrderConfirmation}
               options={screenDefaultOptions}
             />
+              <RootStack.Screen
+              name="AddAddress"
+              component={AddAddress}
+              options={screenDefaultOptions}
+            />
+
           </RootStack.Group>
           <RootStack.Screen
             name="BottomNavigator"
