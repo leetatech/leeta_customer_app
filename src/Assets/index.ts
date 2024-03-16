@@ -8,6 +8,9 @@ const SETTINGS = require('./Images/settings.png');
 const OTPIMAGE = require('./Images/grouped_otpscreen_image.png');
 const DASHBOARD = require('./Images/home-04.png');
 const LEFT_ARROW = require('./Images/left_arrow.png')
+const DOWNLOAD_ICON = require ('./Images/download_icon.png')
+const EMAIL_ICON = require('./Images/email_icon.png')
+const BACKGROUND_IMAGE = require('./Images/background_image.png')
 
 
 export {
@@ -20,5 +23,8 @@ export {
   OTPIMAGE,
   SETTINGS,
   DASHBOARD,
-  LEFT_ARROW
+  LEFT_ARROW,
+  DOWNLOAD_ICON,
+  EMAIL_ICON,
+  BACKGROUND_IMAGE
 };
