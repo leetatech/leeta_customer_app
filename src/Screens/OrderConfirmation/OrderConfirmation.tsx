@@ -18,6 +18,7 @@ import Fonts from '../../Constants/Fonts';
 import {colors} from '../../Constants/Colors';
 import Buttons from '../../Components/Buttons/Buttons';
 import CustomModal from '../../Components/Modal/CustomModal';
+import {Receipt} from '../../Components/Receipt/Receipt';
 
 interface IProps {
   navigation: NavigationProp<ParamListBase>;
@@ -43,6 +44,15 @@ const OrderConfirmation: FC<IProps> = ({navigation}) => {
   const styles = useMemo(() => createStyles(), []);
   const [showModal, setShowModal] = useState(false);
   const bounceValue = new Animated.Value(1);
+  const [viewReceipt, setViewReceipt] = useState(false);
+
+  const handleViewReceipt = () => {
+    setViewReceipt(true);
+  };
+  const handleCloseReceipt = () => {
+    setShowModal(false);
+    setViewReceipt(false);
+  };
 
   useEffect(() => {
     const bounceAnimation = Animated.sequence([
@@ -213,48 +223,66 @@ const OrderConfirmation: FC<IProps> = ({navigation}) => {
           </View>
         </ScrollView>
       </FormMainContainer>
-      <CustomModal visible={showModal} style={{flex: 1}}>
-        <FormMainContainer>
-          <TouchableOpacity onPress={handleCloseModal} style={styles.closeIcon}>
-            <CANCEL_ICON />
-          </TouchableOpacity>
-          <View style={styles.success_msg_container}>
-            <View style={styles.iconContainer}>
-              <Animated.View style={[animatedStyle]}>
-                <SUCCESS />
-              </Animated.View>
+      <CustomModal visible={showModal} style={styles.modal_container}>
+        {viewReceipt && (
+          <>
+            <View style={[styles.close_container]}>
+              <Fonts
+                type="boldBlack"
+                style={{color: colors.DBLACK, fontSize: 25}}>
+                Receipt
+              </Fonts>
+              <TouchableOpacity onPress={handleCloseReceipt}>
+                <CANCEL_ICON />
+              </TouchableOpacity>
             </View>
-            <Fonts type="boldBlack" style={{color: colors.LGRAY}}>
-              THANKS
-            </Fonts>
-            <Fonts
-              type="normalGrayText"
-              style={{color: colors.LGRAY, letterSpacing: 4}}>
-              YOUR REFILL IS ON THE WAY
-            </Fonts>
-          </View>
-          <View style={styles.button_container}>
-            <Buttons
-              title="Back To Homescreen"
-              disabled={false}
-              buttonStyle={undefined}
-              textStyle={{fontSize: 17}}
-              onPress={handleNavigateToHomeScreen}
-            />
-            <Buttons
-              title="View Receipt"
-              disabled={false}
-              buttonStyle={{
-                backgroundColor: 'transparent',
-                borderWidth: 1,
-                borderColor: colors.ORANGE,
-                width: '100%',
-              }}
-              textStyle={{color: colors.ORANGE, fontSize: 17}}
-              onPress={handleModalVisibility}
-            />
-          </View>
-        </FormMainContainer>
+            <ScrollView
+              scrollEnabled={true}
+              showsVerticalScrollIndicator={false}>
+              <Receipt />
+            </ScrollView>
+          </>
+        )}
+        {!viewReceipt && (
+          <FormMainContainer>
+            <TouchableOpacity
+              onPress={handleCloseModal}
+              style={styles.close_icon}>
+              <CANCEL_ICON />
+            </TouchableOpacity>
+            <View style={styles.success_msg_container}>
+              <View style={styles.iconContainer}>
+                <Animated.View style={[animatedStyle]}>
+                  <SUCCESS />
+                </Animated.View>
+              </View>
+              <Fonts type="boldBlack" style={styles.refill_msg}>
+                THANKS
+              </Fonts>
+              <Fonts
+                type="normalGrayText"
+                style={[styles.refill_msg, styles.letter_spacing]}>
+                YOUR REFILL IS ON THE WAY
+              </Fonts>
+            </View>
+            <View style={styles.button_container}>
+              <Buttons
+                title="Back To Homescreen"
+                disabled={false}
+                buttonStyle={undefined}
+                textStyle={{fontSize: 17}}
+                onPress={handleNavigateToHomeScreen}
+              />
+              <Buttons
+                title="View Receipt"
+                disabled={false}
+                buttonStyle={styles.view_receipt_btn}
+                textStyle={styles.view_receipt_text}
+                onPress={handleViewReceipt}
+              />
+            </View>
+          </FormMainContainer>
+        )}
       </CustomModal>
     </>
   );
