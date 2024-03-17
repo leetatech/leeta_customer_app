@@ -8,6 +8,7 @@ const createStyles = () =>
     },
     text_spacing: {
       gap: 3,
+
     },
     checkbox_container: {
       flexDirection: 'row',
@@ -39,6 +40,7 @@ const createStyles = () =>
     },
     order_summary_container: {
       paddingTop: 20,
+
     },
     action: {
       flexDirection: 'row',
@@ -93,6 +95,7 @@ const createStyles = () =>
       color: colors.ORANGE,
       fontSize: 17,
     },
+
   });
 
 export default createStyles;

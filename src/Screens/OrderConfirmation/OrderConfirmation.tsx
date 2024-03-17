@@ -20,6 +20,7 @@ import Buttons from '../../Components/Buttons/Buttons';
 import CustomModal from '../../Components/Modal/CustomModal';
 import {Receipt} from '../../Components/Receipt/Receipt';
 
+
 interface IProps {
   navigation: NavigationProp<ParamListBase>;
 }
@@ -53,6 +54,7 @@ const OrderConfirmation: FC<IProps> = ({navigation}) => {
     setShowModal(false);
     setViewReceipt(false);
   };
+
 
   useEffect(() => {
     const bounceAnimation = Animated.sequence([
@@ -123,6 +125,7 @@ const OrderConfirmation: FC<IProps> = ({navigation}) => {
           </View>
         </View>
         <TouchableOpacity onPress={() => navigation.navigate('AddAddress')}>
+
           <RIGHT_ICON />
         </TouchableOpacity>
       </View>
@@ -170,6 +173,7 @@ const OrderConfirmation: FC<IProps> = ({navigation}) => {
           </View>
         </View>
       )}
+
     </View>
   );
 
@@ -283,9 +287,11 @@ const OrderConfirmation: FC<IProps> = ({navigation}) => {
             </View>
           </FormMainContainer>
         )}
+
       </CustomModal>
     </>
   );
 };
 
 export default OrderConfirmation;
+

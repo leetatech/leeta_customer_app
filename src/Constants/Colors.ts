@@ -50,4 +50,5 @@ export const colors: ColorValues = {
   SLGRAY : "#828282",
   LBLUE:"#3680F0",
   DBLACK:"#000000"
+
 };

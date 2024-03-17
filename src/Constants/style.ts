@@ -41,6 +41,7 @@ const createStyles = () =>
           color:colors.DBLACK,
           fontSize: 15,
           fontWeight:'400'
+
         }
    
   });
