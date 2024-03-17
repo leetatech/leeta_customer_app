@@ -3,11 +3,12 @@ import {colors} from '../../Constants/Colors';
 
 const createStyles = () =>
   StyleSheet.create({
-    main_container :{
-      flex: 1
+    main_container: {
+      flex: 1,
     },
-    text_spacing :{
-gap:3
+    text_spacing: {
+      gap: 3,
+
     },
     checkbox_container: {
       flexDirection: 'row',
@@ -25,19 +26,19 @@ gap:3
       borderBottomWidth: 1,
       borderBottomColor: colors.LGRAY,
     },
-    address :{
+    address: {
       width: 200,
-      gap:3
+      gap: 3,
     },
-    amount_container:{
-      flexDirection:'row',
-       gap:3
+    amount_container: {
+      flexDirection: 'row',
+      gap: 3,
     },
-    summary_container :{
+    summary_container: {
       flexDirection: 'row',
       justifyContent: 'space-between',
     },
-    order_summary_container :{
+    order_summary_container: {
       paddingTop: 20,
 
     },
@@ -46,27 +47,54 @@ gap:3
       justifyContent: 'space-between',
       paddingTop: 10,
     },
-    terms_container:{
+    terms_container: {
       gap: 5,
     },
-    closeIcon : {
+    close_icon: {
       position: 'absolute',
-      top: 50, 
+      top: 50,
       right: 10,
     },
-  success_msg_container :{
-    marginTop:30,
-    justifyContent: 'center',
-    alignItems: 'center',
-    gap: 6,
-  },
-  button_container :{
-    paddingTop: 15
-  },
-   iconContainer: {
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
+    close_container: {
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      paddingBottom: 10,
+      paddingTop: 50,
+      paddingHorizontal: 20,
+    },
+    success_msg_container: {
+      marginTop: 30,
+      justifyContent: 'center',
+      alignItems: 'center',
+      gap: 6,
+    },
+    button_container: {
+      paddingTop: 15,
+    },
+    iconContainer: {
+      justifyContent: 'center',
+      alignItems: 'center',
+    },
+    modal_container: {
+      flex: 1,
+      padding: 0,
+    },
+    view_receipt_btn: {
+      backgroundColor: 'transparent',
+      borderWidth: 1,
+      borderColor: colors.ORANGE,
+      width: '100%',
+    },
+    refill_msg: {
+      color: colors.LGRAY,
+    },
+    letter_spacing: {
+      letterSpacing: 4,
+    },
+    view_receipt_text: {
+      color: colors.ORANGE,
+      fontSize: 17,
+    },
 
   });
 

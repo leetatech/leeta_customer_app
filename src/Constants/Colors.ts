@@ -2,6 +2,7 @@ export interface ColorValues {
   BACKGROUND: string;
   WHITE: string;
   BLACK: string;
+  DBLACK: string;
   DGRAY: string;
   GRAY: string;
   SLGRAY: string;
@@ -47,8 +48,7 @@ export const colors: ColorValues = {
   LYELLOW:"#FFF6DC",
   SUCCESS:"#00ff00",
   SLGRAY : "#828282",
-  LBLUE:"#3680F0"
-
-
+  LBLUE:"#3680F0",
+  DBLACK:"#000000"
 
 };
