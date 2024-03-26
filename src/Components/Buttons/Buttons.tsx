@@ -16,7 +16,7 @@ interface IProps {
   title: string;
   onPress?: () => void;
   onPress2?: () => void;
-  disabled: boolean;
+  disabled?: boolean;
   buttonStyle: StyleProp<ViewStyle>;
   textStyle: StyleProp<TextStyle>;
   text?: string;
