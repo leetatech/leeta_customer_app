@@ -1,5 +1,5 @@
 import React, {useMemo, useState, FC, useEffect} from 'react';
-import {View, Text, Image, TouchableOpacity} from 'react-native';
+import {View, TouchableOpacity} from 'react-native';
 import createStyles from './styles';
 import FormTexts from '../../Components/FormTexts/FormTexts';
 import FormMainContainer from '../../Components/FormMainContainer/FormMainContainer';
@@ -10,17 +10,20 @@ import {NavigationProp, ParamListBase} from '@react-navigation/native';
 import * as Yup from 'yup';
 import {useFormik} from 'formik';
 import {colors} from '../../Constants/Colors';
-import {NAVIGATION_ARROW} from '../../Assets';
 import {ScrollView} from 'react-native-gesture-handler';
 import {useDispatch, useSelector} from 'react-redux';
-import { login} from '../../redux/slices/auth/userServices';
-import {SUCCESS} from '../../Assets/svgImages';
+import {login} from '../../redux/slices/auth/userServices';
 import {RootState} from '../../redux/rootReducer';
 import CustomModal from '../../Components/Modal/CustomModal';
 import CustomLoader from '../../Components/Loader/CustomLoader';
-import { appUserType } from '../../config';
-import {resetUserState} from '../../redux/slices/auth/userSlice';
-import { applicationErrorCode } from '../../errors';
+import {appUserType} from '../../config';
+import {
+  resetUserData,
+  resetUserState,
+  setemail,
+} from '../../redux/slices/auth/userSlice';
+import {applicationErrorCode} from '../../errors';
+import Fonts from '../../Constants/Fonts';
 
 interface IProps {
   navigation: NavigationProp<ParamListBase>;
@@ -29,11 +32,11 @@ interface IProps {
 const SignIn: FC<IProps> = ({navigation}) => {
   const styles = useMemo(() => createStyles(), []);
   const [showPassword, setShowPassword] = useState(false);
-  const [showErrorMsg, setShowErrorMsg] = useState(false); //
+  const [showErrorMsg, setShowErrorMsg] = useState(false);
   const [errorMsg, setErrorMsg] = useState('');
-  const [userNotVerified, setUserNotVerified] = useState(false);
-  const [invalidSigninApp, toggleInvalidSign] = useState(false);
-  let {loading, errorCode, error, userData} = useSelector(
+  const [errorCodeMsg, setErrorCodeMsg] = useState('');
+  const [showErrorCodeMsg, setShowErrorCodeMsg] = useState(false);
+  let {loading, errorCode, error, userData, message} = useSelector(
     (state: RootState) => state.user,
   );
   const dispatch = useDispatch();
@@ -47,7 +50,8 @@ const SignIn: FC<IProps> = ({navigation}) => {
     validationSchema: Yup.object({
       email: Yup.string()
         .email('invalid email format')
-        .required('Email cannot be empty'),
+        .required('Email cannot be empty')
+        .trim(),
       password: Yup.string()
         .required('Password cannot be empty')
         .max(20, 'Password must not exceed 20 characters')
@@ -61,92 +65,85 @@ const SignIn: FC<IProps> = ({navigation}) => {
     onSubmit: () => {},
   });
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     if (!Object.keys(formik.errors).length) {
       const payload = {
-        email: formik.values.email,
-        password: formik.values.password,
+        email: formik.values.email.trim(),
+        password: formik.values.password.trim(),
         user_type: formik.values.user_type,
       };
-      dispatch(login(payload));
+      try {
+        await dispatch(login(payload));
+        dispatch(setemail(formik.values.email.trim()));
+      } catch (err) {}
     }
   };
 
-  const toggleErrorModal = () => {
-    if (userNotVerified) {
-      navigation.navigate('OTPInput');
-    }
+  const navigateToVerify = () => {
     dispatch(resetUserState());
-    setShowErrorMsg(false)
+    navigation.navigate('OTPInput');
+    setShowErrorMsg(false);
   };
-  
+  const dismissErrorCodeMessageModal = () => {
+    dispatch(resetUserState());
+    setShowErrorMsg(false);
+    setShowErrorCodeMsg(false);
+  };
+  const handleNavigateToSignup = () => {
+    dispatch(resetUserData());
+    navigation.navigate('CreateAccount');
+  };
 
   useEffect(() => {
     if (error && errorCode) {
-      console.log(errorCode)
+      console.log(errorCode);
       // TODO: handle more signin error edge cases
       switch (errorCode) {
         case applicationErrorCode.InvalidUserRoleError:
         case applicationErrorCode.UserCategoryError:
-          setErrorMsg("You are trying to log into the wrong LEETA app. kindly sign in with the LEETA Vendor app");
+          setErrorCodeMsg(
+            message ||
+              'You are trying to log into the wrong LEETA app. kindly sign in with the LEETA Vendor app',
+          );
           break;
         case applicationErrorCode.CredentialsValidationError:
         case applicationErrorCode.UserNotFoundError:
-          setErrorMsg("invalid email or password");
+          setErrorCodeMsg(
+            message ||
+              'An error has occurred while trying to sign in. Kindly try again shortly.',
+          );
           break;
         default:
-          setErrorMsg("An error has occurred while trying to sign in. Kindly try again shortly.");
+          setErrorCodeMsg(
+            'An error has occurred while trying to sign in. Kindly try again shortly.',
+          );
           break;
       }
-      setShowErrorMsg(true);
+      setShowErrorCodeMsg(true);
     } else if (!error && Object.keys(userData).length > 0) {
       formik.resetForm();
       const body = (userData as any).body;
-      console.log(body)
-      if(body && typeof body.email === 'object' && body.email.verified === false) {
-        setUserNotVerified(true);
+      console.log('Body', body);
+      if (
+        body &&
+        typeof body.email === 'object' &&
+        body.email.verified === false
+      ) {
         setShowErrorMsg(true);
-        setErrorMsg("Your email is not verified. Kindly check email for OTP for email verification");
-      }else if(body && typeof body.email === 'object' && body.email.verified === true) {
+        setErrorMsg(
+          message ||
+            'Your email is not verified. Kindly check email for OTP for email verification',
+        );
+        dispatch(resetUserState());
+      } else if (
+        body &&
+        typeof body.email === 'object' &&
+        body.email.verified === true
+      ) {
         navigation.navigate('BottomNavigator');
       }
     }
   }, [userData, error, errorCode]);
-
-  interface ModalProps {
-    visible: boolean;
-    title: string;
-    description: string;
-    buttonText: string;
-    onButtonPress: () => void;
-  }
-  
-  const Modal: React.FC<ModalProps> = ({
-    visible,
-    title,
-    description,
-    buttonText,
-    onButtonPress,
-  }) => {
-    return (
-      <CustomModal visible={visible}>
-        <View style={styles.modal_description_container}>
-          {!visible && <SUCCESS />}
-          <Text style={styles.modal_content_title}>{title}</Text>
-          <Text style={styles.modal_content_description}>{description}</Text>
-        </View>
-        <View style={styles.modal_btn_container}>
-          <Buttons
-            title={buttonText}
-            disabled={false}
-            buttonStyle={undefined}
-            textStyle={undefined}
-            onPress={onButtonPress}
-          />
-        </View>
-      </CustomModal>
-    );
-  };
 
   return (
     <>
@@ -165,14 +162,16 @@ const SignIn: FC<IProps> = ({navigation}) => {
                   onChangeText={formik.handleChange('email')}
                   value={formik.values.email}
                   name="email"
-                  onBlur={formik.handleBlur('email')}
+                  onBlur={() => formik.handleBlur('email')}
                   errors={formik.errors.email}
-                  helperText={''}
+                  helperText={formik.errors.email}
                 />
-                {formik.touched.email && formik.errors.email && (
-                  <Text style={{color: colors.RED, paddingTop: 2}}>
+                {formik.errors.email && formik.touched.email && (
+                  <Fonts
+                    type="normalText"
+                    style={{color: colors.RED, paddingTop: 2}}>
                     {formik.errors.email}
-                  </Text>
+                  </Fonts>
                 )}
               </View>
 
@@ -182,7 +181,7 @@ const SignIn: FC<IProps> = ({navigation}) => {
                   name="password"
                   value={formik.values.password}
                   onChangeText={formik.handleChange('password')}
-                  onBlur={formik.handleBlur('password')}
+                  onBlur={() => formik.handleBlur('password')}
                   secureTextEntry={!showPassword}
                   isPassword={true}
                   icon={
@@ -193,16 +192,20 @@ const SignIn: FC<IProps> = ({navigation}) => {
                       style={styles.passwordIcon}
                     />
                   }
-                  helperText={''}
+                  helperText={formik.errors.password}
                 />
-                {formik.touched.password && formik.errors.password && (
-                  <Text style={{color: colors.RED, paddingTop: 2}}>
+                {formik.errors.password && formik.touched.password && (
+                  <Fonts
+                    type="normalText"
+                    style={{color: colors.RED, paddingTop: 2}}>
                     {formik.errors.password}
-                  </Text>
+                  </Fonts>
                 )}
                 <TouchableOpacity
                   onPress={() => navigation.navigate('ForgotPassword')}>
-                  <Text style={styles.fp}>I forgot my password</Text>
+                  <Fonts type="normalText" style={styles.fp}>
+                    I forgot my password
+                  </Fonts>
                 </TouchableOpacity>
               </View>
             </View>
@@ -218,7 +221,7 @@ const SignIn: FC<IProps> = ({navigation}) => {
               formik.isSubmitting
             }
             onPress={handleSubmit}
-            onPress2={() => navigation.navigate('CreateAccount')}
+            onPress2={handleNavigateToSignup}
             buttonStyle={undefined}
             textStyle={undefined}
             text="Don't have an account?"
@@ -227,18 +230,50 @@ const SignIn: FC<IProps> = ({navigation}) => {
         </View>
       </FormMainContainer>
 
-
-      {showErrorMsg ? (
-        <Modal
-          visible={showErrorMsg}
-          title="OOpps"
-          description={`${errorMsg}`}
-          buttonText="Ok"
-          onButtonPress={toggleErrorModal}
-        />
-      ): null }
-      </>
-    );
+      {error && (
+        <CustomModal visible={showErrorCodeMsg}>
+          <View style={styles.modal_description_container}>
+            <Fonts type="normalText" style={styles.modal_content_title}>
+              OOpps
+            </Fonts>
+            <Fonts type="normalText" style={styles.modal_content_description}>
+              {`${errorCodeMsg}`}
+            </Fonts>
+          </View>
+          <View style={styles.modal_btn_container}>
+            <Buttons
+              disabled={false}
+              buttonStyle={undefined}
+              textStyle={undefined}
+              onPress={dismissErrorCodeMessageModal}
+              title="Ok"
+            />
+          </View>
+        </CustomModal>
+      )}
+      {showErrorMsg && (
+        <CustomModal visible={showErrorMsg}>
+          <View style={styles.modal_description_container}>
+            <Fonts type="normalText" style={styles.modal_content_title}>
+              OOpps
+            </Fonts>
+            <Fonts type="normalText" style={styles.modal_content_description}>
+              {`${errorMsg}`}
+            </Fonts>
+          </View>
+          <View style={styles.modal_btn_container}>
+            <Buttons
+              disabled={false}
+              buttonStyle={undefined}
+              textStyle={undefined}
+              onPress={navigateToVerify}
+              title="Ok"
+            />
+          </View>
+        </CustomModal>
+      )}
+    </>
+  );
 };
 
 export default SignIn;
