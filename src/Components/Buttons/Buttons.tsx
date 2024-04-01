@@ -42,7 +42,9 @@ const Buttons: FC<IProps> = ({
           {backgroundColor: disabled ? colors.LGRAY : colors.ORANGE},
           buttonStyle,
         ]}
-        onPress={onPress}>
+        onPress={onPress}
+        disabled={disabled}
+        >
         <Text style={[styles.text, textStyle]}>{title}</Text>
       </TouchableOpacity>
 

@@ -38,14 +38,9 @@ export default function RootNavigation({defaultRoute}: IProps) {
       {!!initialRouteName && (
         <RootStack.Navigator initialRouteName={initialRouteName}>
           <RootStack.Group>
-            {/* <RootStack.Screen
+            <RootStack.Screen
               name="InitialScreen"
               component={InitialScreen}
-              options={screenDefaultOptions}
-            /> */}
-              <RootStack.Screen
-              name="InitialScreen"
-              component={BottomNavigator}
               options={screenDefaultOptions}
             />
             <RootStack.Screen

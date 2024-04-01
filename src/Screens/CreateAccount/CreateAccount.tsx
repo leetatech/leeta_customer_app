@@ -1,5 +1,5 @@
 import React, {FC, useEffect, useMemo, useState} from 'react';
-import {Text, View, TouchableOpacity, Image} from 'react-native';
+import {Text, View, TouchableOpacity} from 'react-native';
 import createStyles from './styles';
 import {NavigationProp, ParamListBase} from '@react-navigation/native';
 import FormTexts from '../../Components/FormTexts/FormTexts';
@@ -11,7 +11,6 @@ import Fontisto from 'react-native-vector-icons/Fontisto';
 import {useFormik} from 'formik';
 import * as Yup from 'yup';
 import {colors} from '../../Constants/Colors';
-import {NAVIGATION_ARROW} from '../../Assets';
 import CustomModal from '../../Components/Modal/CustomModal';
 import {SUCCESS} from '../../Assets/svgImages';
 import {ScrollView} from 'react-native-gesture-handler';
@@ -20,9 +19,8 @@ import {useDispatch, useSelector} from 'react-redux';
 import {signup} from '../../redux/slices/auth/userServices';
 import CustomLoader from '../../Components/Loader/CustomLoader';
 import {resetUserState, setemail} from '../../redux/slices/auth/userSlice';
-import { appUserType } from '../../config';
-import { applicationErrorCode } from '../../errors';
-
+import {appUserType} from '../../config';
+import {applicationErrorCode} from '../../errors';
 
 interface IProps {
   navigation: NavigationProp<ParamListBase>;
@@ -36,7 +34,6 @@ const CreateAccount: FC<IProps> = ({navigation}) => {
   const [isAccountNotCreated, setIsAccountNotCreated] = useState(false);
   const dispatch = useDispatch();
   let {loading, error, userData, errorCode} = useSelector(
-
     (state: RootState) => state.user,
   );
   const [displayErrorMsg, setDisplayErrorMsg] = useState(false);
@@ -53,6 +50,7 @@ const CreateAccount: FC<IProps> = ({navigation}) => {
       full_name: Yup.string().required('Name cannot be empty'),
       email: Yup.string()
         .email('invalid email format')
+        .trim()
         .required('Email cannot be empty'),
       password: Yup.string()
         .required('Password cannot be empty')
@@ -63,44 +61,45 @@ const CreateAccount: FC<IProps> = ({navigation}) => {
         ),
     }),
     enableReinitialize: false,
-    onSubmit: ()=>{}
+    onSubmit: () => {},
   });
 
   const handleSubmit = async () => {
     if (!Object.keys(formik.errors).length) {
       const payload = {
-        full_name: formik.values.full_name,
-        email: formik.values.email,
-        password: formik.values.password,
+        full_name: formik.values.full_name.trim(),
+        email: formik.values.email.trim(),
+        password: formik.values.password.trim(),
         user_type: formik.values.user_type,
       };
       dispatch(setemail(formik.values.email));
-
       dispatch(signup(payload));
     }
   };
 
   const toggleCreateAccount = () => {
     setIsAccountCreated(false);
+    dispatch(resetUserState());
     navigation.navigate('OTPInput');
   };
 
   const toggleErrorModal = () => {
-    setIsAccountNotCreated(false);
+    dispatch(resetUserState());
     navigation.navigate('SignIn');
   };
 
   useEffect(() => {
     const storeToken = async () => {
-      console.log(errorCode)
       if (error && errorCode) {
         setDisplayErrorMsg(true);
         switch (errorCode) {
           case applicationErrorCode.DuplicateUserError:
-            setErrorMsg("User already exists. Kindly proceed to login");
+            setErrorMsg('User already exists. Kindly proceed to login');
             break;
           default:
-            setErrorMsg("Unknown error has occurred while trying to sign up. Kindly try again shortly.");
+            setErrorMsg(
+              'Unknown error has occurred while trying to sign up. Kindly try again shortly.',
+            );
             break;
         }
         setIsAccountNotCreated(true);
@@ -111,10 +110,10 @@ const CreateAccount: FC<IProps> = ({navigation}) => {
         setIsAccountCreated(true);
         setChecked(true);
         formik.resetForm();
+         dispatch(resetUserState());
       }
     };
     storeToken();
-
   }, [userData, error, errorCode]);
 
   interface ModalProps {
@@ -124,7 +123,7 @@ const CreateAccount: FC<IProps> = ({navigation}) => {
     buttonText: string;
     onButtonPress: () => void;
   }
-  
+
   const Modal: React.FC<ModalProps> = ({
     visible,
     title,
@@ -151,8 +150,6 @@ const CreateAccount: FC<IProps> = ({navigation}) => {
       </CustomModal>
     );
   };
-  
-
   return (
     <>
       <FormMainContainer>
@@ -170,7 +167,7 @@ const CreateAccount: FC<IProps> = ({navigation}) => {
                   onChangeText={formik.handleChange('full_name')}
                   value={formik.values.full_name}
                   name="full_name"
-                  onBlur={formik.handleBlur('full_name')}
+                  onBlur={() => formik.handleBlur('full_name')}
                   errors={formik.errors.full_name}
                   helperText={''}
                 />
@@ -186,7 +183,7 @@ const CreateAccount: FC<IProps> = ({navigation}) => {
                   onChangeText={formik.handleChange('email')}
                   value={formik.values.email}
                   name="email"
-                  onBlur={formik.handleBlur('email')}
+                  onBlur={() => formik.handleBlur('email')}
                   errors={formik.errors.email}
                   helperText={''}
                 />
@@ -202,7 +199,7 @@ const CreateAccount: FC<IProps> = ({navigation}) => {
                   name="password"
                   value={formik.values.password}
                   onChangeText={formik.handleChange('password')}
-                  onBlur={formik.handleBlur('password')}
+                  onBlur={() => formik.handleBlur('password')}
                   secureTextEntry={!showPassword}
                   isPassword={true}
                   icon={
@@ -231,8 +228,7 @@ const CreateAccount: FC<IProps> = ({navigation}) => {
                     />
                   </TouchableOpacity>
                   <Text style={styles.fp}>
-
-                    I have read and I agree to Leeta’s{" "}
+                    I have read and I agree to Leeta’s{' '}
                     <Text style={styles.link}>
                       privacy policy, terms and conditions.
                     </Text>
@@ -264,21 +260,49 @@ const CreateAccount: FC<IProps> = ({navigation}) => {
         </View>
       </FormMainContainer>
 
-      {displayErrorMsg ? (
-        <Modal
-          visible={isAccountNotCreated}
-          title="OOpps"
-          description={`${errorMsg}`}
-          buttonText="Ok"
-          onButtonPress={toggleErrorModal}
-        />
-      ) : <Modal
-          visible={isAccountCreated}
-          title="Verification in Progress"
-          description="You'll receive an email regarding the status of your verification request."
-          buttonText="Got it!"
-          onButtonPress={toggleCreateAccount}
-        />}
+      {displayErrorMsg && (
+            <CustomModal visible={isAccountNotCreated}>
+          <View style={styles.modal_description_container}>
+            <Text style={styles.modal_content_title}>
+              OOpps
+            </Text>
+            <Text style={styles.modal_content_description}>
+              {`${errorMsg}`}
+            </Text>
+          </View>
+          <View style={styles.modal_btn_container}>
+            <Buttons
+              disabled={false}
+              buttonStyle={undefined}
+              textStyle={undefined}
+              onPress={toggleErrorModal}
+              title="Ok"
+            />
+          </View>
+        </CustomModal>
+      )}
+      {isAccountCreated && (
+        <CustomModal visible={isAccountCreated}>
+          <View style={styles.modal_description_container}>
+            <Text style={styles.modal_content_title}>
+              Verification in Progress
+            </Text>
+            <Text style={styles.modal_content_description}>
+              You'll receive an email regarding the status of your verification
+              request.
+            </Text>
+          </View>
+          <View style={styles.modal_btn_container}>
+            <Buttons
+              disabled={false}
+              buttonStyle={undefined}
+              textStyle={undefined}
+              onPress={toggleCreateAccount}
+              title="Got it"
+            />
+          </View>
+        </CustomModal>
+      )}
     </>
   );
 };
