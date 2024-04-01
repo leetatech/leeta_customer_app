@@ -29,6 +29,11 @@ export const userSlice = createSlice({
       state.errorCode = initialState.errorCode;
       state.error = initialState.error;
       state.message = initialState.message;
+
+    },
+    resetUserData: state => {
+      state.userData = initialState.userData;
+
     },
   },
   extraReducers: builder => {
@@ -41,12 +46,14 @@ export const userSlice = createSlice({
         state.loading = false;
         state.error = false;
         state.userData = action.payload!.data as Record<string, string>;
+
       })
       .addCase(signup.rejected, (state, action: PayloadAction<any>) => {
         state.loading = false;
         state.error = true;
         state.errorCode = action.payload?.data?.error_code || 1;
         state.message = action.payload.data.message;
+
       })
 
       //verify otp slice
@@ -101,6 +108,7 @@ export const userSlice = createSlice({
   },
 });
 
-export const {setemail, resetUserState} = userSlice.actions;
+export const {setemail, resetUserState, resetUserData} =
+  userSlice.actions;
 
 export default userSlice.reducer;
