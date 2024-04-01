@@ -29,9 +29,11 @@ export const userSlice = createSlice({
       state.errorCode = initialState.errorCode;
       state.error = initialState.error;
       state.message = initialState.message;
+
     },
     resetUserData: state => {
       state.userData = initialState.userData;
+
     },
   },
   extraReducers: builder => {
@@ -44,14 +46,14 @@ export const userSlice = createSlice({
         state.loading = false;
         state.error = false;
         state.userData = action.payload!.data as Record<string, string>;
-        console.log('FUFILLED', state.userData);
+
       })
       .addCase(signup.rejected, (state, action: PayloadAction<any>) => {
         state.loading = false;
         state.error = true;
         state.errorCode = action.payload?.data?.error_code || 1;
         state.message = action.payload.data.message;
-        console.log('REJECTED', state.userData);
+
       })
 
       //verify otp slice
@@ -79,14 +81,12 @@ export const userSlice = createSlice({
         state.loading = false;
         state.error = false;
         state.userData = action.payload!.data as Record<string, string>;
-        console.log('FUFILLED LOGIN', state.userData);
       })
       .addCase(login.rejected, (state, action: PayloadAction<any>) => {
         state.loading = false;
         state.error = true;
         state.message = action.payload.data.message;
         state.errorCode = action.payload?.data?.error_code || 1;
-        console.log('REJECTED LOGIN', state.userData, state.message);
       })
 
       //forgot password
