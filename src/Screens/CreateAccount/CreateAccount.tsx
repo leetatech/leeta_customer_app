@@ -80,7 +80,7 @@ const CreateAccount: FC<IProps> = ({navigation}) => {
   const toggleCreateAccount = () => {
     setIsAccountCreated(false);
     dispatch(resetUserState());
-    navigation.navigate('OTPInput');
+    navigation.navigate('OTPInput', {screenId: 'Signup'});
   };
 
   const toggleErrorModal = () => {
@@ -110,7 +110,7 @@ const CreateAccount: FC<IProps> = ({navigation}) => {
         setIsAccountCreated(true);
         setChecked(true);
         formik.resetForm();
-         dispatch(resetUserState());
+        dispatch(resetUserState());
       }
     };
     storeToken();
@@ -261,11 +261,9 @@ const CreateAccount: FC<IProps> = ({navigation}) => {
       </FormMainContainer>
 
       {displayErrorMsg && (
-            <CustomModal visible={isAccountNotCreated}>
+        <CustomModal visible={isAccountNotCreated}>
           <View style={styles.modal_description_container}>
-            <Text style={styles.modal_content_title}>
-              OOpps
-            </Text>
+            <Text style={styles.modal_content_title}>OOpps</Text>
             <Text style={styles.modal_content_description}>
               {`${errorMsg}`}
             </Text>
