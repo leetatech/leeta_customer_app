@@ -32,6 +32,7 @@ export const userSlice = createSlice({
     },
     resetUserData: state => {
       state.userData = initialState.userData;
+      state.error = initialState.error;
     },
   },
   extraReducers: builder => {
@@ -108,7 +109,6 @@ export const userSlice = createSlice({
   },
 });
 
-export const {setemail, resetUserState, resetUserData} =
-  userSlice.actions;
+export const {setemail, resetUserState, resetUserData} = userSlice.actions;
 
 export default userSlice.reducer;
