@@ -1,6 +1,5 @@
 import React, {FC, useMemo, useState, useEffect, useRef} from 'react';
 import {
-  Text,
   View,
   Image,
   TouchableOpacity,
@@ -21,7 +20,8 @@ import {useDispatch, useSelector} from 'react-redux';
 import {verifyOtp} from '../../redux/slices/auth/userServices';
 import {maskEmail} from '../../utils';
 import {applicationErrorCode} from '../../errors';
-import {resetUserState} from '../../redux/slices/auth/userSlice';
+import { resetUserState} from '../../redux/slices/auth/userSlice';
+import Fonts from '../../Constants/Fonts';
 
 const OTPInput: FC<IOTPInputProps> = props => {
   const {navigation, route} = props;
@@ -31,9 +31,8 @@ const OTPInput: FC<IOTPInputProps> = props => {
   const [isTimerRunning, setIsTimerRunning] = useState(true);
   const [otp, setOtp] = useState('');
   const [errorMsg, setErrorMsg] = useState('');
-  const [showErrorMsg, setShowErrorMsg] = useState(false);
   const otpRef: any = useRef(null);
-  let {loading, message, userEmail} = useSelector(
+  let {loading, message, userEmail, error} = useSelector(
     (state: RootState) => state.user,
   );
   const dispatch = useDispatch();
@@ -81,14 +80,12 @@ const OTPInput: FC<IOTPInputProps> = props => {
                   navigation.navigate('SignIn');
               }
             } else {
-                  navigation.navigate('SignIn');
+              console.log('screen id invalidate');
             }
             setOtp('');
-            dispatch(resetUserState());
           } else {
             const errorCodeString: string = result.data.error_code;
             const errorCode: number = parseInt(errorCodeString, 10);
-            setShowErrorMsg(true);
             switch (errorCode) {
               case applicationErrorCode.TokenValidationError:
                 setErrorMsg(
@@ -104,9 +101,8 @@ const OTPInput: FC<IOTPInputProps> = props => {
             }
             setOtp('');
             setTimeout(() => {
-              setShowErrorMsg(false);
-            }, 5000);
             dispatch(resetUserState());
+            }, 5000);
           }
         })
         .catch(error => {
@@ -114,9 +110,8 @@ const OTPInput: FC<IOTPInputProps> = props => {
         });
     }
   };
-
   const toggleErrMsg = () => {
-    setShowErrorMsg(false);
+    dispatch(resetUserState());
   };
 
   useEffect(() => {
@@ -142,7 +137,7 @@ const OTPInput: FC<IOTPInputProps> = props => {
 
   return (
     <FormMainContainer>
-      <TouchableOpacity onPress={navigation.goBack}>
+      <TouchableOpacity onPress={navigation.goBack} style={{width: 20}}>
         <Image source={NAVIGATION_ARROW} />
       </TouchableOpacity>
 
@@ -152,9 +147,9 @@ const OTPInput: FC<IOTPInputProps> = props => {
             <Image source={OTPIMAGE} />
             {loading && <CustomLoader />}
 
-            <Text style={styles.bigText}>Check your Email.</Text>
-            <Text style={styles.smalltext}>we’ve sent an OTP to .</Text>
-            <Text style={styles.smalltext}>{maskedEmail} to get verified.</Text>
+            <Fonts type="boldBlack" style={styles.bigText}>Check your Email.</Fonts>
+            <Fonts type="smallText">we’ve sent an OTP to .</Fonts>
+            <Fonts type="smallText">{maskedEmail} to get verified.</Fonts>
           </View>
           <View style={styles.otpContainer}>
             <View style={styles.container}>
@@ -174,13 +169,13 @@ const OTPInput: FC<IOTPInputProps> = props => {
             <View style={styles.resendOtpContainer}>
               {!isTimerRunning ? (
                 <TouchableOpacity>
-                  <Text style={styles.resendOtp}>Resend OTP</Text>
+                  <Fonts type="smallText"  style={styles.resendOtp}>Resend OTP</Fonts>
                 </TouchableOpacity>
               ) : (
-                <Text style={styles.timer}>
+                <Fonts type="smallText" >
                   Time Remaining {minutes < 10 ? `0${minutes}` : minutes}:
                   {seconds < 10 ? `0${seconds}` : seconds}
-                </Text>
+                </Fonts>
               )}
             </View>
           </View>
@@ -195,9 +190,9 @@ const OTPInput: FC<IOTPInputProps> = props => {
           onPress={() => handleVerifyOTP(otp)}
         />
       </View>
-      {showErrorMsg && (
+      {error && (
         <CustomToast onPress={toggleErrMsg}>
-          <Text>{errorMsg}.</Text>
+          <Fonts type="smallText">{errorMsg}.</Fonts>
         </CustomToast>
       )}
     </FormMainContainer>
