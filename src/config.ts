@@ -3,6 +3,7 @@ interface ApiUrls {
   otpVerification: string;
   logIn: string;
   forgotPassword:string;
+  passwordReset:string
 
 }
 
@@ -12,7 +13,9 @@ export const apiUrl: ApiUrls = {
   signUp: `${BASE_URL}session/signup`, // POST
   otpVerification: `${BASE_URL}session/otp/validate`, // POST
   logIn: `${BASE_URL}session/signin`, // POST
-  forgotPassword: `${BASE_URL}session/forgot_password` // POST
+  forgotPassword: `${BASE_URL}session/forgot_password`, // POST
+  passwordReset: `${BASE_URL}session/create_new_password`, // POST
+
 };
 
 export const appUserType = "buyer"

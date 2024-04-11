@@ -1,5 +1,5 @@
 import {PayloadAction, createSlice} from '@reduxjs/toolkit';
-import {forgotPassword, login, signup, verifyOtp} from './userServices';
+import {forgotPassword, login, resetPassword, signup, verifyOtp} from './userServices';
 
 interface UserState {
   userData: Record<string, string>;
@@ -105,7 +105,23 @@ export const userSlice = createSlice({
         state.error = true;
         state.message = action.payload.data.message;
         state.errorCode = action.payload?.data?.error_code || 1;
-      });
+      })
+
+      //reset password
+       .addCase(resetPassword.pending, (state) => {
+        state.loading = true;
+        state.error = false;
+      })
+      .addCase(resetPassword.fulfilled, (state, action) => {
+        state.loading = false;
+        state.error = false;
+        state.userData = action.payload!.data as Record<string, string>;
+      })  
+      .addCase(resetPassword.rejected, (state, action: PayloadAction<any> ) => {
+        state.loading = false;
+        state.error = true;
+        state.message = action.payload.data.message
+      })
   },
 });
 

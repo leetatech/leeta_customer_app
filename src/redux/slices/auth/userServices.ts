@@ -25,6 +25,12 @@ export interface ForgotPasswordData {
   email: string;
 }
 
+export interface ResetPasswordData {
+  confirm_password: string;
+  email: string;
+  password: string;
+}
+
 export const signup = createAsyncThunk(
   'user/signup',
   async (userDetails: UserData, {rejectWithValue}) => {
@@ -109,6 +115,27 @@ export const forgotPassword = createAsyncThunk(
       const url = apiUrl.forgotPassword
       const method = 'post';
       const response: any = await apiCall(url, method, forgotPasswordDetails);
+      return response as Record<string, Record<string, string> | string>;
+    } catch (error) {
+      if (axios.isAxiosError(error)) {
+        return rejectWithValue(error.response?.data);
+      } else if (error instanceof Error) {
+        return rejectWithValue(error.message);
+      } else {
+        throw error;
+      }
+    }
+  },
+);
+
+//Password Reset
+export const resetPassword = createAsyncThunk(
+  'user/resetPassword',
+  async (resetPasswordDetails: ResetPasswordData, {rejectWithValue}) => {
+    try {
+      const url = apiUrl.passwordReset;
+      const method = 'post';
+      const response: any = await apiCall(url, method, resetPasswordDetails);
       return response as Record<string, Record<string, string> | string>;
     } catch (error) {
       if (axios.isAxiosError(error)) {
