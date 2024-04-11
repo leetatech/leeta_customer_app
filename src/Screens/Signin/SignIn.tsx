@@ -85,6 +85,7 @@ const SignIn: FC<IProps> = ({navigation}) => {
     navigation.navigate('OTPInput');
   };
 
+
   const dismissErrorCodeMessageModal = () => {
     dispatch(resetUserState());
     setShowErrorMsg(false);
@@ -145,8 +146,8 @@ const SignIn: FC<IProps> = ({navigation}) => {
       }
     }
   }, [userData, error, errorCode]);
-  console.log('ERROR', error);
-  console.log('ERRMSG', showErrorMsg);
+
+
   return (
     <>
       <FormMainContainer>
