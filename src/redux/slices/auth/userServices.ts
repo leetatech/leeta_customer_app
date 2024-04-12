@@ -30,6 +30,9 @@ export interface ResetPasswordData {
   email: string;
   password: string;
 }
+export interface ResendOtpData {
+  email: string;
+}
 
 export const signup = createAsyncThunk(
   'user/signup',
@@ -136,6 +139,27 @@ export const resetPassword = createAsyncThunk(
       const url = apiUrl.passwordReset;
       const method = 'post';
       const response: any = await apiCall(url, method, resetPasswordDetails);
+      return response as Record<string, Record<string, string> | string>;
+    } catch (error) {
+      if (axios.isAxiosError(error)) {
+        return rejectWithValue(error.response?.data);
+      } else if (error instanceof Error) {
+        return rejectWithValue(error.message);
+      } else {
+        throw error;
+      }
+    }
+  },
+);
+
+//Resend Otp
+export const resendOtp = createAsyncThunk(
+  'user/resendOtp',
+  async (resendOtpDetails: ResendOtpData, {rejectWithValue}) => {
+    try {
+      const url = apiUrl.resendOtp
+      const method = 'post';
+      const response: any = await apiCall(url, method, resendOtpDetails);
       return response as Record<string, Record<string, string> | string>;
     } catch (error) {
       if (axios.isAxiosError(error)) {

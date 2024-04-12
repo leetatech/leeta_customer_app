@@ -4,6 +4,7 @@ interface ApiUrls {
   logIn: string;
   forgotPassword:string;
   passwordReset:string
+  resendOtp : string;
 
 }
 
@@ -15,7 +16,7 @@ export const apiUrl: ApiUrls = {
   logIn: `${BASE_URL}session/signin`, // POST
   forgotPassword: `${BASE_URL}session/forgot_password`, // POST
   passwordReset: `${BASE_URL}session/create_new_password`, // POST
-
+  resendOtp: `${BASE_URL}session/otp/request`, //POST
 };
 
 export const appUserType = "buyer"
