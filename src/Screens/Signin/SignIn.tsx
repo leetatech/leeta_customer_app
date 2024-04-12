@@ -82,10 +82,10 @@ const SignIn: FC<IProps> = ({navigation}) => {
   const navigateToVerify = () => {
     dispatch(resetUserData());
     setShowErrorMsg(false);
-    // navigation.navigate('OTPInput');
         navigation.navigate('OTPInput', {screenId: 'Signin'});
 
   };
+
 
   const dismissErrorCodeMessageModal = () => {
     dispatch(resetUserState());
@@ -149,6 +149,7 @@ const SignIn: FC<IProps> = ({navigation}) => {
   }, [userData, error, errorCode]);
   console.log('ERROR', error);
   console.log('ERRMSG', showErrorMsg);
+
   return (
     <>
       <FormMainContainer>
