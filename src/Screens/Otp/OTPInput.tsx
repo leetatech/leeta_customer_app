@@ -17,10 +17,10 @@ import {OtpInput} from 'react-native-otp-entry';
 import {colors} from '../../Constants/Colors';
 import {RootState} from '../../redux/rootReducer';
 import {useDispatch, useSelector} from 'react-redux';
-import {verifyOtp} from '../../redux/slices/auth/userServices';
+import {resendOtp, verifyOtp} from '../../redux/slices/auth/userServices';
 import {maskEmail} from '../../utils';
 import {applicationErrorCode} from '../../errors';
-import { resetUserState} from '../../redux/slices/auth/userSlice';
+import {resetUserState} from '../../redux/slices/auth/userSlice';
 import Fonts from '../../Constants/Fonts';
 
 const OTPInput: FC<IOTPInputProps> = props => {
@@ -31,6 +31,9 @@ const OTPInput: FC<IOTPInputProps> = props => {
   const [isTimerRunning, setIsTimerRunning] = useState(true);
   const [otp, setOtp] = useState('');
   const [errorMsg, setErrorMsg] = useState('');
+  const [resendOtpMessage, setResendOtpMsg] = useState('');
+  const [showResendOtpMsg, setShowResendOtpMsg] = useState(false);
+
   const otpRef: any = useRef(null);
   let {loading, message, userEmail, error} = useSelector(
     (state: RootState) => state.user,
@@ -76,8 +79,13 @@ const OTPInput: FC<IOTPInputProps> = props => {
                   otpRef.current.setValue('');
                   navigation.navigate('CreateNewPassword');
                   break;
+                case 'Signin':
+                  otpRef.current.setValue('');
+                  navigation.navigate('SignIn');
+                  break;
                 default:
                   navigation.navigate('SignIn');
+                  break;
               }
             } else {
               console.log('screen id invalidate');
@@ -101,7 +109,7 @@ const OTPInput: FC<IOTPInputProps> = props => {
             }
             setOtp('');
             setTimeout(() => {
-            dispatch(resetUserState());
+              dispatch(resetUserState());
             }, 5000);
           }
         })
@@ -112,6 +120,50 @@ const OTPInput: FC<IOTPInputProps> = props => {
   };
   const toggleErrMsg = () => {
     dispatch(resetUserState());
+  };
+  const toggleResendOtpMsg = () => {
+    setShowResendOtpMsg(false);
+  };
+
+  const handleResendOtp = () => {
+    const payload = {
+      email: userEmail!,
+    };
+    dispatch(resendOtp(payload))
+      .then(response => {
+        const result = response.payload as unknown as Record<
+          string,
+          Record<string, string>
+        >;
+        if (response && result && result.data.success) {
+          setResendOtpMsg(message || result.data.message);
+          setShowResendOtpMsg(true);
+        } else {
+          const errorCodeString: string = result.data.error_code;
+          const errorCode: number = parseInt(errorCodeString, 10);
+          setShowResendOtpMsg(true);
+          switch (errorCode) {
+            case applicationErrorCode.InternalError:
+              setResendOtpMsg(
+                message ||
+                  result.data.message ||
+                  'An error occurred while trying to reset a user password',
+              );
+              break;
+            default:
+              setResendOtpMsg(
+                'An unknown error has occured, ensure that email is correct and try again',
+              );
+              break;
+          }
+        }
+        setTimeout(() => {
+          setShowResendOtpMsg(false);
+        }, 5000);
+      })
+      .catch(error => {
+        console.error('Error sending OTP:', error);
+      });
   };
 
   useEffect(() => {
@@ -147,7 +199,9 @@ const OTPInput: FC<IOTPInputProps> = props => {
             <Image source={OTPIMAGE} />
             {loading && <CustomLoader />}
 
-            <Fonts type="boldBlack" style={styles.bigText}>Check your Email.</Fonts>
+            <Fonts type="boldBlack" style={styles.bigText}>
+              Check your Email.
+            </Fonts>
             <Fonts type="smallText">we’ve sent an OTP to .</Fonts>
             <Fonts type="smallText">{maskedEmail} to get verified.</Fonts>
           </View>
@@ -158,7 +212,6 @@ const OTPInput: FC<IOTPInputProps> = props => {
                 focusColor={colors.BLACK}
                 focusStickBlinkingDuration={200}
                 onTextChange={handleOtpCodeChange}
-                onFilled={otp => console.log(`OTP is ${otp}`)}
                 theme={{
                   pinCodeContainerStyle: styles.input,
                   pinCodeTextStyle: styles.inputText,
@@ -168,11 +221,13 @@ const OTPInput: FC<IOTPInputProps> = props => {
             </View>
             <View style={styles.resendOtpContainer}>
               {!isTimerRunning ? (
-                <TouchableOpacity>
-                  <Fonts type="smallText"  style={styles.resendOtp}>Resend OTP</Fonts>
+                <TouchableOpacity onPress={handleResendOtp}>
+                  <Fonts type="smallText" style={styles.resendOtp}>
+                    Resend OTP
+                  </Fonts>
                 </TouchableOpacity>
               ) : (
-                <Fonts type="smallText" >
+                <Fonts type="smallText">
                   Time Remaining {minutes < 10 ? `0${minutes}` : minutes}:
                   {seconds < 10 ? `0${seconds}` : seconds}
                 </Fonts>
@@ -193,6 +248,11 @@ const OTPInput: FC<IOTPInputProps> = props => {
       {error && (
         <CustomToast onPress={toggleErrMsg}>
           <Fonts type="smallText">{errorMsg}.</Fonts>
+        </CustomToast>
+      )}
+      {showResendOtpMsg && (
+        <CustomToast onPress={toggleResendOtpMsg}>
+          <Fonts type="smallText">{resendOtpMessage}.</Fonts>
         </CustomToast>
       )}
     </FormMainContainer>
