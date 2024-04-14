@@ -82,7 +82,6 @@ const SignIn: FC<IProps> = ({navigation}) => {
   const navigateToVerify = () => {
     dispatch(resetUserData());
     setShowErrorMsg(false);
-    // navigation.navigate('OTPInput');
         navigation.navigate('OTPInput', {screenId: 'Signin'});
 
   };
