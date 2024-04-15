@@ -20,24 +20,17 @@ const createStyles = () =>
     input: {
       backgroundColor: colors.LGRAY,
       alignItems: 'center',
-      borderRadius:0,
-      height:10
+      borderRadius: 0,
+      height: 10,
     },
     inputText: {
       color: colors.BLACK,
       fontWeight: 'bold',
       fontSize: 20,
     },
- 
-
-    smalltext: {
-      fontSize: 12,
-      color: colors.GRAY,
-      alignContent: 'center',
-    },
 
     bigText: {
-      fontSize: 30,
+      fontSize: 25,
       fontWeight: 'bold',
       color: colors.BLACK,
     },
@@ -54,10 +47,6 @@ const createStyles = () =>
 
     resendOtpContainer: {
       alignItems: 'center',
-    },
-
-    timer: {
-      color: colors.GRAY,
     },
 
     buttonContainer: {

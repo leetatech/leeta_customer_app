@@ -18,7 +18,8 @@ import {RootState} from '../../redux/rootReducer';
 import {useDispatch, useSelector} from 'react-redux';
 import {signup} from '../../redux/slices/auth/userServices';
 import CustomLoader from '../../Components/Loader/CustomLoader';
-import {resetUserState, setemail} from '../../redux/slices/auth/userSlice';
+import {resetUserData, resetUserState, setemail} from '../../redux/slices/auth/userSlice';
+
 import {appUserType} from '../../config';
 import {applicationErrorCode} from '../../errors';
 
@@ -79,8 +80,9 @@ const CreateAccount: FC<IProps> = ({navigation}) => {
 
   const toggleCreateAccount = () => {
     setIsAccountCreated(false);
-    dispatch(resetUserState());
-    navigation.navigate('OTPInput');
+    dispatch(resetUserData());
+    navigation.navigate('OTPInput', {screenId: 'Signup'});
+
   };
 
   const toggleErrorModal = () => {
@@ -110,7 +112,8 @@ const CreateAccount: FC<IProps> = ({navigation}) => {
         setIsAccountCreated(true);
         setChecked(true);
         formik.resetForm();
-         dispatch(resetUserState());
+        dispatch(resetUserState());
+
       }
     };
     storeToken();
@@ -261,11 +264,10 @@ const CreateAccount: FC<IProps> = ({navigation}) => {
       </FormMainContainer>
 
       {displayErrorMsg && (
-            <CustomModal visible={isAccountNotCreated}>
+        <CustomModal visible={isAccountNotCreated}>
           <View style={styles.modal_description_container}>
-            <Text style={styles.modal_content_title}>
-              OOpps
-            </Text>
+            <Text style={styles.modal_content_title}>OOpps</Text>
+
             <Text style={styles.modal_content_description}>
               {`${errorMsg}`}
             </Text>

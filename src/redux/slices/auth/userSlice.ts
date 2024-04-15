@@ -29,10 +29,10 @@ export const userSlice = createSlice({
       state.errorCode = initialState.errorCode;
       state.error = initialState.error;
       state.message = initialState.message;
-
     },
     resetUserData: state => {
       state.userData = initialState.userData;
+      state.error = initialState.error;
 
     },
   },
@@ -81,12 +81,14 @@ export const userSlice = createSlice({
         state.loading = false;
         state.error = false;
         state.userData = action.payload!.data as Record<string, string>;
+
       })
       .addCase(login.rejected, (state, action: PayloadAction<any>) => {
         state.loading = false;
         state.error = true;
         state.message = action.payload.data.message;
         state.errorCode = action.payload?.data?.error_code || 1;
+
       })
 
       //forgot password
@@ -108,7 +110,7 @@ export const userSlice = createSlice({
   },
 });
 
-export const {setemail, resetUserState, resetUserData} =
-  userSlice.actions;
+export const {setemail, resetUserState, resetUserData} = userSlice.actions;
+
 
 export default userSlice.reducer;
