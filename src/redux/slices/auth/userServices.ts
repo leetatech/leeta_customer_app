@@ -34,6 +34,7 @@ export interface ResendOtpData {
   email: string;
 }
 
+
 export const signup = createAsyncThunk(
   'user/signup',
   async (userDetails: UserData, {rejectWithValue}) => {
@@ -171,4 +172,5 @@ export const resendOtp = createAsyncThunk(
       }
     }
   },
+
 );

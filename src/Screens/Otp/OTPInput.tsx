@@ -21,6 +21,7 @@ import {resendOtp, verifyOtp} from '../../redux/slices/auth/userServices';
 import {maskEmail} from '../../utils';
 import {applicationErrorCode} from '../../errors';
 import {resetUserState} from '../../redux/slices/auth/userSlice';
+
 import Fonts from '../../Constants/Fonts';
 
 const OTPInput: FC<IOTPInputProps> = props => {
@@ -86,6 +87,7 @@ const OTPInput: FC<IOTPInputProps> = props => {
                 default:
                   navigation.navigate('SignIn');
                   break;
+
               }
             } else {
               console.log('screen id invalidate');
@@ -164,6 +166,7 @@ const OTPInput: FC<IOTPInputProps> = props => {
       .catch(error => {
         console.error('Error sending OTP:', error);
       });
+
   };
 
   useEffect(() => {
@@ -202,6 +205,7 @@ const OTPInput: FC<IOTPInputProps> = props => {
             <Fonts type="boldBlack" style={styles.bigText}>
               Check your Email.
             </Fonts>
+
             <Fonts type="smallText">we’ve sent an OTP to .</Fonts>
             <Fonts type="smallText">{maskedEmail} to get verified.</Fonts>
           </View>
@@ -212,6 +216,7 @@ const OTPInput: FC<IOTPInputProps> = props => {
                 focusColor={colors.BLACK}
                 focusStickBlinkingDuration={200}
                 onTextChange={handleOtpCodeChange}
+
                 theme={{
                   pinCodeContainerStyle: styles.input,
                   pinCodeTextStyle: styles.inputText,
@@ -228,6 +233,7 @@ const OTPInput: FC<IOTPInputProps> = props => {
                 </TouchableOpacity>
               ) : (
                 <Fonts type="smallText">
+
                   Time Remaining {minutes < 10 ? `0${minutes}` : minutes}:
                   {seconds < 10 ? `0${seconds}` : seconds}
                 </Fonts>
@@ -255,6 +261,7 @@ const OTPInput: FC<IOTPInputProps> = props => {
           <Fonts type="smallText">{resendOtpMessage}.</Fonts>
         </CustomToast>
       )}
+
     </FormMainContainer>
   );
 };

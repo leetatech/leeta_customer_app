@@ -84,6 +84,7 @@ const SignIn: FC<IProps> = ({navigation}) => {
     setShowErrorMsg(false);
         navigation.navigate('OTPInput', {screenId: 'Signin'});
 
+
   };
 
 
