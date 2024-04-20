@@ -1,4 +1,4 @@
-package com.vendor;
+package com.leeta;
 
 import android.app.Application;
 import com.facebook.react.PackageList;
