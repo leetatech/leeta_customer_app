@@ -1,5 +1,6 @@
 import {PayloadAction, createSlice} from '@reduxjs/toolkit';
-import {forgotPassword, login, resetPassword, signup, verifyOtp} from './userServices';
+import {forgotPassword, login, resendOtp, resetPassword, signup, verifyOtp} from './userServices';
+
 
 
 interface UserState {
@@ -112,7 +113,8 @@ export const userSlice = createSlice({
       })
 
       //reset password
-       .addCase(resetPassword.pending, (state) => {
+      .addCase(resetPassword.pending, state => {
+
         state.loading = true;
         state.error = false;
       })
@@ -120,12 +122,29 @@ export const userSlice = createSlice({
         state.loading = false;
         state.error = false;
         state.userData = action.payload!.data as Record<string, string>;
-      })  
-      .addCase(resetPassword.rejected, (state, action: PayloadAction<any> ) => {
+      })
+      .addCase(resetPassword.rejected, (state, action: PayloadAction<any>) => {
         state.loading = false;
         state.error = true;
-        state.message = action.payload.data.message
+        state.message = action.payload.data.message;
       })
+
+      //resend Otp
+      .addCase(resendOtp.pending, state => {
+        state.loading = true;
+        state.error = false;
+      })
+      .addCase(resendOtp.fulfilled, (state, action) => {
+        state.loading = false;
+        state.error = false;
+        state.userData = action.payload!.data as Record<string, string>;
+      })
+      .addCase(resendOtp.rejected, (state, action: PayloadAction<any>) => {
+        state.loading = false;
+        state.error = true;
+        state.message = action.payload.data.message;
+      });
+
   },
 });
 
