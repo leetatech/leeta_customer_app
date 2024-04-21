@@ -148,6 +148,8 @@ const SignIn: FC<IProps> = ({navigation}) => {
       }
     }
   }, [userData, error, errorCode]);
+  console.log('ERROR', error);
+  console.log('ERRMSG', showErrorMsg);
 
 
   return (
