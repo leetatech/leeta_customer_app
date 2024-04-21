@@ -73,7 +73,8 @@ const CreateAccount: FC<IProps> = ({navigation}) => {
         password: formik.values.password.trim(),
         user_type: formik.values.user_type,
       };
-      dispatch(setemail(formik.values.email));
+      dispatch(setemail(formik.values.email.trim()));
+
       dispatch(signup(payload));
     }
   };

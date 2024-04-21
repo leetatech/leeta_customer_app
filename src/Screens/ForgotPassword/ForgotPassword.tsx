@@ -51,7 +51,7 @@ const ForgotPassword: FC<IProps> = ({navigation}) => {
     const payload = {
       email: formik.values.email.trim(),
     };
-    dispatch(setemail(formik.values.email));
+    dispatch(setemail(formik.values.email.trim()));
     dispatch(forgotPassword(payload))
       .then(response => {
         const result = response.payload as unknown as Record<
