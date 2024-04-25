@@ -7,7 +7,6 @@ import AppIntroSlider from 'react-native-app-intro-slider';
 import {colors} from '../../../Constants/Colors';
 import {SafeAreaView} from 'react-native-safe-area-context';
 import {NavigationProp, ParamListBase} from '@react-navigation/native';
-import {SvgUri} from 'react-native-svg';
 import { TouchableOpacity } from 'react-native';
 interface IProps {
   navigation: NavigationProp<ParamListBase>;
@@ -30,7 +29,6 @@ const Slider: FC<IProps> = ({navigation}) => {
                   <View style={styles.description_container}>
                   <Text style={styles.title}>{item.title}</Text>
                   <Text style={styles.description}>{item.description1}</Text>
-                  <Text style={styles.description}> {item.description2}</Text>
                   </View>
                  
                 </View>
