@@ -5,7 +5,6 @@ interface ApiUrls {
   forgotPassword:string;
   passwordReset:string
   resendOtp : string;
-
 }
 
 const BASE_URL = 'https://leetabackend-e6d948d15ae2.herokuapp.com/api/';

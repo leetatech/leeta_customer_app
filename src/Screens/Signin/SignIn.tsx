@@ -64,7 +64,6 @@ const SignIn: FC<IProps> = ({navigation}) => {
     validateOnBlur: false,
     onSubmit: () => {},
   });
-
   const handleSubmit = async () => {
     if (!Object.keys(formik.errors).length) {
       const payload = {
@@ -78,14 +77,11 @@ const SignIn: FC<IProps> = ({navigation}) => {
       } catch (err) {}
     }
   };
-
   const navigateToVerify = () => {
     dispatch(resetUserData());
     setShowErrorMsg(false);
         navigation.navigate('OTPInput', {screenId: 'Signin'});
-
   };
-
   const dismissErrorCodeMessageModal = () => {
     dispatch(resetUserState());
     setShowErrorMsg(false);
@@ -148,6 +144,7 @@ const SignIn: FC<IProps> = ({navigation}) => {
   }, [userData, error, errorCode]);
   console.log('ERROR', error);
   console.log('ERRMSG', showErrorMsg);
+
   return (
     <>
       <FormMainContainer>

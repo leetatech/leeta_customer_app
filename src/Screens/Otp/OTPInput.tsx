@@ -164,6 +164,7 @@ const OTPInput: FC<IOTPInputProps> = props => {
       .catch(error => {
         console.error('Error sending OTP:', error);
       });
+
   };
 
   useEffect(() => {
@@ -212,6 +213,7 @@ const OTPInput: FC<IOTPInputProps> = props => {
                 focusColor={colors.BLACK}
                 focusStickBlinkingDuration={200}
                 onTextChange={handleOtpCodeChange}
+
                 theme={{
                   pinCodeContainerStyle: styles.input,
                   pinCodeTextStyle: styles.inputText,
@@ -228,6 +230,7 @@ const OTPInput: FC<IOTPInputProps> = props => {
                 </TouchableOpacity>
               ) : (
                 <Fonts type="smallText">
+
                   Time Remaining {minutes < 10 ? `0${minutes}` : minutes}:
                   {seconds < 10 ? `0${seconds}` : seconds}
                 </Fonts>
@@ -255,6 +258,7 @@ const OTPInput: FC<IOTPInputProps> = props => {
           <Fonts type="smallText">{resendOtpMessage}.</Fonts>
         </CustomToast>
       )}
+
     </FormMainContainer>
   );
 };
