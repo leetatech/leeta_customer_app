@@ -1,4 +1,4 @@
-import React, {FC, useEffect, useState, useMemo} from 'react';
+import React, {FC, useEffect, useMemo} from 'react';
 import {View, Image, Text} from 'react-native';
 import createStyles from './styles';
 import {NavigationProp, ParamListBase} from '@react-navigation/native';
