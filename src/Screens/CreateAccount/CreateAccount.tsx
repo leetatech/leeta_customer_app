@@ -19,7 +19,6 @@ import {useDispatch, useSelector} from 'react-redux';
 import {signup} from '../../redux/slices/auth/userServices';
 import CustomLoader from '../../Components/Loader/CustomLoader';
 import {resetUserData, resetUserState, setemail} from '../../redux/slices/auth/userSlice';
-
 import {appUserType} from '../../config';
 import {applicationErrorCode} from '../../errors';
 

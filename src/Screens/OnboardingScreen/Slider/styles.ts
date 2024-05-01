@@ -1,61 +1,53 @@
 import {Dimensions, StyleSheet} from 'react-native';
 import {colors} from '../../../Constants/Colors';
-let height = Dimensions.get('window').height
-let width = Dimensions.get('window').width;
+let screenHeight = Dimensions.get('window').height;
+let screenWidth = Dimensions.get('window').width;
 
+const isSmallDevice = screenWidth < 380;
 
 const createStyles = () =>
   StyleSheet.create({
     contentContainer: {
       justifyContent: 'center',
       alignItems: 'center',
-      paddingBottom:50,
-      width:'100%'
+      width: '100%',
     },
     title: {
-      fontSize: 20,
+      fontSize: isSmallDevice ? 16 : 20,
       fontWeight: '600',
       color: colors.BLACK,
-      textAlign:'center',
-      
+      textAlign: 'center',
     },
+
     description: {
       color: colors.GRAY,
-      textAlign:'center',
+      textAlign: 'center',
     },
-    description_container:{
-      justifyContent: 'center',
-      alignItems: 'center',
-      textAlign:'center',
-      width:'80%',
-      height:70,
-      gap: 4,
-      paddingBottom:20,
+    description_container: {
+      textAlign: 'center',
+      width: isSmallDevice ? '100%' : '70%',
+      gap: 6,
+      marginTop: isSmallDevice ? 20 : 50,
+      overflow: 'scroll',
     },
     button_container: {
       width: '100%',
-      padding: 10,
-      paddingBottom: 40,
+      paddingHorizontal: 10,
+      paddingBottom: screenHeight * 0.04,
     },
-    existing_user: {
-      color: colors.ORANGE,
-      fontWeight: 'bold',
-      fontSize: 15,
-      alignSelf: 'center',
-      paddingTop: 5,
-    },
-    boy: {
-      width: 400,
-      height: height - 360,
+
+    image: {
+      width: '100%',
+      height: '75%',
     },
     image_container: {
       flex: 1,
     },
-    skip:{
-      color:colors.ORANGE,
+    skip: {
+      color: colors.ORANGE,
       fontWeight: 'bold',
       alignSelf: 'center',
-    }
+    },
   });
 
 export default createStyles;

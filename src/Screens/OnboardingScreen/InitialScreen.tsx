@@ -3,43 +3,50 @@ import {View, Image, Text} from 'react-native';
 import createStyles from './styles';
 import {NavigationProp, ParamListBase} from '@react-navigation/native';
 import {LOGO} from '../../Assets';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 interface IProps {
   navigation: NavigationProp<ParamListBase>;
 }
 const InitialScreen: FC<IProps> = ({navigation}) => {
-  // TODO: uncomment code to get user data and determine next screen
-  // const getUser = async () => {
-  //   try {
-  //     const value = await AsyncStorage.getItem('Slider');
-  //     if (value != null) {
-  //       navigation.navigate('CreateAccount');
-  //     } else {
-  //       navigation.navigate('Slider', {title: 'Slider'});
-  //     }
-  //   } catch (e) {
-  //   }
-  // };
-  const navigateToSignUp = () => {
-    navigation.reset({
-      index: 0, 
-      routes: [{name: "SignIn"}]
-    });
+
+  const checkOnboardingStatus = async () => {
+    try {
+      const onboardingStatus = await AsyncStorage.getItem('userOnboarding');
+      const routeName =
+        onboardingStatus === 'true' ? 'BottomNavigator' : 'Slider';
+      navigation.reset({
+        index: 0,
+        routes: [{name: routeName}],
+      });
+    } catch (error) {
+      console.error('Error checking onboarding status:', error);
+    }
   };
+
   useEffect(() => {
-    setTimeout(navigateToSignUp, 2000);
+    const handleUserStatus = async () => {
+      let onboardingStatus = await AsyncStorage.getItem('userOnboarding');
+      console.log(`onboarding status: ${onboardingStatus});`);
+      if (!onboardingStatus) {
+        await AsyncStorage.setItem('userOnboarding', 'false');
+      }
+      setTimeout(checkOnboardingStatus, 2000);
+    };
+    handleUserStatus();
   }, []);
+
   const styles = useMemo(() => createStyles(), []);
+
   return (
     <>
-       <View style={styles.body}>
-      <Image source={LOGO} />
-    </View>
-    <View style={styles.sub_container}>
-    <Text style={styles.description}>Your reliable kitchen assistant.</Text>
-    </View>
+      <View style={styles.body}>
+        <Image source={LOGO} />
+      </View>
+      <View style={styles.sub_container}>
+        <Text style={styles.description}>Your reliable kitchen assistant.</Text>
+      </View>
     </>
- 
   );
 };
 

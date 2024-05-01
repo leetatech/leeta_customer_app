@@ -21,7 +21,6 @@ import {resendOtp, verifyOtp} from '../../redux/slices/auth/userServices';
 import {maskEmail} from '../../utils';
 import {applicationErrorCode} from '../../errors';
 import {resetUserState} from '../../redux/slices/auth/userSlice';
-
 import Fonts from '../../Constants/Fonts';
 
 const OTPInput: FC<IOTPInputProps> = props => {
@@ -87,7 +86,6 @@ const OTPInput: FC<IOTPInputProps> = props => {
                 default:
                   navigation.navigate('SignIn');
                   break;
-
               }
             } else {
               console.log('screen id invalidate');
@@ -205,7 +203,6 @@ const OTPInput: FC<IOTPInputProps> = props => {
             <Fonts type="boldBlack" style={styles.bigText}>
               Check your Email.
             </Fonts>
-
             <Fonts type="smallText">we’ve sent an OTP to .</Fonts>
             <Fonts type="smallText">{maskedEmail} to get verified.</Fonts>
           </View>
