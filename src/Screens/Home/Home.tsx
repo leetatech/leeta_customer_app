@@ -1,4 +1,4 @@
-import React, {FC, useMemo, useRef, useState} from 'react';
+import React, {FC, useEffect, useMemo, useRef, useState} from 'react';
 import {NavigationProp, ParamListBase} from '@react-navigation/native';
 import GoogleMap from '../GoogleMap/GoogleMap';
 import {View, Text, TextInput} from 'react-native';
@@ -10,6 +10,8 @@ import {TouchableOpacity} from 'react-native-gesture-handler';
 import {CANCEL_ICON} from '../../Assets/svgImages';
 import {colors} from '../../Constants/Colors';
 import KeyboardAvoidingContainer from '../../Components/KeyboardAvoidingContainer';
+import {useDispatch, useSelector} from 'react-redux';
+import { productList } from '../../redux/slices/order/orderServices';
 
 interface IProps {
   navigation: NavigationProp<ParamListBase>;
@@ -22,6 +24,8 @@ const Home: FC<IProps> = ({navigation}) => {
   const [openGasWeightOptions, setopenGasWeightOptions] = useState(false);
   const [inputWeight, setInputWeight] = useState(false);
   const inputRef = useRef<TextInput>(null);
+const dispatch = useDispatch()
+
 
   const focusInput = () => {
     if (inputRef.current) {
@@ -39,15 +43,28 @@ const Home: FC<IProps> = ({navigation}) => {
   const handleInputWeight = (index: number) => {
     if (index === weightOptions.length - 1) {
       setInputWeight(true);
-      // navigation.navigate("AddAddress")
     }
   };
 
   const handleNavigation = () => {
     navigation.navigate('Cart');
     setopenGasWeightOptions(false);
-    
   };
+
+  const handleProductListing = () => {
+    console.log("Product Listing")
+    const payload = {
+      paging: {
+        index: 0,
+        size: 0,
+      },
+    };
+    dispatch(productList(payload))
+  };
+
+  useEffect(() => {
+    handleProductListing();
+  }, [])
 
   return (
     <KeyboardAvoidingContainer>
