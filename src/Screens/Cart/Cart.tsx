@@ -17,7 +17,10 @@ import Modal from 'react-native-modal';
 import CustomToast from '../../Components/Toast/CustomToast';
 import {useDispatch, useSelector} from 'react-redux';
 import {RootState} from '../../redux/rootReducer';
-import { gasRefill } from '../../redux/slices/order/orderServices';
+import {gasRefill} from '../../redux/slices/order/orderServices';
+import {
+  updateCart,
+} from '../../redux/slices/order/orderSlice';
 
 interface IProps {
   navigation: NavigationProp<ParamListBase>;
@@ -25,19 +28,12 @@ interface IProps {
 
 const Cart: FC<IProps> = ({navigation}) => {
   const styles = useMemo(() => createStyles(), []);
-  const {productId, productWeight} = useSelector((state: RootState) => state.order);
+  const {productId, productWeight, productQuantity, userCart} = useSelector(
+    (state: RootState) => state.order,
+  );
   const [showModal, setShowModal] = useState(false);
   const [showToastMsg, setshowToastMsg] = useState(false);
-  const [itemQuantity, setitemQuantity] = useState(1);
-  const [cartItems, setCartItems] = useState([
-    {
-      title: 'Max Gas',
-      type: 'Refill',
-      weight: `${productWeight} Kg`,
-      amount: '₦6800',
-    },
-   
-  ]);
+  const [selectedItem, setSelectedItem] = useState<number>(-1);
   const dispatch = useDispatch();
 
   const addToCart = async () => {
@@ -45,13 +41,12 @@ const Cart: FC<IProps> = ({navigation}) => {
       const payload = {
         cost: 0,
         product_id: productId!,
-        quantity: itemQuantity,
+        quantity: productQuantity!,
         weight: productWeight!,
       };
       await dispatch(gasRefill(payload));
       navigation.navigate('OrderConfirmation');
     } catch (error) {
-      console.log("ERROR",error);
       console.error('An error occurred while adding to cart:', error);
     }
   };
@@ -59,25 +54,42 @@ const Cart: FC<IProps> = ({navigation}) => {
   const removeCartItem = () => {
     setShowModal(false);
     setshowToastMsg(true);
+    const data = [...userCart!]
+    data.splice(selectedItem, 1);
+    dispatch(updateCart(data));
     setTimeout(() => {
       setshowToastMsg(false);
-      setCartItems([]);
     }, 2000);
   };
-
 
   const closeToast = () => {
     setshowToastMsg(false);
   };
-  
 
-  const handleItemIncrease = () => {
-    setitemQuantity((prevQuantity: number) => prevQuantity + 1);
+  const handleItemIncrease = (index: number) => {
+    const data = userCart?.map((item, indx) => {
+      if (index === indx) {
+        return {
+          ...item,
+          quantity: item.quantity + 1,
+        };
+      }
+      return item;
+    });
+    dispatch(updateCart(data));
   };
-  const handleItemDecrease = () => {
-    if (itemQuantity > 1) {
-      setitemQuantity((prevQuantity: number) => prevQuantity - 1);
-    }
+
+  const handleItemDecrease = (index: number) => {
+    const data = userCart?.map((item, indx) => {
+      if (index === indx && item.quantity > 1) {
+        return {
+          ...item,
+          quantity: item.quantity - 1,
+        };
+      }
+      return item;
+    });
+    dispatch(updateCart(data));
   };
 
   return (
@@ -90,12 +102,12 @@ const Cart: FC<IProps> = ({navigation}) => {
           <Text style={styles.description}>YOUR CART</Text>
         </View>
 
-        {cartItems.length > 0 ? (
+        {userCart && userCart.length > 0 ? (
           <>
             <ScrollView
               scrollEnabled={true}
               showsVerticalScrollIndicator={false}>
-              {cartItems.map((item, index) => {
+              {userCart.map((item, index) => {
                 return (
                   <View key={index} style={styles.orders_container}>
                     <View style={styles.container}>
@@ -117,17 +129,23 @@ const Cart: FC<IProps> = ({navigation}) => {
                       </View>
                     </View>
                     <View style={styles.action}>
-                      <TouchableOpacity onPress={()=> setShowModal(true)}>
+                      <TouchableOpacity
+                        onPress={() => {
+                          setShowModal(true);
+                          setSelectedItem(index);
+                        }}>
                         <Text style={styles.bold_txt}>Remove</Text>
                       </TouchableOpacity>
                       <View style={styles.cart_item_cta_container}>
-                        <TouchableOpacity onPress={handleItemDecrease}>
+                        <TouchableOpacity
+                          onPress={() => handleItemDecrease(index)}>
                           <DECREASE_ORDER_ICON />
                         </TouchableOpacity>
                         <Text style={[styles.gray_txt, {lineHeight: 15}]}>
-                          {itemQuantity}
+                          {item.quantity}
                         </Text>
-                        <TouchableOpacity onPress={handleItemIncrease}>
+                        <TouchableOpacity
+                          onPress={() => handleItemIncrease(index)}>
                           <INCREASE_ORDER_ICON />
                         </TouchableOpacity>
                       </View>
@@ -177,7 +195,7 @@ const Cart: FC<IProps> = ({navigation}) => {
         <View style={styles.modal_container}>
           <View style={styles.action}>
             <Text style={styles.modal_title}>Remove from cart</Text>
-            <TouchableOpacity onPress={()=> setShowModal(false)}>
+            <TouchableOpacity onPress={() => setShowModal(false)}>
               <CANCEL_ICON />
             </TouchableOpacity>
           </View>
@@ -189,7 +207,7 @@ const Cart: FC<IProps> = ({navigation}) => {
             disabled={false}
             buttonStyle={{marginTop: 5}}
             textStyle={{fontSize: 17}}
-            onPress={()=>setShowModal(false)}
+            onPress={() => setShowModal(false)}
           />
           <Buttons
             title="Remove Item"

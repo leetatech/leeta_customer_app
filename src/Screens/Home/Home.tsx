@@ -10,15 +10,19 @@ import {TouchableOpacity} from 'react-native-gesture-handler';
 import {CANCEL_ICON} from '../../Assets/svgImages';
 import {colors} from '../../Constants/Colors';
 import KeyboardAvoidingContainer from '../../Components/KeyboardAvoidingContainer';
-import {useDispatch} from 'react-redux';
+import {useDispatch, useSelector} from 'react-redux';
 import {productList} from '../../redux/slices/order/orderServices';
-import {setProductWeight} from '../../redux/slices/order/orderSlice';
+import {
+  setProductWeight,
+  setUserCart,
+} from '../../redux/slices/order/orderSlice';
+import {RootState} from '../../redux/rootReducer';
 
 interface IProps {
   navigation: NavigationProp<ParamListBase>;
 }
 
-const weightOptions = [1,2, 3, 4, 5, 6, 7];
+const weightOptions = [1, 2, 3, 4, 5, 6, 7];
 
 const Home: FC<IProps> = ({navigation}) => {
   const styles = useMemo(() => createStyles(), []);
@@ -27,6 +31,7 @@ const Home: FC<IProps> = ({navigation}) => {
   const inputRef = useRef<TextInput>(null);
   const dispatch = useDispatch();
   const [weightInput, setWeightInput] = useState<number>(weightOptions[0]);
+  const {productWeight} = useSelector((state: RootState) => state.order);
 
   const focusInput = () => {
     if (inputRef.current) {
@@ -34,10 +39,19 @@ const Home: FC<IProps> = ({navigation}) => {
     }
   };
 
+  const cartItems = {
+    title: 'Max Gas',
+    type: 'Refill',
+    weight:`${productWeight} Kg`,
+    amount: '₦6800',
+    quantity: 1,
+  };
+
   const closeWeightOptions = () => {
     setopenGasWeightOptions(false);
     setInputWeight(false);
   };
+
 
   const handleInputWeight = (index: number) => {
     if (index === weightOptions.length - 1) {
@@ -45,19 +59,23 @@ const Home: FC<IProps> = ({navigation}) => {
     } else {
       setWeightInput(weightOptions[index]);
       dispatch(setProductWeight(weightOptions[index]));
+      cartItems.weight = `${weightOptions[index]} Kg`;
+      dispatch(setUserCart(cartItems));
       navigation.navigate('Cart');
       setopenGasWeightOptions(false);
     }
   };
 
-  const handleChange = (e:string) => {
-      setWeightInput(Number(e));
+  const handleChange = (e: string) => {
+    setWeightInput(Number(e));
   };
 
   const handleNavigation = () => {
     dispatch(setProductWeight(weightInput));
-      navigation.navigate('Cart');
-      setopenGasWeightOptions(false);
+    cartItems.weight = `${weightInput} Kg`;
+    dispatch(setUserCart(cartItems));
+    navigation.navigate('Cart');
+    setopenGasWeightOptions(false);
   };
 
   const handleProductListing = () => {
@@ -132,7 +150,9 @@ const Home: FC<IProps> = ({navigation}) => {
 
               <Buttons
                 title="Continue"
-                disabled={inputWeight && (isNaN(weightInput) || weightInput === 0)}
+                disabled={
+                  inputWeight && (isNaN(weightInput) || weightInput === 0)
+                }
                 buttonStyle={undefined}
                 textStyle={undefined}
                 onPress={handleNavigation}

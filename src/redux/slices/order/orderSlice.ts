@@ -10,7 +10,9 @@ interface orderState {
   productListData?: Record<string, string>;
   productId? : string 
   productWeight?: number;
-  
+  productQuantity?: number;
+  userCart?:Array<Record<string,any>>;
+
 }
 
 const initialState: orderState = {
@@ -21,7 +23,9 @@ const initialState: orderState = {
   errorCode: 0,
   productListData: {},
   productId: "",
-  productWeight: 0
+  productWeight: 1,
+  productQuantity : 1,
+  userCart:[],
 };
 
 export const orderSlice = createSlice({
@@ -31,6 +35,18 @@ export const orderSlice = createSlice({
     setProductWeight: (state,action) => {
       state.productWeight = action.payload;
     },
+    setProductQuantity: (state,action) => {
+      state.productQuantity = action.payload;
+      console.log("QUANTITY",state.productQuantity);
+    },
+    setUserCart: (state,action) => {
+      state.userCart?.push(action.payload);
+      console.log("QUANTITY",state.userCart);
+    },
+    updateCart: (state,action) => {
+      state.userCart=action.payload;
+    },
+  
   },
   extraReducers: builder => {
     builder
@@ -68,6 +84,6 @@ export const orderSlice = createSlice({
   },
 });
 
-export const {setProductWeight} = orderSlice.actions;
+export const {setProductWeight,setProductQuantity,setUserCart,updateCart} = orderSlice.actions;
 
 export default orderSlice.reducer;
