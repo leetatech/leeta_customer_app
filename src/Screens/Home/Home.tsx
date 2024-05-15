@@ -10,22 +10,23 @@ import {TouchableOpacity} from 'react-native-gesture-handler';
 import {CANCEL_ICON} from '../../Assets/svgImages';
 import {colors} from '../../Constants/Colors';
 import KeyboardAvoidingContainer from '../../Components/KeyboardAvoidingContainer';
-import {useDispatch, useSelector} from 'react-redux';
-import { productList } from '../../redux/slices/order/orderServices';
+import {useDispatch} from 'react-redux';
+import {productList} from '../../redux/slices/order/orderServices';
+import {setProductWeight} from '../../redux/slices/order/orderSlice';
 
 interface IProps {
   navigation: NavigationProp<ParamListBase>;
 }
 
-const weightOptions = ['2 kg', '3 kg', '4 kg', '5 kg', '6 kg', '7 kg', 'Other'];
+const weightOptions = [1,2, 3, 4, 5, 6, 7];
 
 const Home: FC<IProps> = ({navigation}) => {
   const styles = useMemo(() => createStyles(), []);
   const [openGasWeightOptions, setopenGasWeightOptions] = useState(false);
   const [inputWeight, setInputWeight] = useState(false);
   const inputRef = useRef<TextInput>(null);
-const dispatch = useDispatch()
-
+  const dispatch = useDispatch();
+  const [weightInput, setWeightInput] = useState<number>(weightOptions[0]);
 
   const focusInput = () => {
     if (inputRef.current) {
@@ -33,38 +34,55 @@ const dispatch = useDispatch()
     }
   };
 
-  const handleOpenWeightOptions = () => {
-    setopenGasWeightOptions(true);
-  };
-  const handleCloseWeightOptions = () => {
+  const closeWeightOptions = () => {
     setopenGasWeightOptions(false);
     setInputWeight(false);
   };
+
   const handleInputWeight = (index: number) => {
     if (index === weightOptions.length - 1) {
       setInputWeight(true);
+    } else {
+      setWeightInput(weightOptions[index]);
+      dispatch(setProductWeight(weightOptions[index]));
+      navigation.navigate('Cart');
+      setopenGasWeightOptions(false);
     }
   };
 
+  const handleChange = (e:string) => {
+      setWeightInput(Number(e));
+  };
+
   const handleNavigation = () => {
-    navigation.navigate('Cart');
-    setopenGasWeightOptions(false);
+    dispatch(setProductWeight(weightInput));
+      navigation.navigate('Cart');
+      setopenGasWeightOptions(false);
   };
 
   const handleProductListing = () => {
-    console.log("Product Listing")
     const payload = {
+      filter: {
+        fields: [
+          {
+            name: 'string',
+            operator: 'isEqualTo',
+            value: 'string',
+          },
+        ],
+        operator: 'string',
+      },
       paging: {
         index: 0,
         size: 0,
       },
     };
-    dispatch(productList(payload))
+    dispatch(productList(payload));
   };
 
   useEffect(() => {
     handleProductListing();
-  }, [])
+  }, []);
 
   return (
     <KeyboardAvoidingContainer>
@@ -76,7 +94,7 @@ const dispatch = useDispatch()
             disabled={false}
             buttonStyle={undefined}
             textStyle={undefined}
-            onPress={handleOpenWeightOptions}
+            onPress={() => setopenGasWeightOptions(true)}
           />
         </View>
         <CustomModal visible={openGasWeightOptions}>
@@ -92,7 +110,7 @@ const dispatch = useDispatch()
             <Text style={styles.text_color}>
               {inputWeight ? 'Input Weight' : 'Select Weight'}
             </Text>
-            <TouchableOpacity onPress={handleCloseWeightOptions}>
+            <TouchableOpacity onPress={closeWeightOptions}>
               <CANCEL_ICON />
             </TouchableOpacity>
           </View>
@@ -102,17 +120,19 @@ const dispatch = useDispatch()
                 style={styles.input_weight_and_unit_container}
                 onPress={focusInput}>
                 <TextInput
+                  onChangeText={e => handleChange(e)}
                   placeholderTextColor={colors.LGRAY}
                   ref={inputRef}
                   style={styles.input_style}
+                  keyboardType="number-pad"
+                  value={weightInput.toString()}
                 />
-
                 <Text style={styles.unit}>Kg</Text>
               </TouchableOpacity>
 
               <Buttons
                 title="Continue"
-                disabled={false}
+                disabled={inputWeight && (isNaN(weightInput) || weightInput === 0)}
                 buttonStyle={undefined}
                 textStyle={undefined}
                 onPress={handleNavigation}
@@ -124,7 +144,9 @@ const dispatch = useDispatch()
                 {weightOptions.map((kg, index) => (
                   <View key={index} style={styles.weight_options_container}>
                     <TouchableOpacity onPress={() => handleInputWeight(index)}>
-                      <Text style={styles.text_color}>{kg}</Text>
+                      <Text style={styles.text_color}>
+                        {index < 6 ? `${kg} Kg` : 'Others'}
+                      </Text>
                     </TouchableOpacity>
                   </View>
                 ))}

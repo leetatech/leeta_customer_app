@@ -15,6 +15,9 @@ import {LEFT_ARROW} from '../../Assets';
 import {NavigationProp, ParamListBase} from '@react-navigation/native';
 import Modal from 'react-native-modal';
 import CustomToast from '../../Components/Toast/CustomToast';
+import {useDispatch, useSelector} from 'react-redux';
+import {RootState} from '../../redux/rootReducer';
+import { gasRefill } from '../../redux/slices/order/orderServices';
 
 interface IProps {
   navigation: NavigationProp<ParamListBase>;
@@ -22,6 +25,7 @@ interface IProps {
 
 const Cart: FC<IProps> = ({navigation}) => {
   const styles = useMemo(() => createStyles(), []);
+  const {productId, productWeight} = useSelector((state: RootState) => state.order);
   const [showModal, setShowModal] = useState(false);
   const [showToastMsg, setshowToastMsg] = useState(false);
   const [itemQuantity, setitemQuantity] = useState(1);
@@ -29,21 +33,30 @@ const Cart: FC<IProps> = ({navigation}) => {
     {
       title: 'Max Gas',
       type: 'Refill',
-      weight: '10Kg',
+      weight: `${productWeight} Kg`,
       amount: '₦6800',
     },
-    
+   
   ]);
+  const dispatch = useDispatch();
 
-  const handleModalVisibility = () => {
-    setShowModal(true);
+  const addToCart = async () => {
+    try {
+      const payload = {
+        cost: 0,
+        product_id: productId!,
+        quantity: itemQuantity,
+        weight: productWeight!,
+      };
+      await dispatch(gasRefill(payload));
+      navigation.navigate('OrderConfirmation');
+    } catch (error) {
+      console.log("ERROR",error);
+      console.error('An error occurred while adding to cart:', error);
+    }
   };
 
-  const handleCloseModal = () => {
-    setShowModal(false);
-  };
-
-  const handleRemoveItem = () => {
+  const removeCartItem = () => {
     setShowModal(false);
     setshowToastMsg(true);
     setTimeout(() => {
@@ -51,16 +64,21 @@ const Cart: FC<IProps> = ({navigation}) => {
       setCartItems([]);
     }, 2000);
   };
-  const closeToast = () =>{
+
+
+  const closeToast = () => {
     setshowToastMsg(false);
-  }
-  const handleItemIncrease = () =>{
+  };
+  
+
+  const handleItemIncrease = () => {
     setitemQuantity((prevQuantity: number) => prevQuantity + 1);
-  }
-  const handleItemDecrease = () =>{
+  };
+  const handleItemDecrease = () => {
     if (itemQuantity > 1) {
       setitemQuantity((prevQuantity: number) => prevQuantity - 1);
-    }  }
+    }
+  };
 
   return (
     <>
@@ -99,7 +117,7 @@ const Cart: FC<IProps> = ({navigation}) => {
                       </View>
                     </View>
                     <View style={styles.action}>
-                      <TouchableOpacity onPress={handleModalVisibility}>
+                      <TouchableOpacity onPress={()=> setShowModal(true)}>
                         <Text style={styles.bold_txt}>Remove</Text>
                       </TouchableOpacity>
                       <View style={styles.cart_item_cta_container}>
@@ -138,7 +156,7 @@ const Cart: FC<IProps> = ({navigation}) => {
                 disabled={false}
                 textStyle={undefined}
                 buttonStyle={undefined}
-                onPress={()=> navigation.navigate('OrderConfirmation')}
+                onPress={addToCart}
               />
             </View>
           </>
@@ -159,7 +177,7 @@ const Cart: FC<IProps> = ({navigation}) => {
         <View style={styles.modal_container}>
           <View style={styles.action}>
             <Text style={styles.modal_title}>Remove from cart</Text>
-            <TouchableOpacity onPress={handleCloseModal}>
+            <TouchableOpacity onPress={()=> setShowModal(false)}>
               <CANCEL_ICON />
             </TouchableOpacity>
           </View>
@@ -171,7 +189,7 @@ const Cart: FC<IProps> = ({navigation}) => {
             disabled={false}
             buttonStyle={{marginTop: 5}}
             textStyle={{fontSize: 17}}
-            onPress={handleCloseModal}
+            onPress={()=>setShowModal(false)}
           />
           <Buttons
             title="Remove Item"
@@ -182,12 +200,15 @@ const Cart: FC<IProps> = ({navigation}) => {
               borderWidth: 1,
             }}
             textStyle={{color: colors.ORANGE, fontSize: 17}}
-            onPress={handleRemoveItem}
+            onPress={removeCartItem}
           />
         </View>
       </Modal>
       {showToastMsg && (
-        <CustomToast viewStyle={{backgroundColor: colors.SUCCESS}} textStyle={{fontWeight:'500', fontSize:15}} onPress={closeToast}>
+        <CustomToast
+          viewStyle={{backgroundColor: colors.SUCCESS}}
+          textStyle={{fontWeight: '500', fontSize: 15}}
+          onPress={closeToast}>
           <Text>product has been removed from cart</Text>
         </CustomToast>
       )}

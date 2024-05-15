@@ -8,6 +8,9 @@ interface orderState {
   errorCode?: number;
   message?: string;
   productListData?: Record<string, string>;
+  productId? : string 
+  productWeight?: number;
+  
 }
 
 const initialState: orderState = {
@@ -17,12 +20,18 @@ const initialState: orderState = {
   message: '',
   errorCode: 0,
   productListData: {},
+  productId: "",
+  productWeight: 0
 };
 
 export const orderSlice = createSlice({
   name: 'order',
   initialState,
-  reducers: {},
+  reducers: {
+    setProductWeight: (state,action) => {
+      state.productWeight = action.payload;
+    },
+  },
   extraReducers: builder => {
     builder
       //gas refill
@@ -48,8 +57,8 @@ export const orderSlice = createSlice({
       .addCase(productList.fulfilled, (state, action) => {
         state.loading = false;
         state.error = false;
-        state.productListData = action.payload.data as Record<string, string>;
-        console.log('PRODUCTLISTDATA', state.productListData);
+        state.productListData = action.payload as unknown as Record<string, string>;
+        state.productId=action.payload.data.data[0].id
       })
       .addCase(productList.rejected, (state) => {
         state.loading = false;
@@ -58,5 +67,7 @@ export const orderSlice = createSlice({
       });
   },
 });
+
+export const {setProductWeight} = orderSlice.actions;
 
 export default orderSlice.reducer;

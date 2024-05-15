@@ -4,17 +4,16 @@ export const apiCall = async <T>(
   url: string,
   method: string,
   data?: any,
-  token?: Record<string, string>
+  header?: Record<string, string>
 ): Promise<T | undefined> => {
   try {
-     const headers = token ? { Authorization: `Bearer ${token}` } : {};
-
+    console.log("TOKEEEEN", header)
+     const headers = header ? header : {};
     const response: AxiosResponse = await axios({
       method,
       url,
       data,
       headers
-
     });
     return response.data
   } catch (error) {
