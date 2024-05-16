@@ -11,6 +11,13 @@ export interface GasRefillData {
   weight: number;
 }
 
+export interface FeeTypeData {
+  paging: {
+    index: number;
+    size: number;
+  };
+}
+
 export interface ProductListingData {
   filter: {
     fields: {
@@ -26,47 +33,44 @@ export interface ProductListingData {
   };
 }
 
+// interface FilterField {
+//   name: string;
+//   operator: string;
+//   value: string;
+// }
 
-interface FilterField {
-  name: string;
-  operator: string;
-  value: string;
-}
+// interface Filter {
+//   operator: string;
+//   fields: FilterField[];
+// }
 
-interface Filter {
-  operator: string;
-  fields: FilterField[];
-}
+// interface Paging {
+//   index: number;
+//   size: number;
+//   total: number;
+// }
 
-interface Paging {
-  index: number;
-  size: number;
-  total: number;
-}
+// interface Metadata {
+//   filter: Filter;
+//   paging: Paging;
+// }
 
-interface Metadata {
-  filter: Filter;
-  paging: Paging;
-}
+// interface DataItem {
+//   id: string;
+//   parent_category: string;
+//   name: string;
+//   description: string;
+//   status: string;
+//   status_ts: number;
+//   ts: number;
+// }
 
-interface DataItem {
-  id: string;
-  parent_category: string;
-  name: string;
-  description: string;
-  status: string;
-  status_ts: number;
-  ts: number;
-}
-
-export interface ApiResponse {
-  data: {
-      metadata: Metadata;
-      data: DataItem[];
-  };
-}
-
-
+// export interface ApiResponse {
+//   data: {
+//     metadata: Metadata;
+//     data: DataItem[];
+//   };
+// }
 
 export const gasRefill = createAsyncThunk(
   'order/gas_refill',
@@ -79,7 +83,7 @@ export const gasRefill = createAsyncThunk(
         Authorization: `Bearer ${token}`,
       };
       const response = await apiCall(url, method, gasRefillDetails, headers);
-      return response as Record<string, Record<string, string> | string>;
+      return response as Record<string, Record<string, string>>;
     } catch (error) {
       if (axios.isAxiosError(error)) {
         return rejectWithValue(error.response?.data);
@@ -103,9 +107,32 @@ export const productList = createAsyncThunk(
         Authorization: `Bearer ${token}`,
       };
       const response = await apiCall(url, method, productList, headers);
-      
-   return response as ApiResponse;
 
+      return response as Record<string, Record<string, string> | string>;
+    } catch (error) {
+      if (axios.isAxiosError(error)) {
+        return rejectWithValue(error.response?.data);
+      } else if (error instanceof Error) {
+        return rejectWithValue(error.message);
+      } else {
+        throw error;
+      }
+    }
+  },
+);
+
+export const feeType = createAsyncThunk(
+  'order/feeType',
+  async (feeType: FeeTypeData, {rejectWithValue}) => {
+    try {
+      const url = apiUrl.feesType;
+      const method = 'post';
+      const token = await AsyncStorage.getItem('userToken');
+      const headers = {
+        Authorization: `Bearer ${token}`,
+      };
+      const response = await apiCall(url, method, feeType, headers);
+      return response as Record<string, Record<string, string> | string>;
     } catch (error) {
       if (axios.isAxiosError(error)) {
         return rejectWithValue(error.response?.data);

@@ -11,10 +11,11 @@ import {CANCEL_ICON} from '../../Assets/svgImages';
 import {colors} from '../../Constants/Colors';
 import KeyboardAvoidingContainer from '../../Components/KeyboardAvoidingContainer';
 import {useDispatch, useSelector} from 'react-redux';
-import {productList} from '../../redux/slices/order/orderServices';
+import {feeType, productList} from '../../redux/slices/order/orderServices';
 import {
   setProductWeight,
   setUserCart,
+  sumCartFee,
 } from '../../redux/slices/order/orderSlice';
 import {RootState} from '../../redux/rootReducer';
 
@@ -31,7 +32,7 @@ const Home: FC<IProps> = ({navigation}) => {
   const inputRef = useRef<TextInput>(null);
   const dispatch = useDispatch();
   const [weightInput, setWeightInput] = useState<number>(weightOptions[0]);
-  const {productWeight} = useSelector((state: RootState) => state.order);
+  const {productWeight,fee,userCart} = useSelector((state: RootState) => state.order);
 
   const focusInput = () => {
     if (inputRef.current) {
@@ -43,7 +44,7 @@ const Home: FC<IProps> = ({navigation}) => {
     title: 'Max Gas',
     type: 'Refill',
     weight:`${productWeight} Kg`,
-    amount: '₦6800',
+    amount:`₦${fee}`,
     quantity: 1,
   };
 
@@ -52,15 +53,20 @@ const Home: FC<IProps> = ({navigation}) => {
     setInputWeight(false);
   };
 
-
   const handleInputWeight = (index: number) => {
     if (index === weightOptions.length - 1) {
       setInputWeight(true);
     } else {
+      const selectedWeight = weightOptions[index];
       setWeightInput(weightOptions[index]);
       dispatch(setProductWeight(weightOptions[index]));
-      cartItems.weight = `${weightOptions[index]} Kg`;
-      dispatch(setUserCart(cartItems));
+      const totalFeePerItem = fee! * selectedWeight;
+      const updatedCartItems = {
+        ...cartItems,
+        weight: `${selectedWeight} Kg`,
+        amount: `₦${totalFeePerItem}`,
+      };
+      dispatch(setUserCart(updatedCartItems));
       navigation.navigate('Cart');
       setopenGasWeightOptions(false);
     }
@@ -72,13 +78,18 @@ const Home: FC<IProps> = ({navigation}) => {
 
   const handleNavigation = () => {
     dispatch(setProductWeight(weightInput));
-    cartItems.weight = `${weightInput} Kg`;
-    dispatch(setUserCart(cartItems));
+    const totalFeePerItem = fee! * weightInput;
+  const updatedCartItems = {
+    ...cartItems,
+    weight: `${weightInput} Kg`,
+    amount: `₦${totalFeePerItem}`,
+  };
+    dispatch(setUserCart(updatedCartItems));
     navigation.navigate('Cart');
     setopenGasWeightOptions(false);
   };
 
-  const handleProductListing = () => {
+  const getProductListing = () => {
     const payload = {
       filter: {
         fields: [
@@ -98,8 +109,29 @@ const Home: FC<IProps> = ({navigation}) => {
     dispatch(productList(payload));
   };
 
+  const getFee = () => {
+    const payload = {
+      paging: {
+        index: 0,
+        size: 0,
+      },
+    };
+    dispatch(feeType(payload));
+  }
+
+  // const calculateTotalAmountAndDispatch = () => {
+      const totalAmount = userCart!.reduce((total, item) => {
+        const numericAmount = parseFloat(item.amount.replace('₦', ''));
+        return total + numericAmount;
+      }, 0);
+      const formattedTotalAmount = `₦${totalAmount.toFixed(2)}`;
+      dispatch(sumCartFee(formattedTotalAmount));
+  // };
+
   useEffect(() => {
-    handleProductListing();
+    getProductListing();
+    getFee();
+    // calculateTotalAmountAndDispatch()
   }, []);
 
   return (

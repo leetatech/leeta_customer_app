@@ -28,7 +28,7 @@ interface IProps {
 
 const Cart: FC<IProps> = ({navigation}) => {
   const styles = useMemo(() => createStyles(), []);
-  const {productId, productWeight, productQuantity, userCart} = useSelector(
+  const {productId, productWeight, productQuantity, userCart,fee,cartSummary} = useSelector(
     (state: RootState) => state.order,
   );
   const [showModal, setShowModal] = useState(false);
@@ -39,7 +39,7 @@ const Cart: FC<IProps> = ({navigation}) => {
   const addToCart = async () => {
     try {
       const payload = {
-        cost: 0,
+        cost: fee!,
         product_id: productId!,
         quantity: productQuantity!,
         weight: productWeight!,
@@ -166,7 +166,7 @@ const Cart: FC<IProps> = ({navigation}) => {
                   Total
                 </Text>
                 <Text style={[styles.bold_txt, {color: colors.GRAY}]}>
-                  ₦6800.00
+                {cartSummary}
                 </Text>
               </View>
               <Buttons
