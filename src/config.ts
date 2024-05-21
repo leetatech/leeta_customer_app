@@ -5,6 +5,8 @@ interface ApiUrls {
   forgotPassword:string;
   passwordReset:string
   resendOtp : string;
+  productList:string;
+  feesType:string;
 }
 
 const BASE_URL = 'https://leetabackend-e6d948d15ae2.herokuapp.com/api/';
@@ -16,6 +18,8 @@ export const apiUrl: ApiUrls = {
   forgotPassword: `${BASE_URL}session/forgot_password`, // POST
   passwordReset: `${BASE_URL}session/create_new_password`, // POST
   resendOtp: `${BASE_URL}session/otp/request`, //POST
+  productList:`${BASE_URL}product`, // PUT
+  feesType:`${BASE_URL}fees` // PUT
 };
 
-export const appUserType = "buyer"
+export const appUserType = "customer"

@@ -15,6 +15,9 @@ import {LEFT_ARROW} from '../../Assets';
 import {NavigationProp, ParamListBase} from '@react-navigation/native';
 import Modal from 'react-native-modal';
 import CustomToast from '../../Components/Toast/CustomToast';
+import {useDispatch, useSelector} from 'react-redux';
+import {RootState} from '../../redux/rootReducer';
+import {updateCart} from '../../redux/slices/order/orderSlice';
 
 interface IProps {
   navigation: NavigationProp<ParamListBase>;
@@ -22,45 +25,66 @@ interface IProps {
 
 const Cart: FC<IProps> = ({navigation}) => {
   const styles = useMemo(() => createStyles(), []);
+  const {productWeight, userCart, fee} = useSelector(
+    (state: RootState) => state.order,
+  );
   const [showModal, setShowModal] = useState(false);
   const [showToastMsg, setshowToastMsg] = useState(false);
-  const [itemQuantity, setitemQuantity] = useState(1);
-  const [cartItems, setCartItems] = useState([
-    {
-      title: 'Max Gas',
-      type: 'Refill',
-      weight: '10Kg',
-      amount: '₦6800',
-    },
-    
-  ]);
+  const [selectedItem, setSelectedItem] = useState<number>(-1);
+  const dispatch = useDispatch();
 
-  const handleModalVisibility = () => {
-    setShowModal(true);
-  };
-
-  const handleCloseModal = () => {
-    setShowModal(false);
-  };
-
-  const handleRemoveItem = () => {
+  const removeCartItem = () => {
     setShowModal(false);
     setshowToastMsg(true);
+    const data = [...userCart!];
+    data.splice(selectedItem, 1);
+    dispatch(updateCart(data));
     setTimeout(() => {
       setshowToastMsg(false);
-      setCartItems([]);
     }, 2000);
   };
-  const closeToast = () =>{
+
+  const closeToast = () => {
     setshowToastMsg(false);
-  }
-  const handleItemIncrease = () =>{
-    setitemQuantity((prevQuantity: number) => prevQuantity + 1);
-  }
-  const handleItemDecrease = () =>{
-    if (itemQuantity > 1) {
-      setitemQuantity((prevQuantity: number) => prevQuantity - 1);
-    }  }
+  };
+
+  const handleItemIncrease = (index: number) => {
+    const data = userCart?.map((item, indx) => {
+      if (index === indx) {
+        return {
+          ...item,
+          quantity: item.quantity + 1,
+          amount: (item.quantity + 1) * fee! * productWeight!,
+        };
+      }
+      return item;
+    });
+
+    dispatch(updateCart(data));
+  };
+
+  const handleItemDecrease = (index: number) => {
+    const data = userCart?.map((item, indx) => {
+      if (index === indx && item.quantity > 1) {
+        return {
+          ...item,
+          quantity: item.quantity - 1,
+          amount: (item.quantity - 1) * fee! * productWeight!,
+        };
+      }
+      return item;
+    });
+    dispatch(updateCart(data));
+  };
+
+  const calculateTotalAmountAndDispatch = () => {
+    const totalAmount = userCart!.reduce((total, item) => {
+      const numericAmount = parseFloat(item.amount);
+      return total + numericAmount;
+    }, 0);
+    const formattedTotalAmount = `₦${totalAmount.toFixed(2)}`;
+    return formattedTotalAmount;
+  };
 
   return (
     <>
@@ -72,12 +96,12 @@ const Cart: FC<IProps> = ({navigation}) => {
           <Text style={styles.description}>YOUR CART</Text>
         </View>
 
-        {cartItems.length > 0 ? (
+        {userCart && userCart.length > 0 ? (
           <>
             <ScrollView
               scrollEnabled={true}
               showsVerticalScrollIndicator={false}>
-              {cartItems.map((item, index) => {
+              {userCart.map((item, index) => {
                 return (
                   <View key={index} style={styles.orders_container}>
                     <View style={styles.container}>
@@ -99,17 +123,23 @@ const Cart: FC<IProps> = ({navigation}) => {
                       </View>
                     </View>
                     <View style={styles.action}>
-                      <TouchableOpacity onPress={handleModalVisibility}>
+                      <TouchableOpacity
+                        onPress={() => {
+                          setShowModal(true);
+                          setSelectedItem(index);
+                        }}>
                         <Text style={styles.bold_txt}>Remove</Text>
                       </TouchableOpacity>
                       <View style={styles.cart_item_cta_container}>
-                        <TouchableOpacity onPress={handleItemDecrease}>
+                        <TouchableOpacity
+                          onPress={() => handleItemDecrease(index)}>
                           <DECREASE_ORDER_ICON />
                         </TouchableOpacity>
                         <Text style={[styles.gray_txt, {lineHeight: 15}]}>
-                          {itemQuantity}
+                          {item.quantity}
                         </Text>
-                        <TouchableOpacity onPress={handleItemIncrease}>
+                        <TouchableOpacity
+                          onPress={() => handleItemIncrease(index)}>
                           <INCREASE_ORDER_ICON />
                         </TouchableOpacity>
                       </View>
@@ -130,7 +160,7 @@ const Cart: FC<IProps> = ({navigation}) => {
                   Total
                 </Text>
                 <Text style={[styles.bold_txt, {color: colors.GRAY}]}>
-                  ₦6800.00
+                  {calculateTotalAmountAndDispatch()}{' '}
                 </Text>
               </View>
               <Buttons
@@ -138,7 +168,7 @@ const Cart: FC<IProps> = ({navigation}) => {
                 disabled={false}
                 textStyle={undefined}
                 buttonStyle={undefined}
-                onPress={()=> navigation.navigate('OrderConfirmation')}
+                onPress={() => navigation.navigate('OrderConfirmation')}
               />
             </View>
           </>
@@ -159,7 +189,7 @@ const Cart: FC<IProps> = ({navigation}) => {
         <View style={styles.modal_container}>
           <View style={styles.action}>
             <Text style={styles.modal_title}>Remove from cart</Text>
-            <TouchableOpacity onPress={handleCloseModal}>
+            <TouchableOpacity onPress={() => setShowModal(false)}>
               <CANCEL_ICON />
             </TouchableOpacity>
           </View>
@@ -171,7 +201,7 @@ const Cart: FC<IProps> = ({navigation}) => {
             disabled={false}
             buttonStyle={{marginTop: 5}}
             textStyle={{fontSize: 17}}
-            onPress={handleCloseModal}
+            onPress={() => setShowModal(false)}
           />
           <Buttons
             title="Remove Item"
@@ -182,12 +212,15 @@ const Cart: FC<IProps> = ({navigation}) => {
               borderWidth: 1,
             }}
             textStyle={{color: colors.ORANGE, fontSize: 17}}
-            onPress={handleRemoveItem}
+            onPress={removeCartItem}
           />
         </View>
       </Modal>
       {showToastMsg && (
-        <CustomToast viewStyle={{backgroundColor: colors.SUCCESS}} textStyle={{fontWeight:'500', fontSize:15}} onPress={closeToast}>
+        <CustomToast
+          viewStyle={{backgroundColor: colors.SUCCESS}}
+          textStyle={{fontWeight: '500', fontSize: 15}}
+          onPress={closeToast}>
           <Text>product has been removed from cart</Text>
         </CustomToast>
       )}
