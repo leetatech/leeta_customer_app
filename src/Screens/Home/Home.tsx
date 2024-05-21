@@ -15,7 +15,6 @@ import {feeType, productList} from '../../redux/slices/order/orderServices';
 import {
   setProductWeight,
   setUserCart,
-  sumCartFee,
 } from '../../redux/slices/order/orderSlice';
 import {RootState} from '../../redux/rootReducer';
 
@@ -32,7 +31,7 @@ const Home: FC<IProps> = ({navigation}) => {
   const inputRef = useRef<TextInput>(null);
   const dispatch = useDispatch();
   const [weightInput, setWeightInput] = useState<number>(weightOptions[0]);
-  const {productWeight,fee,userCart} = useSelector((state: RootState) => state.order);
+  const {productWeight,fee,productQuantity} = useSelector((state: RootState) => state.order);
 
   const focusInput = () => {
     if (inputRef.current) {
@@ -44,7 +43,7 @@ const Home: FC<IProps> = ({navigation}) => {
     title: 'Max Gas',
     type: 'Refill',
     weight:`${productWeight} Kg`,
-    amount:`₦${fee}`,
+    amount:fee! * productWeight! * productQuantity!,
     quantity: 1,
   };
 
@@ -58,14 +57,14 @@ const Home: FC<IProps> = ({navigation}) => {
       setInputWeight(true);
     } else {
       const selectedWeight = weightOptions[index];
-      setWeightInput(weightOptions[index]);
       dispatch(setProductWeight(weightOptions[index]));
-      const totalFeePerItem = fee! * selectedWeight;
+      const totalFeePerItem = fee! * selectedWeight ;
       const updatedCartItems = {
         ...cartItems,
         weight: `${selectedWeight} Kg`,
-        amount: `₦${totalFeePerItem}`,
+        amount: totalFeePerItem,
       };
+
       dispatch(setUserCart(updatedCartItems));
       navigation.navigate('Cart');
       setopenGasWeightOptions(false);
@@ -82,7 +81,7 @@ const Home: FC<IProps> = ({navigation}) => {
   const updatedCartItems = {
     ...cartItems,
     weight: `${weightInput} Kg`,
-    amount: `₦${totalFeePerItem}`,
+    amount: totalFeePerItem,
   };
     dispatch(setUserCart(updatedCartItems));
     navigation.navigate('Cart');
@@ -119,19 +118,9 @@ const Home: FC<IProps> = ({navigation}) => {
     dispatch(feeType(payload));
   }
 
-  // const calculateTotalAmountAndDispatch = () => {
-      const totalAmount = userCart!.reduce((total, item) => {
-        const numericAmount = parseFloat(item.amount.replace('₦', ''));
-        return total + numericAmount;
-      }, 0);
-      const formattedTotalAmount = `₦${totalAmount.toFixed(2)}`;
-      dispatch(sumCartFee(formattedTotalAmount));
-  // };
-
   useEffect(() => {
     getProductListing();
     getFee();
-    // calculateTotalAmountAndDispatch()
   }, []);
 
   return (

@@ -5,7 +5,6 @@ interface ApiUrls {
   forgotPassword:string;
   passwordReset:string
   resendOtp : string;
-  cart:string;
   productList:string;
   feesType:string;
 }
@@ -19,9 +18,8 @@ export const apiUrl: ApiUrls = {
   forgotPassword: `${BASE_URL}session/forgot_password`, // POST
   passwordReset: `${BASE_URL}session/create_new_password`, // POST
   resendOtp: `${BASE_URL}session/otp/request`, //POST
-  cart:`${BASE_URL}cart/add`, // POST
-  productList:`${BASE_URL}product/list`, // POST
-  feesType:`${BASE_URL}fees/type` // POST
+  productList:`${BASE_URL}product`, // PUT
+  feesType:`${BASE_URL}fees` // PUT
 };
 
 export const appUserType = "customer"

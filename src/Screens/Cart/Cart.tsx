@@ -17,10 +17,7 @@ import Modal from 'react-native-modal';
 import CustomToast from '../../Components/Toast/CustomToast';
 import {useDispatch, useSelector} from 'react-redux';
 import {RootState} from '../../redux/rootReducer';
-import {gasRefill} from '../../redux/slices/order/orderServices';
-import {
-  updateCart,
-} from '../../redux/slices/order/orderSlice';
+import {updateCart} from '../../redux/slices/order/orderSlice';
 
 interface IProps {
   navigation: NavigationProp<ParamListBase>;
@@ -28,7 +25,7 @@ interface IProps {
 
 const Cart: FC<IProps> = ({navigation}) => {
   const styles = useMemo(() => createStyles(), []);
-  const {productId, productWeight, productQuantity, userCart,fee,cartSummary} = useSelector(
+  const {productWeight, userCart, fee} = useSelector(
     (state: RootState) => state.order,
   );
   const [showModal, setShowModal] = useState(false);
@@ -36,25 +33,10 @@ const Cart: FC<IProps> = ({navigation}) => {
   const [selectedItem, setSelectedItem] = useState<number>(-1);
   const dispatch = useDispatch();
 
-  const addToCart = async () => {
-    try {
-      const payload = {
-        cost: fee!,
-        product_id: productId!,
-        quantity: productQuantity!,
-        weight: productWeight!,
-      };
-      await dispatch(gasRefill(payload));
-      navigation.navigate('OrderConfirmation');
-    } catch (error) {
-      console.error('An error occurred while adding to cart:', error);
-    }
-  };
-
   const removeCartItem = () => {
     setShowModal(false);
     setshowToastMsg(true);
-    const data = [...userCart!]
+    const data = [...userCart!];
     data.splice(selectedItem, 1);
     dispatch(updateCart(data));
     setTimeout(() => {
@@ -72,10 +54,12 @@ const Cart: FC<IProps> = ({navigation}) => {
         return {
           ...item,
           quantity: item.quantity + 1,
+          amount: (item.quantity + 1) * fee! * productWeight!,
         };
       }
       return item;
     });
+
     dispatch(updateCart(data));
   };
 
@@ -85,11 +69,21 @@ const Cart: FC<IProps> = ({navigation}) => {
         return {
           ...item,
           quantity: item.quantity - 1,
+          amount: (item.quantity - 1) * fee! * productWeight!,
         };
       }
       return item;
     });
     dispatch(updateCart(data));
+  };
+
+  const calculateTotalAmountAndDispatch = () => {
+    const totalAmount = userCart!.reduce((total, item) => {
+      const numericAmount = parseFloat(item.amount);
+      return total + numericAmount;
+    }, 0);
+    const formattedTotalAmount = `₦${totalAmount.toFixed(2)}`;
+    return formattedTotalAmount;
   };
 
   return (
@@ -166,7 +160,7 @@ const Cart: FC<IProps> = ({navigation}) => {
                   Total
                 </Text>
                 <Text style={[styles.bold_txt, {color: colors.GRAY}]}>
-                {cartSummary}
+                  {calculateTotalAmountAndDispatch()}{' '}
                 </Text>
               </View>
               <Buttons
@@ -174,7 +168,7 @@ const Cart: FC<IProps> = ({navigation}) => {
                 disabled={false}
                 textStyle={undefined}
                 buttonStyle={undefined}
-                onPress={addToCart}
+                onPress={() => navigation.navigate('OrderConfirmation')}
               />
             </View>
           </>
