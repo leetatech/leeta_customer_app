@@ -54,7 +54,7 @@ const Cart: FC<IProps> = ({navigation}) => {
         return {
           ...item,
           quantity: item.quantity + 1,
-          amount: (item.quantity + 1) * fee! * productWeight!,
+          amount: (item.quantity + 1) * fee! * parseFloat(item.weight),
         };
       }
       return item;
@@ -69,7 +69,7 @@ const Cart: FC<IProps> = ({navigation}) => {
         return {
           ...item,
           quantity: item.quantity - 1,
-          amount: (item.quantity - 1) * fee! * productWeight!,
+          amount: (item.quantity - 1) * fee! * parseFloat(item.weight),
         };
       }
       return item;
