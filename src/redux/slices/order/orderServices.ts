@@ -26,6 +26,12 @@ export interface ProductListingData {
     size: number;
   };
 }
+export interface CheckoutData {
+  cost: number,
+  product_id: string,
+  quantity: number,
+  weight: number
+}
 
 export const productList = createAsyncThunk(
   'order/productList',
@@ -63,6 +69,30 @@ export const feeType = createAsyncThunk(
       };
       const response = await apiCall(url, method, feeType, headers);
       return response as FeeResponse;
+    } catch (error) {
+      if (axios.isAxiosError(error)) {
+        return rejectWithValue(error.response?.data);
+      } else if (error instanceof Error) {
+        return rejectWithValue(error.message);
+      } else {
+        throw error;
+      }
+    }
+  },
+);
+
+export const checkout = createAsyncThunk(
+  'order/checkout',
+  async (checkout: CheckoutData, {rejectWithValue}) => {
+    try {
+      const url = apiUrl.checkout
+      const method = 'post';
+      const token = await AsyncStorage.getItem('userToken');
+      const headers = {
+        Authorization: `Bearer ${token}`,
+      };
+      const response = await apiCall(url, method, checkout, headers);
+      return response as  Record<string, Record<string, string> | string>;
     } catch (error) {
       if (axios.isAxiosError(error)) {
         return rejectWithValue(error.response?.data);

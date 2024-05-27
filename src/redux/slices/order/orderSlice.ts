@@ -1,5 +1,5 @@
-import {createSlice} from '@reduxjs/toolkit';
-import {feeType, productList} from './orderServices';
+import {PayloadAction, createSlice} from '@reduxjs/toolkit';
+import {checkout, feeType, productList} from './orderServices';
 import {ProductListResponse, FeeResponse} from './types';
 
 interface orderState {
@@ -14,6 +14,7 @@ interface orderState {
   userCart?: Array<Record<string, any>>;
   feeTypeData?: FeeResponse;
   fee?: number;
+  checkoutData?: Record<string, string>
 }
 
 const initialState: orderState = {
@@ -28,6 +29,7 @@ const initialState: orderState = {
   userCart: [],
   feeTypeData: {},
   fee: 0,
+  checkoutData:{}
 };
 
 export const orderSlice = createSlice({
@@ -84,8 +86,29 @@ export const orderSlice = createSlice({
       .addCase(feeType.rejected, state => {
         state.loading = false;
         state.error = true;
-      });
-  },
+      })
+
+      //CHECKOUT
+      .addCase(checkout.pending, state => {
+        state.loading = true;
+        state.error = false;
+      })
+      .addCase(checkout.fulfilled, (state, action) => {
+        state.loading = false;
+        state.error = false;
+        state.checkoutData = action.payload!.data as Record<string, string>;
+      }) 
+      .addCase(checkout.rejected, (state, action: PayloadAction<any>) => {
+        state.loading = false;
+        state.error = true;
+        state.errorCode = action.payload?.data?.error_code || 1;
+        state.message = action.payload.data.message;
+        console.log("ERROR MSG",state.message);
+
+      })
+    
+    },
+      
 });
 
 export const {setProductWeight, setProductQuantity, setUserCart, updateCart} =

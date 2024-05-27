@@ -19,42 +19,28 @@ import {colors} from '../../Constants/Colors';
 import Buttons from '../../Components/Buttons/Buttons';
 import CustomModal from '../../Components/Modal/CustomModal';
 import {Receipt} from '../../Components/Receipt/Receipt';
-
+import {useDispatch, useSelector} from 'react-redux';
+import {RootState} from '../../redux/rootReducer';
+import {checkout} from '../../redux/slices/order/orderServices';
 
 interface IProps {
   navigation: NavigationProp<ParamListBase>;
 }
-
-interface OrderItem {
-  title: string;
-  type: string;
-  weight: string;
-  amount: string;
-}
-
-const orderInformation = [
-  {
-    title: 'Max Gas',
-    type: 'Refill',
-    weight: '10Kg',
-    amount: '₦6800',
-  },
-];
 
 const OrderConfirmation: FC<IProps> = ({navigation}) => {
   const styles = useMemo(() => createStyles(), []);
   const [showModal, setShowModal] = useState(false);
   const bounceValue = new Animated.Value(1);
   const [viewReceipt, setViewReceipt] = useState(false);
+  const {userCart, productId} = useSelector(
+    (state: RootState) => state.order,
+  );
+  const dispatch = useDispatch();
 
-  const handleViewReceipt = () => {
-    setViewReceipt(true);
-  };
   const handleCloseReceipt = () => {
     setShowModal(false);
     setViewReceipt(false);
   };
-
 
   useEffect(() => {
     const bounceAnimation = Animated.sequence([
@@ -69,9 +55,7 @@ const OrderConfirmation: FC<IProps> = ({navigation}) => {
         useNativeDriver: false,
       }),
     ]);
-
     Animated.loop(bounceAnimation).start();
-
     return () => {
       bounceValue.removeAllListeners();
     };
@@ -84,13 +68,53 @@ const OrderConfirmation: FC<IProps> = ({navigation}) => {
   const handleModalVisibility = () => {
     setShowModal(true);
   };
-  const handleCloseModal = () => {
-    setShowModal(false);
-  };
-
   const handleNavigateToHomeScreen = () => {
     setShowModal(false);
     navigation.navigate('BottomNavigator');
+  };
+
+  const calculateTotalAmountAndDispatch = () => {
+    const totalAmount = userCart!.reduce((total, item) => {
+      const numericAmount = parseFloat(item.amount);
+      return total + numericAmount;
+    }, 0);
+    const formattedTotalAmount = `₦${totalAmount.toFixed(2)}`;
+    return formattedTotalAmount;
+  };
+
+  const handleCheckOut = () => {
+    const getTotalWeight = () => {
+      return userCart?.reduce((total, item) => {
+        const weight = parseFloat(item.weight.replace(' Kg', ''));
+        return total + weight;
+      }, 0);
+    };
+    const totalWeight = getTotalWeight();
+
+    const getTotalQuantity = () => {
+      return userCart?.reduce((total, item) => {
+        const quantity = parseFloat(item.quantity);
+        return total + quantity;
+      }, 0);
+    };
+    const totalQuantity = getTotalQuantity();
+
+    const payload = {
+      cost: Number(calculateTotalAmountAndDispatch()),
+      product_id: productId!,
+      quantity: totalQuantity!,
+      weight: totalWeight!,
+    };
+
+    dispatch(checkout(payload))
+      .then(response => {
+        // if (response.status === 200) {
+        //   handleNavigateToHomeScreen();
+        // }
+      })
+      .catch(error => {
+        console.error('Error adding items to cart:', error);
+      });
   };
 
   const renderPaymentMethod = () => (
@@ -125,58 +149,57 @@ const OrderConfirmation: FC<IProps> = ({navigation}) => {
           </View>
         </View>
         <TouchableOpacity onPress={() => navigation.navigate('AddAddress')}>
-
           <RIGHT_ICON />
         </TouchableOpacity>
       </View>
     </View>
   );
 
-  const renderOrder = (order: OrderItem, index: number) => (
-    <View
-      style={[index === orderInformation.length - 1 && styles.card_style]}
-      key={index}>
-      <View style={styles.payment_container} key={index}>
-        <View style={styles.checkbox_container}>
-          <CYLINDER />
-          <View style={styles.address}>
-            <Fonts type="boldBlack">{order.title}</Fonts>
-            <Fonts type="normalGrayText">Type: {order.type}</Fonts>
-            <Fonts type="normalGrayText">Weight: {order.weight}</Fonts>
-            <View style={styles.amount_container}>
-              <Fonts type="normalGrayText">Amount:</Fonts>
-              <Fonts
-                type="normalGrayText"
-                style={{fontWeight: '800', color: colors.DGRAY}}>
-                {order.amount}
-              </Fonts>
+  const renderOrder = () => (
+    <View style={styles.card_style}>
+      {userCart?.map((item, indx) => {
+        return (
+          <View style={styles.payment_container} key={indx}>
+            <View style={styles.checkbox_container}>
+              <CYLINDER />
+              <View style={styles.address}>
+                <Fonts type="normalBoldText">{item.title}</Fonts>
+                <Fonts type="normalGrayText">Type: {item.type}</Fonts>
+                <Fonts type="normalGrayText">Weight: {item.weight}</Fonts>
+                <View style={styles.amount_container}>
+                  <Fonts type="normalGrayText">Amount:</Fonts>
+                  <Fonts
+                    type="normalGrayText"
+                    style={{fontWeight: '800', color: colors.GRAY}}>
+                    {`₦${item.amount}`}
+                  </Fonts>
+                </View>
+              </View>
             </View>
+          </View>
+        );
+      })}
+      <View style={styles.order_summary_container}>
+        <Fonts type="boldBlack" style={{paddingBottom: 20}}>
+          Summary
+        </Fonts>
+        <View style={styles.summary_container}>
+          <View style={styles.text_spacing}>
+            <Fonts type="normalBlackText">Total item costs </Fonts>
+            <Fonts type="normalBlackText">Delivery fee</Fonts>
+            <Fonts type="normalBlackText">Service fee</Fonts>
+          </View>
+          <View style={styles.text_spacing}>
+            <Fonts type="normalBlackText">
+              {calculateTotalAmountAndDispatch()}
+            </Fonts>
+            <Fonts type="normalBlackText">₦1500</Fonts>
+            <Fonts type="normalBlackText">₦25</Fonts>
           </View>
         </View>
       </View>
-      {index === orderInformation.length - 1 && (
-        <View style={styles.order_summary_container}>
-          <Fonts type="boldBlack" style={{paddingBottom: 20}}>
-            Summary
-          </Fonts>
-          <View style={styles.summary_container}>
-            <View style={styles.text_spacing}>
-              <Fonts type="normalBlackText">Total item costs </Fonts>
-              <Fonts type="normalBlackText">Delivery fee</Fonts>
-              <Fonts type="normalBlackText">Service fee</Fonts>
-            </View>
-            <View style={styles.text_spacing}>
-              <Fonts type="normalBlackText">₦6800</Fonts>
-              <Fonts type="normalBlackText">₦1500</Fonts>
-              <Fonts type="normalBlackText">₦25</Fonts>
-            </View>
-          </View>
-        </View>
-      )}
-
     </View>
   );
-
   return (
     <>
       <FormMainContainer>
@@ -192,7 +215,7 @@ const OrderConfirmation: FC<IProps> = ({navigation}) => {
               <Fonts type="boldLightGray" style={{paddingTop: 15}}>
                 Your Cart
               </Fonts>
-              {orderInformation.map(renderOrder)}
+              {renderOrder()}
               <TouchableOpacity onPress={() => navigation.navigate('Cart')}>
                 <Fonts
                   type="boldLightGray"
@@ -214,14 +237,16 @@ const OrderConfirmation: FC<IProps> = ({navigation}) => {
               </Fonts>
               <View style={styles.action}>
                 <Fonts type="boldBlack"> Total</Fonts>
-                <Fonts type="boldBlack"> ₦6800.00</Fonts>
+                <Fonts type="boldBlack">
+                  {calculateTotalAmountAndDispatch()}
+                </Fonts>
               </View>
               <Buttons
                 title="Checkout"
                 disabled={false}
                 textStyle={undefined}
                 buttonStyle={undefined}
-                onPress={handleModalVisibility}
+                onPress={handleCheckOut}
               />
             </View>
           </View>
@@ -250,7 +275,7 @@ const OrderConfirmation: FC<IProps> = ({navigation}) => {
         {!viewReceipt && (
           <FormMainContainer>
             <TouchableOpacity
-              onPress={handleCloseModal}
+              onPress={() => setShowModal(false)}
               style={styles.close_icon}>
               <CANCEL_ICON />
             </TouchableOpacity>
@@ -282,16 +307,14 @@ const OrderConfirmation: FC<IProps> = ({navigation}) => {
                 disabled={false}
                 buttonStyle={styles.view_receipt_btn}
                 textStyle={styles.view_receipt_text}
-                onPress={handleViewReceipt}
+                onPress={() => setViewReceipt(true)}
               />
             </View>
           </FormMainContainer>
         )}
-
       </CustomModal>
     </>
   );
 };
 
 export default OrderConfirmation;
-
