@@ -42,6 +42,12 @@ const createStyles = () =>
           fontSize: 15,
           fontWeight:'400'
 
+        },
+        normalBoldText :{
+          color:colors.DGRAY,
+          fontSize: 12,
+          fontWeight:'700'
+
         }
    
   });
