@@ -3,7 +3,7 @@ import axios from 'axios';
 import {apiUrl} from '../../../config';
 import {apiCall} from '../../../utils';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import {ProductListResponse, FeeResponse} from './types';
+import {ProductListResponse, FeeResponse, CartItemResponsePayload} from './types';
 
 export interface FeeTypeData {
   paging: {
@@ -26,11 +26,17 @@ export interface ProductListingData {
     size: number;
   };
 }
-export interface CheckoutData {
+export interface CartData {
   cost: number,
   product_id: string,
   quantity: number,
   weight: number
+}
+export interface CartItemQuantityData {
+  
+  cart_item_id: string,
+    quantity: number
+  
 }
 
 export const productList = createAsyncThunk(
@@ -81,22 +87,47 @@ export const feeType = createAsyncThunk(
   },
 );
 
-export const checkout = createAsyncThunk(
-  'order/checkout',
-  async (checkout: CheckoutData, {rejectWithValue}) => {
+export const addTocart = createAsyncThunk(
+  'order/addTocart',
+  async (cart: CartData, {rejectWithValue}) => {
     try {
-      const url = apiUrl.checkout
+      const url = apiUrl.cartAdd
       const method = 'post';
       const token = await AsyncStorage.getItem('userToken');
       const headers = {
         Authorization: `Bearer ${token}`,
       };
-      const response = await apiCall(url, method, checkout, headers);
+      const response = await apiCall(url, method, cart, headers);
+      return response as  CartItemResponsePayload;
+    } catch (error) {
+      if (axios.isAxiosError(error)) {
+        return rejectWithValue(error.response?.data);
+      } else if (error instanceof Error) {
+        return rejectWithValue(error.message);
+      } else {
+        throw error;
+      }
+    }
+  },
+);
+
+export const updateCartItemQuantity = createAsyncThunk(
+  'order/updateCartItemQuantity',
+  async (cartItemQuantity: CartItemQuantityData, {rejectWithValue}) => {
+    try {
+      const url = apiUrl.cartItemQuantity;
+      const method = 'put';
+      const token = await AsyncStorage.getItem('userToken');
+      const headers = {
+        Authorization: `Bearer ${token}`,
+      };
+      const response = await apiCall(url, method, cartItemQuantity, headers);
       return response as  Record<string, Record<string, string> | string>;
     } catch (error) {
       if (axios.isAxiosError(error)) {
         return rejectWithValue(error.response?.data);
       } else if (error instanceof Error) {
+        console.log("ERROR",error.message)
         return rejectWithValue(error.message);
       } else {
         throw error;

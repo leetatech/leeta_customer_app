@@ -1,6 +1,6 @@
 import {PayloadAction, createSlice} from '@reduxjs/toolkit';
-import {checkout, feeType, productList} from './orderServices';
-import {ProductListResponse, FeeResponse} from './types';
+import {addTocart, feeType, productList, updateCartItemQuantity} from './orderServices';
+import {ProductListResponse, FeeResponse, CartItemResponsePayload} from './types';
 
 interface orderState {
   loading: boolean;
@@ -14,7 +14,9 @@ interface orderState {
   userCart?: Array<Record<string, any>>;
   feeTypeData?: FeeResponse;
   fee?: number;
-  checkoutData?: Record<string, string>
+  cartData?: CartItemResponsePayload
+  cartItemId?: string;
+  newCartItemQuantity?: Record<string, string>
 }
 
 const initialState: orderState = {
@@ -29,7 +31,9 @@ const initialState: orderState = {
   userCart: [],
   feeTypeData: {},
   fee: 0,
-  checkoutData:{}
+  cartData:{},
+  cartItemId:"",
+  newCartItemQuantity:{}
 };
 
 export const orderSlice = createSlice({
@@ -47,6 +51,9 @@ export const orderSlice = createSlice({
     },
     updateCart: (state, action) => {
       state.userCart = action.payload;
+    },
+    setCartItemId: (state, action) => {
+      state.cartItemId = action.payload;
     },
   },
   extraReducers: builder => {
@@ -88,30 +95,48 @@ export const orderSlice = createSlice({
         state.error = true;
       })
 
-      //CHECKOUT
-      .addCase(checkout.pending, state => {
+      //ADD TO CART
+      .addCase(addTocart.pending, state => {
         state.loading = true;
         state.error = false;
       })
-      .addCase(checkout.fulfilled, (state, action) => {
+      .addCase(addTocart.fulfilled, (state, action) => {
         state.loading = false;
         state.error = false;
-        state.checkoutData = action.payload!.data as Record<string, string>;
+        state.cartData = action.payload as CartItemResponsePayload;
       }) 
-      .addCase(checkout.rejected, (state, action: PayloadAction<any>) => {
+      .addCase(addTocart.rejected, (state, action: PayloadAction<any>) => {
         state.loading = false;
         state.error = true;
         state.errorCode = action.payload?.data?.error_code || 1;
         state.message = action.payload.data.message;
         console.log("ERROR MSG",state.message);
+      })
 
+      //UPDATTE ITEM QUANTITY
+      .addCase(updateCartItemQuantity.pending, state => {
+        state.loading = true;
+        state.error = false;
+      })
+      .addCase(updateCartItemQuantity.fulfilled, (state, action) => {
+        state.loading = false;
+        state.error = false;
+        state.newCartItemQuantity = action.payload!.data as Record<string, string>;
+        console.log("NEW QUANTITY",JSON.stringify(state.newCartItemQuantity,null,2));
+      }) 
+      .addCase(updateCartItemQuantity.rejected, (state, action: PayloadAction<any>) => {
+        state.loading = false;
+        state.error = true;
+        state.errorCode = action.payload?.data?.error_code || 1;
+        state.message = action.payload.data.message;
+        console.log("ERROR MSG",state.message);
       })
     
     },
       
 });
 
-export const {setProductWeight, setProductQuantity, setUserCart, updateCart} =
+export const {setProductWeight, setProductQuantity, setUserCart, updateCart,setCartItemId} =
   orderSlice.actions;
 
 export default orderSlice.reducer;

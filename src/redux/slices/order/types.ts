@@ -76,3 +76,27 @@ export interface FeeResponse {
         data: DataItem[];
     };
 }
+
+interface CartItem {
+  id: string;
+  product_id: string;
+  product_category: string;
+  vendor_id: string;
+  weight: number;
+  quantity: number;
+  cost: number;
+}
+
+interface ResultData {
+  id: string;
+  customer_id: string;
+  cart_items: CartItem[];
+  total: number;
+  status: string;
+  status_ts: number;
+  ts: number;
+}
+
+export interface CartItemResponsePayload {
+  data?: ResultData;
+}

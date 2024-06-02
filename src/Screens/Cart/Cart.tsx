@@ -18,6 +18,7 @@ import CustomToast from '../../Components/Toast/CustomToast';
 import {useDispatch, useSelector} from 'react-redux';
 import {RootState} from '../../redux/rootReducer';
 import {updateCart} from '../../redux/slices/order/orderSlice';
+import {updateCartItemQuantity} from '../../redux/slices/order/orderServices';
 
 interface IProps {
   navigation: NavigationProp<ParamListBase>;
@@ -25,7 +26,7 @@ interface IProps {
 
 const Cart: FC<IProps> = ({navigation}) => {
   const styles = useMemo(() => createStyles(), []);
-  const {productWeight, userCart, fee} = useSelector(
+  const {userCart, fee, cartItemId} = useSelector(
     (state: RootState) => state.order,
   );
   const [showModal, setShowModal] = useState(false);
@@ -54,27 +55,51 @@ const Cart: FC<IProps> = ({navigation}) => {
         return {
           ...item,
           quantity: item.quantity + 1,
-          amount: (item.quantity + 1) * fee! * productWeight!,
+          amount: (item.quantity + 1) * fee! * parseFloat(item.weight),
         };
       }
       return item;
     });
-
     dispatch(updateCart(data));
+    const updatedItem = data![index];
+    console.log("Updated item",updatedItem)
+    const payload = {
+      cart_item_id: cartItemId!,
+      quantity: updatedItem.quantity,
+    };
+    console.log('item id: ' + payload.cart_item_id);
+    console.log('item qty: ' + payload.quantity);
+    dispatch(updateCartItemQuantity(payload));
   };
 
+
   const handleItemDecrease = (index: number) => {
+    let updatedItem:any;
     const data = userCart?.map((item, indx) => {
       if (index === indx && item.quantity > 1) {
-        return {
+        updatedItem = {
           ...item,
           quantity: item.quantity - 1,
-          amount: (item.quantity - 1) * fee! * productWeight!,
+          amount: (item.quantity - 1) * fee! * parseFloat(item.weight),
         };
+        return updatedItem;
       }
       return item;
     });
-    dispatch(updateCart(data));
+  
+    if (updatedItem) {
+      const payload = {
+        cart_item_id: cartItemId!,
+        quantity: updatedItem.quantity,
+      };
+      dispatch(updateCart(data));
+      console.log("Updated item", updatedItem);
+      console.log('item id: ' + payload.cart_item_id);
+      console.log('item qty: ' + payload.quantity);
+      dispatch(updateCartItemQuantity(payload));
+    } else {
+      dispatch(updateCart(data));
+    }
   };
 
   const calculateTotalAmountAndDispatch = () => {

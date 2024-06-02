@@ -11,15 +11,30 @@ import {CANCEL_ICON} from '../../Assets/svgImages';
 import {colors} from '../../Constants/Colors';
 import KeyboardAvoidingContainer from '../../Components/KeyboardAvoidingContainer';
 import {useDispatch, useSelector} from 'react-redux';
-import {feeType, productList} from '../../redux/slices/order/orderServices';
 import {
+  addTocart,
+  feeType,
+  productList,
+} from '../../redux/slices/order/orderServices';
+import {
+  setCartItemId,
   setProductWeight,
   setUserCart,
 } from '../../redux/slices/order/orderSlice';
 import {RootState} from '../../redux/rootReducer';
+import {CartItemResponsePayload} from '../../redux/slices/order/types';
 
 interface IProps {
   navigation: NavigationProp<ParamListBase>;
+}
+interface CartItem {
+  id: string;
+  product_id: string;
+  product_category: string;
+  vendor_id: string;
+  weight: number;
+  quantity: number;
+  cost: number;
 }
 
 const weightOptions = [1, 2, 3, 4, 5, 6, 7];
@@ -31,7 +46,9 @@ const Home: FC<IProps> = ({navigation}) => {
   const inputRef = useRef<TextInput>(null);
   const dispatch = useDispatch();
   const [weightInput, setWeightInput] = useState<number>(weightOptions[0]);
-  const {productWeight,fee,productQuantity} = useSelector((state: RootState) => state.order);
+  const {productWeight, fee, productQuantity, productId} = useSelector(
+    (state: RootState) => state.order,
+  );
 
   const focusInput = () => {
     if (inputRef.current) {
@@ -42,8 +59,8 @@ const Home: FC<IProps> = ({navigation}) => {
   const cartItems = {
     title: 'Max Gas',
     type: 'Refill',
-    weight:`${productWeight} Kg`,
-    amount:fee! * productWeight! * productQuantity!,
+    weight: `${productWeight} Kg`,
+    amount: fee! * productWeight! * productQuantity!,
     quantity: 1,
   };
 
@@ -58,16 +75,39 @@ const Home: FC<IProps> = ({navigation}) => {
     } else {
       const selectedWeight = weightOptions[index];
       dispatch(setProductWeight(weightOptions[index]));
-      const totalFeePerItem = fee! * selectedWeight ;
+      const totalFeePerItem = fee! * selectedWeight;
       const updatedCartItems = {
         ...cartItems,
         weight: `${selectedWeight} Kg`,
         amount: totalFeePerItem,
       };
-
       dispatch(setUserCart(updatedCartItems));
-      navigation.navigate('Cart');
-      setopenGasWeightOptions(false);
+      const payload = {
+        cost: totalFeePerItem,
+        product_id: productId!,
+        quantity: productQuantity!,
+        weight: productWeight!,
+      };
+      dispatch(addTocart(payload))
+        .then(response => {
+          const result = response.payload as CartItemResponsePayload;
+          if (response && result) {
+            const cartItemIds = result?.data?.cart_items;
+            console.log("**",cartItemIds)
+            if (cartItemIds) {
+              cartItemIds.forEach(item => {
+                console.log("********",item.id)
+                dispatch(setCartItemId(item.id));
+              });
+            }
+
+            navigation.navigate('Cart');
+            setopenGasWeightOptions(false);
+          }
+        })
+        .catch(error => {
+          console.error('Error adding items to cart:', error);
+        });
     }
   };
 
@@ -78,14 +118,37 @@ const Home: FC<IProps> = ({navigation}) => {
   const handleNavigation = () => {
     dispatch(setProductWeight(weightInput));
     const totalFeePerItem = fee! * weightInput;
-  const updatedCartItems = {
-    ...cartItems,
-    weight: `${weightInput} Kg`,
-    amount: totalFeePerItem,
-  };
+    const updatedCartItems = {
+      ...cartItems,
+      weight: `${weightInput} Kg`,
+      amount: totalFeePerItem,
+    };
     dispatch(setUserCart(updatedCartItems));
-    navigation.navigate('Cart');
-    setopenGasWeightOptions(false);
+    const payload = {
+      cost: totalFeePerItem,
+      product_id: productId!,
+      quantity: productQuantity!,
+      weight: productWeight!,
+    };
+    dispatch(addTocart(payload))
+      .then(response => {
+        const result = response.payload  as CartItemResponsePayload
+        if (response && result) {
+          const cartItemIds = result?.data?.cart_items;
+          console.log("**",cartItemIds)
+          if (cartItemIds) {
+            cartItemIds.forEach(item => {
+              console.log("********",item.id)
+              dispatch(setCartItemId(item.id));
+            });
+          }
+          navigation.navigate('Cart');
+          setopenGasWeightOptions(false);
+        }
+      })
+      .catch(error => {
+        console.error('Error adding items to cart:', error);
+      });
   };
 
   const getProductListing = () => {
@@ -116,7 +179,7 @@ const Home: FC<IProps> = ({navigation}) => {
       },
     };
     dispatch(feeType(payload));
-  }
+  };
 
   useEffect(() => {
     getProductListing();

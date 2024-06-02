@@ -7,7 +7,8 @@ interface ApiUrls {
   resendOtp : string;
   productList:string;
   feesType:string;
-  checkout:string;
+  cartAdd:string;
+  cartItemQuantity:string;
 
 }
 
@@ -22,7 +23,8 @@ export const apiUrl: ApiUrls = {
   resendOtp: `${BASE_URL}session/otp/request`, //POST
   productList:`${BASE_URL}product`, // PUT
   feesType:`${BASE_URL}fees`, // PUT
-  checkout: `{BASE_URL}cart/add` //POST
+  cartAdd:`${BASE_URL}cart/add`, //POST
+  cartItemQuantity:`${BASE_URL}cart/item/quantity`, // PUT
 };
 
 export const appUserType = "customer"

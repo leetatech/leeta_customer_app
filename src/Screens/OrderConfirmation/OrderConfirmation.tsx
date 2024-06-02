@@ -21,7 +21,6 @@ import CustomModal from '../../Components/Modal/CustomModal';
 import {Receipt} from '../../Components/Receipt/Receipt';
 import {useDispatch, useSelector} from 'react-redux';
 import {RootState} from '../../redux/rootReducer';
-import {checkout} from '../../redux/slices/order/orderServices';
 
 interface IProps {
   navigation: NavigationProp<ParamListBase>;
@@ -32,7 +31,7 @@ const OrderConfirmation: FC<IProps> = ({navigation}) => {
   const [showModal, setShowModal] = useState(false);
   const bounceValue = new Animated.Value(1);
   const [viewReceipt, setViewReceipt] = useState(false);
-  const {userCart, productId} = useSelector(
+  const {userCart} = useSelector(
     (state: RootState) => state.order,
   );
   const dispatch = useDispatch();
@@ -82,40 +81,6 @@ const OrderConfirmation: FC<IProps> = ({navigation}) => {
     return formattedTotalAmount;
   };
 
-  const handleCheckOut = () => {
-    const getTotalWeight = () => {
-      return userCart?.reduce((total, item) => {
-        const weight = parseFloat(item.weight.replace(' Kg', ''));
-        return total + weight;
-      }, 0);
-    };
-    const totalWeight = getTotalWeight();
-
-    const getTotalQuantity = () => {
-      return userCart?.reduce((total, item) => {
-        const quantity = parseFloat(item.quantity);
-        return total + quantity;
-      }, 0);
-    };
-    const totalQuantity = getTotalQuantity();
-
-    const payload = {
-      cost: Number(calculateTotalAmountAndDispatch()),
-      product_id: productId!,
-      quantity: totalQuantity!,
-      weight: totalWeight!,
-    };
-
-    dispatch(checkout(payload))
-      .then(response => {
-        // if (response.status === 200) {
-        //   handleNavigateToHomeScreen();
-        // }
-      })
-      .catch(error => {
-        console.error('Error adding items to cart:', error);
-      });
-  };
 
   const renderPaymentMethod = () => (
     <View>
@@ -246,7 +211,7 @@ const OrderConfirmation: FC<IProps> = ({navigation}) => {
                 disabled={false}
                 textStyle={undefined}
                 buttonStyle={undefined}
-                onPress={handleCheckOut}
+                onPress={handleModalVisibility}
               />
             </View>
           </View>
