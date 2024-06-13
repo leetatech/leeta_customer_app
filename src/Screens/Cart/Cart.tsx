@@ -26,7 +26,7 @@ interface IProps {
 
 const Cart: FC<IProps> = ({navigation}) => {
   const styles = useMemo(() => createStyles(), []);
-  const {userCart, fee, cartItemId} = useSelector(
+  const {userCart, fee, cartItemId, cartData} = useSelector(
     (state: RootState) => state.order,
   );
   const [showModal, setShowModal] = useState(false);
@@ -48,66 +48,74 @@ const Cart: FC<IProps> = ({navigation}) => {
   const closeToast = () => {
     setshowToastMsg(false);
   };
-
   const handleItemIncrease = (index: number) => {
-    const data = userCart?.map((item, indx) => {
+    const data = cartData?.data?.cart_items?.map((item, indx) => {
       if (index === indx) {
         return {
           ...item,
           quantity: item.quantity + 1,
-          amount: (item.quantity + 1) * fee! * parseFloat(item.weight),
+          cost: (item.quantity + 1) * fee! * item.weight,
         };
       }
       return item;
     });
-    dispatch(updateCart(data));
-    const updatedItem = data![index];
-    console.log("Updated item",updatedItem)
-    const payload = {
-      cart_item_id: cartItemId!,
-      quantity: updatedItem.quantity,
-    };
-    console.log('item id: ' + payload.cart_item_id);
-    console.log('item qty: ' + payload.quantity);
-    dispatch(updateCartItemQuantity(payload));
-  };
 
-
-  const handleItemDecrease = (index: number) => {
-    let updatedItem:any;
-    const data = userCart?.map((item, indx) => {
-      if (index === indx && item.quantity > 1) {
-        updatedItem = {
-          ...item,
-          quantity: item.quantity - 1,
-          amount: (item.quantity - 1) * fee! * parseFloat(item.weight),
-        };
-        return updatedItem;
-      }
-      return item;
-    });
-  
-    if (updatedItem) {
+    if (data) {
+      const updatedItem = data[index];
+      dispatch(
+        updateCart({
+          ...cartData,
+          data: {
+            ...cartData?.data,
+            cart_items: data,
+          },
+        }),
+      );
       const payload = {
-        cart_item_id: cartItemId!,
+        cart_item_id: updatedItem.id,
         quantity: updatedItem.quantity,
       };
-      dispatch(updateCart(data));
-      console.log("Updated item", updatedItem);
-      console.log('item id: ' + payload.cart_item_id);
-      console.log('item qty: ' + payload.quantity);
       dispatch(updateCartItemQuantity(payload));
-    } else {
-      dispatch(updateCart(data));
     }
   };
 
-  const calculateTotalAmountAndDispatch = () => {
-    const totalAmount = userCart!.reduce((total, item) => {
-      const numericAmount = parseFloat(item.amount);
-      return total + numericAmount;
+  const handleItemDecrease = (index: number) => {
+
+    const data = cartData?.data?.cart_items?.map((item, indx) => {
+      if (index === indx && item.quantity > 1) {
+        return {
+          ...item,
+          quantity: item.quantity - 1,
+          cost: (item.quantity - 1) * fee! * item.weight,
+        };
+      }
+      return item;
+    });
+
+    if (data) {
+      const updatedItem = data[index];
+      dispatch(
+        updateCart({
+          ...cartData,
+          data: {
+            ...cartData?.data,
+            cart_items: data,
+          },
+        }),
+      );
+      const payload = {
+        cart_item_id: updatedItem.id,
+        quantity: updatedItem.quantity,
+      };
+      dispatch(updateCartItemQuantity(payload));
+    }
+  };
+
+  const sumAllOrders = () => {
+    const totalAmount = cartData?.data?.cart_items.reduce((total, item) => {
+      return total + item.cost;
     }, 0);
-    const formattedTotalAmount = `₦${totalAmount.toFixed(2)}`;
+    const formattedTotalAmount = `₦${totalAmount?.toFixed(2)}`;
     return formattedTotalAmount;
   };
 
@@ -121,28 +129,28 @@ const Cart: FC<IProps> = ({navigation}) => {
           <Text style={styles.description}>YOUR CART</Text>
         </View>
 
-        {userCart && userCart.length > 0 ? (
+        {cartData?.data?.cart_items && cartData.data?.cart_items.length > 0 ? (
           <>
             <ScrollView
               scrollEnabled={true}
               showsVerticalScrollIndicator={false}>
-              {userCart.map((item, index) => {
+              {cartData.data.cart_items?.map((item, index) => {
                 return (
                   <View key={index} style={styles.orders_container}>
                     <View style={styles.container}>
                       <CYLINDER />
                       <View style={styles.description_container}>
                         <Text style={[styles.bold_txt, {color: colors.GRAY}]}>
-                          {item.title}
+                          Max Gas
                         </Text>
-                        <Text style={styles.gray_txt}>Type: {item.type}</Text>
+                        <Text style={styles.gray_txt}>Type: Refill</Text>
                         <Text style={styles.gray_txt}>
                           Weight: {item.weight}
                         </Text>
                         <View style={styles.amount_container}>
                           <Text style={styles.gray_txt}>Amount:</Text>
                           <Text style={[styles.bold_txt, {color: colors.GRAY}]}>
-                            {item.amount}
+                            {item.cost}
                           </Text>
                         </View>
                       </View>
@@ -185,7 +193,7 @@ const Cart: FC<IProps> = ({navigation}) => {
                   Total
                 </Text>
                 <Text style={[styles.bold_txt, {color: colors.GRAY}]}>
-                  {calculateTotalAmountAndDispatch()}{' '}
+                  {sumAllOrders()}
                 </Text>
               </View>
               <Buttons

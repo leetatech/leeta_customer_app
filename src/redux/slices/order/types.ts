@@ -100,3 +100,41 @@ interface ResultData {
 export interface CartItemResponsePayload {
   data?: ResultData;
 }
+
+interface FeeItem {
+  id: string;
+  product_id: string;
+  fee_type: string;
+  lga: {
+      state: string;
+      lga: string;
+  };
+  cost: {
+      cost_per_kg: number;
+      cost_per_qty: number;
+      cost_per_type: number;
+  };
+  status: string;
+  status_ts: number;
+  ts: number;
+}
+interface Metadata {
+  filter: {
+      operator: string;
+      fields: {
+          name: string;
+          operator: string;
+          value: string;
+      }[];
+  };
+  paging: {
+      index: number;
+      size: number;
+      total: number;
+  };
+}
+
+export interface ServiceFeesResponse {
+  data?: FeeItem[];
+  metadata?: Metadata;
+}

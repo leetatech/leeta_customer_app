@@ -14,27 +14,23 @@ import {useDispatch, useSelector} from 'react-redux';
 import {
   addTocart,
   feeType,
+  fees,
   productList,
 } from '../../redux/slices/order/orderServices';
 import {
   setCartItemId,
   setProductWeight,
+  setServiceFee,
   setUserCart,
 } from '../../redux/slices/order/orderSlice';
 import {RootState} from '../../redux/rootReducer';
-import {CartItemResponsePayload} from '../../redux/slices/order/types';
+import {
+  CartItemResponsePayload,
+  ServiceFeesResponse,
+} from '../../redux/slices/order/types';
 
 interface IProps {
   navigation: NavigationProp<ParamListBase>;
-}
-interface CartItem {
-  id: string;
-  product_id: string;
-  product_category: string;
-  vendor_id: string;
-  weight: number;
-  quantity: number;
-  cost: number;
 }
 
 const weightOptions = [1, 2, 3, 4, 5, 6, 7];
@@ -57,8 +53,6 @@ const Home: FC<IProps> = ({navigation}) => {
   };
 
   const cartItems = {
-    title: 'Max Gas',
-    type: 'Refill',
     weight: `${productWeight} Kg`,
     amount: fee! * productWeight! * productQuantity!,
     quantity: 1,
@@ -86,21 +80,18 @@ const Home: FC<IProps> = ({navigation}) => {
         cost: totalFeePerItem,
         product_id: productId!,
         quantity: productQuantity!,
-        weight: productWeight!,
+        weight:selectedWeight,
       };
       dispatch(addTocart(payload))
         .then(response => {
           const result = response.payload as CartItemResponsePayload;
           if (response && result) {
             const cartItemIds = result?.data?.cart_items;
-            console.log("**",cartItemIds)
             if (cartItemIds) {
               cartItemIds.forEach(item => {
-                console.log("********",item.id)
                 dispatch(setCartItemId(item.id));
               });
             }
-
             navigation.navigate('Cart');
             setopenGasWeightOptions(false);
           }
@@ -132,13 +123,11 @@ const Home: FC<IProps> = ({navigation}) => {
     };
     dispatch(addTocart(payload))
       .then(response => {
-        const result = response.payload  as CartItemResponsePayload
+        const result = response.payload as CartItemResponsePayload;
         if (response && result) {
           const cartItemIds = result?.data?.cart_items;
-          console.log("**",cartItemIds)
           if (cartItemIds) {
             cartItemIds.forEach(item => {
-              console.log("********",item.id)
               dispatch(setCartItemId(item.id));
             });
           }
@@ -173,17 +162,70 @@ const Home: FC<IProps> = ({navigation}) => {
 
   const getFee = () => {
     const payload = {
+      filter: {
+        fields: [
+          {
+            name: 'fee_type',
+            operator: 'isEqualTo',
+            value: 'PRODUCT_FEE',
+          },
+        ],
+        operator: 'OR',
+      },
       paging: {
         index: 0,
         size: 0,
       },
     };
+
     dispatch(feeType(payload));
+  };
+
+  const listFees = () => {
+    const payload = {
+      filter: {
+        fields: [
+          {
+            name: 'fee_type',
+            operator: 'isEqualTo',
+            value: 'SERVICE_FEE',
+          },
+        ],
+        operator: 'OR',
+      },
+      paging: {
+        index: 0,
+        size: 0,
+      },
+    };
+    dispatch(fees(payload))
+      .then(response => {
+        const result = response.payload as ServiceFeesResponse;
+        if (response && result && result.data) {
+          console.log('RESULT', JSON.stringify(result, null, 2));
+          const serviceFee = result.data?.find(
+            item => item.fee_type === 'SERVICE_FEE',
+          );
+          console.log('Service Fee:', serviceFee);
+          if (serviceFee) {
+            const costPerType = serviceFee.cost.cost_per_type;
+            console.log('Cost per type:', costPerType);
+            dispatch(setServiceFee(costPerType));
+          } else {
+            console.log('Service Fee not found');
+            return null;
+          }
+        }
+      })
+      .catch(error => {
+        console.error('Error getting fees:', error);
+      });
   };
 
   useEffect(() => {
     getProductListing();
     getFee();
+    listFees();
   }, []);
 
   return (

@@ -31,7 +31,7 @@ const OrderConfirmation: FC<IProps> = ({navigation}) => {
   const [showModal, setShowModal] = useState(false);
   const bounceValue = new Animated.Value(1);
   const [viewReceipt, setViewReceipt] = useState(false);
-  const {userCart} = useSelector(
+  const {userCart,serviceFee,cartData} = useSelector(
     (state: RootState) => state.order,
   );
   const dispatch = useDispatch();
@@ -72,12 +72,11 @@ const OrderConfirmation: FC<IProps> = ({navigation}) => {
     navigation.navigate('BottomNavigator');
   };
 
-  const calculateTotalAmountAndDispatch = () => {
-    const totalAmount = userCart!.reduce((total, item) => {
-      const numericAmount = parseFloat(item.amount);
-      return total + numericAmount;
+  const sumAllOrders = () => {
+    const totalAmount = cartData?.data?.cart_items.reduce((total, item) => {
+      return total + item.cost;
     }, 0);
-    const formattedTotalAmount = `₦${totalAmount.toFixed(2)}`;
+    const formattedTotalAmount = `₦${totalAmount?.toFixed(2)}`;
     return formattedTotalAmount;
   };
 
@@ -122,21 +121,21 @@ const OrderConfirmation: FC<IProps> = ({navigation}) => {
 
   const renderOrder = () => (
     <View style={styles.card_style}>
-      {userCart?.map((item, indx) => {
+      {cartData?.data?.cart_items?.map((item, indx) => {
         return (
           <View style={styles.payment_container} key={indx}>
             <View style={styles.checkbox_container}>
               <CYLINDER />
               <View style={styles.address}>
-                <Fonts type="normalBoldText">{item.title}</Fonts>
-                <Fonts type="normalGrayText">Type: {item.type}</Fonts>
+                <Fonts type="normalBoldText">Max Gas</Fonts>
+                <Fonts type="normalGrayText">Type: Refill</Fonts>
                 <Fonts type="normalGrayText">Weight: {item.weight}</Fonts>
                 <View style={styles.amount_container}>
                   <Fonts type="normalGrayText">Amount:</Fonts>
                   <Fonts
                     type="normalGrayText"
                     style={{fontWeight: '800', color: colors.GRAY}}>
-                    {`₦${item.amount}`}
+                    {`₦${item.cost}`}
                   </Fonts>
                 </View>
               </View>
@@ -156,10 +155,10 @@ const OrderConfirmation: FC<IProps> = ({navigation}) => {
           </View>
           <View style={styles.text_spacing}>
             <Fonts type="normalBlackText">
-              {calculateTotalAmountAndDispatch()}
+              {sumAllOrders()}
             </Fonts>
             <Fonts type="normalBlackText">₦1500</Fonts>
-            <Fonts type="normalBlackText">₦25</Fonts>
+            <Fonts type="normalBlackText">₦{serviceFee}</Fonts>
           </View>
         </View>
       </View>
@@ -203,7 +202,7 @@ const OrderConfirmation: FC<IProps> = ({navigation}) => {
               <View style={styles.action}>
                 <Fonts type="boldBlack"> Total</Fonts>
                 <Fonts type="boldBlack">
-                  {calculateTotalAmountAndDispatch()}
+                  {sumAllOrders()}
                 </Fonts>
               </View>
               <Buttons
