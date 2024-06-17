@@ -7,6 +7,10 @@ interface ApiUrls {
   resendOtp : string;
   productList:string;
   feesType:string;
+  cartAdd:string;
+  cartItemQuantity:string;
+  listCart:string;
+
 }
 
 const BASE_URL = 'https://leetabackend-e6d948d15ae2.herokuapp.com/api/';
@@ -19,7 +23,10 @@ export const apiUrl: ApiUrls = {
   passwordReset: `${BASE_URL}session/password/create`, // POST
   resendOtp: `${BASE_URL}session/otp/request`, //POST
   productList:`${BASE_URL}product`, // PUT
-  feesType:`${BASE_URL}fees` // PUT
+  feesType:`${BASE_URL}fees`, // PUT
+  cartAdd:`${BASE_URL}cart/add`, //POST
+  cartItemQuantity:`${BASE_URL}cart/item/quantity`, // PUT
+  listCart:`${BASE_URL}cart`, // PUT
 };
 
 export const appUserType = "customer"

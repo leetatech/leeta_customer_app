@@ -29,6 +29,7 @@ const createStyles = () =>
     address: {
       width: 200,
       gap: 3,
+      paddingTop:8
     },
     amount_container: {
       flexDirection: 'row',

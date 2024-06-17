@@ -11,12 +11,23 @@ import {CANCEL_ICON} from '../../Assets/svgImages';
 import {colors} from '../../Constants/Colors';
 import KeyboardAvoidingContainer from '../../Components/KeyboardAvoidingContainer';
 import {useDispatch, useSelector} from 'react-redux';
-import {feeType, productList} from '../../redux/slices/order/orderServices';
 import {
+  addTocart,
+  feeType,
+  fees,
+  productList,
+} from '../../redux/slices/order/orderServices';
+import {
+  setCartItemId,
   setProductWeight,
+  setServiceFee,
   setUserCart,
 } from '../../redux/slices/order/orderSlice';
 import {RootState} from '../../redux/rootReducer';
+import {
+  CartItemResponsePayload,
+  ServiceFeesResponse,
+} from '../../redux/slices/order/types';
 
 interface IProps {
   navigation: NavigationProp<ParamListBase>;
@@ -31,7 +42,9 @@ const Home: FC<IProps> = ({navigation}) => {
   const inputRef = useRef<TextInput>(null);
   const dispatch = useDispatch();
   const [weightInput, setWeightInput] = useState<number>(weightOptions[0]);
-  const {productWeight,fee,productQuantity} = useSelector((state: RootState) => state.order);
+  const {productWeight, fee, productQuantity, productId} = useSelector(
+    (state: RootState) => state.order,
+  );
 
   const focusInput = () => {
     if (inputRef.current) {
@@ -40,10 +53,8 @@ const Home: FC<IProps> = ({navigation}) => {
   };
 
   const cartItems = {
-    title: 'Max Gas',
-    type: 'Refill',
-    weight:`${productWeight} Kg`,
-    amount:fee! * productWeight! * productQuantity!,
+    weight: `${productWeight} Kg`,
+    amount: fee! * productWeight! * productQuantity!,
     quantity: 1,
   };
 
@@ -58,16 +69,36 @@ const Home: FC<IProps> = ({navigation}) => {
     } else {
       const selectedWeight = weightOptions[index];
       dispatch(setProductWeight(weightOptions[index]));
-      const totalFeePerItem = fee! * selectedWeight ;
+      const totalFeePerItem = fee! * selectedWeight;
       const updatedCartItems = {
         ...cartItems,
         weight: `${selectedWeight} Kg`,
         amount: totalFeePerItem,
       };
-
       dispatch(setUserCart(updatedCartItems));
-      navigation.navigate('Cart');
-      setopenGasWeightOptions(false);
+      const payload = {
+        cost: totalFeePerItem,
+        product_id: productId!,
+        quantity: productQuantity!,
+        weight:selectedWeight,
+      };
+      dispatch(addTocart(payload))
+        .then(response => {
+          const result = response.payload as CartItemResponsePayload;
+          if (response && result) {
+            const cartItemIds = result?.data?.cart_items;
+            if (cartItemIds) {
+              cartItemIds.forEach(item => {
+                dispatch(setCartItemId(item.id));
+              });
+            }
+            navigation.navigate('Cart');
+            setopenGasWeightOptions(false);
+          }
+        })
+        .catch(error => {
+          console.error('Error adding items to cart:', error);
+        });
     }
   };
 
@@ -78,14 +109,35 @@ const Home: FC<IProps> = ({navigation}) => {
   const handleNavigation = () => {
     dispatch(setProductWeight(weightInput));
     const totalFeePerItem = fee! * weightInput;
-  const updatedCartItems = {
-    ...cartItems,
-    weight: `${weightInput} Kg`,
-    amount: totalFeePerItem,
-  };
+    const updatedCartItems = {
+      ...cartItems,
+      weight: `${weightInput} Kg`,
+      amount: totalFeePerItem,
+    };
     dispatch(setUserCart(updatedCartItems));
-    navigation.navigate('Cart');
-    setopenGasWeightOptions(false);
+    const payload = {
+      cost: totalFeePerItem,
+      product_id: productId!,
+      quantity: productQuantity!,
+      weight: productWeight!,
+    };
+    dispatch(addTocart(payload))
+      .then(response => {
+        const result = response.payload as CartItemResponsePayload;
+        if (response && result) {
+          const cartItemIds = result?.data?.cart_items;
+          if (cartItemIds) {
+            cartItemIds.forEach(item => {
+              dispatch(setCartItemId(item.id));
+            });
+          }
+          navigation.navigate('Cart');
+          setopenGasWeightOptions(false);
+        }
+      })
+      .catch(error => {
+        console.error('Error adding items to cart:', error);
+      });
   };
 
   const getProductListing = () => {
@@ -110,17 +162,69 @@ const Home: FC<IProps> = ({navigation}) => {
 
   const getFee = () => {
     const payload = {
+      filter: {
+        fields: [
+          {
+            name: 'fee_type',
+            operator: 'isEqualTo',
+            value: 'PRODUCT_FEE',
+          },
+        ],
+        operator: 'OR',
+      },
       paging: {
         index: 0,
         size: 0,
       },
     };
+
     dispatch(feeType(payload));
-  }
+  };
+
+  const listFees = () => {
+    const payload = {
+      filter: {
+        fields: [
+          {
+            name: 'fee_type',
+            operator: 'isEqualTo',
+            value: 'SERVICE_FEE',
+          },
+        ],
+        operator: 'OR',
+      },
+      paging: {
+        index: 0,
+        size: 0,
+      },
+    };
+    dispatch(fees(payload))
+      .then(response => {
+        const result = response.payload as ServiceFeesResponse;
+        if (response && result && result.data) {
+          const feeItem = result.data as ServiceFeesResponse
+          const serviceFee = feeItem.data!.find(
+            item => item.fee_type === 'SERVICE_FEE',
+          );
+          if (serviceFee) {
+            const costPerType = serviceFee.cost.cost_per_type;
+            dispatch(setServiceFee(costPerType));
+          } else {
+            return null;
+          }
+        }
+      })
+      .catch(error => {
+        console.error('Error getting fees:', error);
+      });
+  };
+
+ 
 
   useEffect(() => {
     getProductListing();
     getFee();
+    listFees();
   }, []);
 
   return (

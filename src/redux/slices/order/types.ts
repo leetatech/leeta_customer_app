@@ -76,3 +76,65 @@ export interface FeeResponse {
         data: DataItem[];
     };
 }
+
+interface CartItem {
+  id: string;
+  product_id: string;
+  product_category: string;
+  vendor_id: string;
+  weight: number;
+  quantity: number;
+  cost: number;
+}
+
+interface ResultData {
+  id: string;
+  customer_id: string;
+  cart_items: CartItem[];
+  total: number;
+  status: string;
+  status_ts: number;
+  ts: number;
+}
+
+export interface CartItemResponsePayload {
+  data?: ResultData;
+}
+
+interface FeeItem {
+  id: string;
+  product_id: string;
+  fee_type: string;
+  lga: {
+      state: string;
+      lga: string;
+  };
+  cost: {
+      cost_per_kg: number;
+      cost_per_qty: number;
+      cost_per_type: number;
+  };
+  status: string;
+  status_ts: number;
+  ts: number;
+}
+interface Metadata {
+  filter: {
+      operator: string;
+      fields: {
+          name: string;
+          operator: string;
+          value: string;
+      }[];
+  };
+  paging: {
+      index: number;
+      size: number;
+      total: number;
+  };
+}
+
+export interface ServiceFeesResponse {
+  data?: FeeItem[];
+  metadata?: Metadata;
+}

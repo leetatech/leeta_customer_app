@@ -7,7 +7,6 @@ export const apiCall = async <T>(
   header?: Record<string, string>
 ): Promise<T | undefined> => {
   try {
-    console.log("TOKEEEEN", header)
      const headers = header ? header : {};
     const response: AxiosResponse = await axios({
       method,

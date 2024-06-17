@@ -18,6 +18,7 @@ import CustomToast from '../../Components/Toast/CustomToast';
 import {useDispatch, useSelector} from 'react-redux';
 import {RootState} from '../../redux/rootReducer';
 import {updateCart} from '../../redux/slices/order/orderSlice';
+import {updateCartItemQuantity} from '../../redux/slices/order/orderServices';
 
 interface IProps {
   navigation: NavigationProp<ParamListBase>;
@@ -25,7 +26,7 @@ interface IProps {
 
 const Cart: FC<IProps> = ({navigation}) => {
   const styles = useMemo(() => createStyles(), []);
-  const {productWeight, userCart, fee} = useSelector(
+  const {userCart,fee,cartData} = useSelector(
     (state: RootState) => state.order,
   );
   const [showModal, setShowModal] = useState(false);
@@ -44,45 +45,75 @@ const Cart: FC<IProps> = ({navigation}) => {
     }, 2000);
   };
 
-  const closeToast = () => {
-    setshowToastMsg(false);
-  };
-
   const handleItemIncrease = (index: number) => {
-    const data = userCart?.map((item, indx) => {
+    const data = cartData?.data?.cart_items?.map((item, indx) => {
       if (index === indx) {
         return {
           ...item,
           quantity: item.quantity + 1,
-          amount: (item.quantity + 1) * fee! * parseFloat(item.weight),
+          cost: (item.quantity + 1) * fee! * item.weight,
+
         };
       }
       return item;
     });
 
-    dispatch(updateCart(data));
+    if (data) {
+      const updatedItem = data[index];
+      dispatch(
+        updateCart({
+          ...cartData,
+          data: {
+            ...cartData?.data,
+            cart_items: data,
+          },
+        }),
+      );
+      const payload = {
+        cart_item_id: updatedItem.id,
+        quantity: updatedItem.quantity,
+      };
+      dispatch(updateCartItemQuantity(payload));
+    }
   };
 
   const handleItemDecrease = (index: number) => {
-    const data = userCart?.map((item, indx) => {
+    const data = cartData?.data?.cart_items?.map((item, indx) => {
       if (index === indx && item.quantity > 1) {
         return {
           ...item,
           quantity: item.quantity - 1,
-          amount: (item.quantity - 1) * fee! * parseFloat(item.weight),
+          cost: (item.quantity - 1) * fee! * item.weight,
+
         };
       }
       return item;
     });
-    dispatch(updateCart(data));
+
+    if (data) {
+      const updatedItem = data[index];
+      dispatch(
+        updateCart({
+          ...cartData,
+          data: {
+            ...cartData?.data,
+            cart_items: data,
+          },
+        }),
+      );
+      const payload = {
+        cart_item_id: updatedItem.id,
+        quantity: updatedItem.quantity,
+      };
+      dispatch(updateCartItemQuantity(payload));
+    }
   };
 
-  const calculateTotalAmountAndDispatch = () => {
-    const totalAmount = userCart!.reduce((total, item) => {
-      const numericAmount = parseFloat(item.amount);
-      return total + numericAmount;
+  const sumAllOrders = () => {
+    const totalAmount = cartData?.data?.cart_items.reduce((total, item) => {
+      return total + item.cost;
     }, 0);
-    const formattedTotalAmount = `₦${totalAmount.toFixed(2)}`;
+    const formattedTotalAmount = `₦${totalAmount?.toFixed(2)}`;
     return formattedTotalAmount;
   };
 
@@ -96,28 +127,28 @@ const Cart: FC<IProps> = ({navigation}) => {
           <Text style={styles.description}>YOUR CART</Text>
         </View>
 
-        {userCart && userCart.length > 0 ? (
+        {cartData?.data?.cart_items && cartData.data?.cart_items.length > 0 ? (
           <>
             <ScrollView
               scrollEnabled={true}
               showsVerticalScrollIndicator={false}>
-              {userCart.map((item, index) => {
+              {cartData.data.cart_items?.map((item, index) => {
                 return (
                   <View key={index} style={styles.orders_container}>
                     <View style={styles.container}>
                       <CYLINDER />
                       <View style={styles.description_container}>
                         <Text style={[styles.bold_txt, {color: colors.GRAY}]}>
-                          {item.title}
+                          Max Gas
                         </Text>
-                        <Text style={styles.gray_txt}>Type: {item.type}</Text>
+                        <Text style={styles.gray_txt}>Type: Refill</Text>
                         <Text style={styles.gray_txt}>
                           Weight: {item.weight}
                         </Text>
                         <View style={styles.amount_container}>
                           <Text style={styles.gray_txt}>Amount:</Text>
                           <Text style={[styles.bold_txt, {color: colors.GRAY}]}>
-                            {item.amount}
+                            {item.cost}
                           </Text>
                         </View>
                       </View>
@@ -160,7 +191,7 @@ const Cart: FC<IProps> = ({navigation}) => {
                   Total
                 </Text>
                 <Text style={[styles.bold_txt, {color: colors.GRAY}]}>
-                  {calculateTotalAmountAndDispatch()}{' '}
+                  {sumAllOrders()}
                 </Text>
               </View>
               <Buttons
@@ -220,7 +251,7 @@ const Cart: FC<IProps> = ({navigation}) => {
         <CustomToast
           viewStyle={{backgroundColor: colors.SUCCESS}}
           textStyle={{fontWeight: '500', fontSize: 15}}
-          onPress={closeToast}>
+          onPress={() => setshowToastMsg(false)}>
           <Text>product has been removed from cart</Text>
         </CustomToast>
       )}
