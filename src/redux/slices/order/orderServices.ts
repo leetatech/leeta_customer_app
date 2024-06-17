@@ -62,6 +62,21 @@ export interface FeesData {
   };
 }
 
+export interface PaginationData {
+  filter: {
+    fields: {
+      name: string;
+      operator: string;
+      value: string;
+    }[];
+    operator: string;
+  };
+  paging: {
+    index: number;
+    size: number;
+  };
+}
+
 export const productList = createAsyncThunk(
   'order/productList',
   async (productList: ProductListingData, {rejectWithValue}) => {
@@ -150,7 +165,6 @@ export const updateCartItemQuantity = createAsyncThunk(
       if (axios.isAxiosError(error)) {
         return rejectWithValue(error.response?.data);
       } else if (error instanceof Error) {
-        console.log("ERROR",error.message)
         return rejectWithValue(error.message);
       } else {
         throw error;
@@ -171,13 +185,35 @@ export const fees = createAsyncThunk(
       };
       const response = await apiCall(url, method, fee, headers);
       return response as  ServiceFeesResponse;
-      // return response as  Record<string, Record<string, string> | string>;
 
     } catch (error) {
       if (axios.isAxiosError(error)) {
         return rejectWithValue(error.response?.data);
       } else if (error instanceof Error) {
-        console.log("ERROR",error.message)
+        return rejectWithValue(error.message);
+      } else {
+        throw error;
+      }
+    }
+  },
+);
+
+export const triggerCartList = createAsyncThunk(
+  'order/cartList',
+  async (cartList: PaginationData, {rejectWithValue}) => {
+    try {
+      const url = apiUrl.listCart
+      const method = 'put';
+      const token = await AsyncStorage.getItem('userToken');
+      const headers = {
+        Authorization: `Bearer ${token}`,
+      };
+      const response = await apiCall(url, method, cartList, headers);
+      return response as CartItemResponsePayload
+    } catch (error) {
+      if (axios.isAxiosError(error)) {
+        return rejectWithValue(error.response?.data);
+      } else if (error instanceof Error) {
         return rejectWithValue(error.message);
       } else {
         throw error;

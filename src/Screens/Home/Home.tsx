@@ -202,17 +202,14 @@ const Home: FC<IProps> = ({navigation}) => {
       .then(response => {
         const result = response.payload as ServiceFeesResponse;
         if (response && result && result.data) {
-          console.log('RESULT', JSON.stringify(result, null, 2));
-          const serviceFee = result.data?.find(
+          const feeItem = result.data as ServiceFeesResponse
+          const serviceFee = feeItem.data!.find(
             item => item.fee_type === 'SERVICE_FEE',
           );
-          console.log('Service Fee:', serviceFee);
           if (serviceFee) {
             const costPerType = serviceFee.cost.cost_per_type;
-            console.log('Cost per type:', costPerType);
             dispatch(setServiceFee(costPerType));
           } else {
-            console.log('Service Fee not found');
             return null;
           }
         }
@@ -221,6 +218,8 @@ const Home: FC<IProps> = ({navigation}) => {
         console.error('Error getting fees:', error);
       });
   };
+
+ 
 
   useEffect(() => {
     getProductListing();

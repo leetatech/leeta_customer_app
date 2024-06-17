@@ -21,17 +21,78 @@ import CustomModal from '../../Components/Modal/CustomModal';
 import {Receipt} from '../../Components/Receipt/Receipt';
 import {useDispatch, useSelector} from 'react-redux';
 import {RootState} from '../../redux/rootReducer';
+import {CartItemResponsePayload} from '../../redux/slices/order/types';
+import {triggerCartList} from '../../redux/slices/order/orderServices';
+import CustomLoader from '../../Components/Loader/CustomLoader';
 
 interface IProps {
   navigation: NavigationProp<ParamListBase>;
 }
+interface Order {
+  cartList: CartItemResponsePayload;
+  sumAllOrders: () => string;
+  serviceFee: number;
+}
+const RenderOrder = ({cartList, sumAllOrders, serviceFee}: Order) => {
+  const styles = useMemo(() => createStyles(), []);
+  return (
+    <View style={styles.card_style}>
+      {cartList.data ? (
+        <>
+          {cartList?.data!.cart_items?.map((item, indx) => {
+            return (
+              <View style={styles.payment_container} key={indx}>
+                <View style={styles.checkbox_container}>
+                  <CYLINDER />
+                  <View style={styles.address}>
+                    <Fonts type="normalBoldText">Max Gas</Fonts>
+                    <Fonts type="normalGrayText">Type: Refill</Fonts>
+                    <Fonts type="normalGrayText">Weight: {item.weight}</Fonts>
+                    <View style={styles.amount_container}>
+                      <Fonts type="normalGrayText">Amount:</Fonts>
+                      <Fonts
+                        type="normalGrayText"
+                        style={{fontWeight: '800', color: colors.GRAY}}>
+                        {`₦${item.cost}`}
+                      </Fonts>
+                    </View>
+                  </View>
+                </View>
+              </View>
+            );
+          })}
+        </>
+      ) : (
+        <CustomLoader />
+      )}
+
+      <View style={styles.order_summary_container}>
+        <Fonts type="boldBlack" style={{paddingBottom: 20}}>
+          Summary
+        </Fonts>
+        <View style={styles.summary_container}>
+          <View style={styles.text_spacing}>
+            <Fonts type="normalBlackText">Total item costs </Fonts>
+            <Fonts type="normalBlackText">Delivery fee</Fonts>
+            <Fonts type="normalBlackText">Service fee</Fonts>
+          </View>
+          <View style={styles.text_spacing}>
+            <Fonts type="normalBlackText">{sumAllOrders()}</Fonts>
+            <Fonts type="normalBlackText">₦1500</Fonts>
+            <Fonts type="normalBlackText">₦{serviceFee}</Fonts>
+          </View>
+        </View>
+      </View>
+    </View>
+  );
+};
 
 const OrderConfirmation: FC<IProps> = ({navigation}) => {
   const styles = useMemo(() => createStyles(), []);
   const [showModal, setShowModal] = useState(false);
   const bounceValue = new Animated.Value(1);
   const [viewReceipt, setViewReceipt] = useState(false);
-  const {userCart,serviceFee,cartData} = useSelector(
+  const {serviceFee, cartData, cartList} = useSelector(
     (state: RootState) => state.order,
   );
   const dispatch = useDispatch();
@@ -80,6 +141,35 @@ const OrderConfirmation: FC<IProps> = ({navigation}) => {
     return formattedTotalAmount;
   };
 
+  const listCart = () => {
+    const payload = {
+      filter: {
+        fields: [
+          {
+            name: 'string',
+            operator: 'isEqualTo',
+            value: 'string',
+          },
+        ],
+        operator: 'OR',
+      },
+      paging: {
+        index: 0,
+        size: 0,
+      },
+    };
+    dispatch(triggerCartList(payload))
+      .then(response => {
+        const result = response.payload as CartItemResponsePayload;
+        if (response && result && result.data) {
+        } else {
+          return null;
+        }
+      })
+      .catch(error => {
+        console.error('Error getting Cart list:', error);
+      });
+  };
 
   const renderPaymentMethod = () => (
     <View>
@@ -119,51 +209,10 @@ const OrderConfirmation: FC<IProps> = ({navigation}) => {
     </View>
   );
 
-  const renderOrder = () => (
-    <View style={styles.card_style}>
-      {cartData?.data?.cart_items?.map((item, indx) => {
-        return (
-          <View style={styles.payment_container} key={indx}>
-            <View style={styles.checkbox_container}>
-              <CYLINDER />
-              <View style={styles.address}>
-                <Fonts type="normalBoldText">Max Gas</Fonts>
-                <Fonts type="normalGrayText">Type: Refill</Fonts>
-                <Fonts type="normalGrayText">Weight: {item.weight}</Fonts>
-                <View style={styles.amount_container}>
-                  <Fonts type="normalGrayText">Amount:</Fonts>
-                  <Fonts
-                    type="normalGrayText"
-                    style={{fontWeight: '800', color: colors.GRAY}}>
-                    {`₦${item.cost}`}
-                  </Fonts>
-                </View>
-              </View>
-            </View>
-          </View>
-        );
-      })}
-      <View style={styles.order_summary_container}>
-        <Fonts type="boldBlack" style={{paddingBottom: 20}}>
-          Summary
-        </Fonts>
-        <View style={styles.summary_container}>
-          <View style={styles.text_spacing}>
-            <Fonts type="normalBlackText">Total item costs </Fonts>
-            <Fonts type="normalBlackText">Delivery fee</Fonts>
-            <Fonts type="normalBlackText">Service fee</Fonts>
-          </View>
-          <View style={styles.text_spacing}>
-            <Fonts type="normalBlackText">
-              {sumAllOrders()}
-            </Fonts>
-            <Fonts type="normalBlackText">₦1500</Fonts>
-            <Fonts type="normalBlackText">₦{serviceFee}</Fonts>
-          </View>
-        </View>
-      </View>
-    </View>
-  );
+  useEffect(() => {
+    listCart();
+  }, []);
+
   return (
     <>
       <FormMainContainer>
@@ -179,7 +228,11 @@ const OrderConfirmation: FC<IProps> = ({navigation}) => {
               <Fonts type="boldLightGray" style={{paddingTop: 15}}>
                 Your Cart
               </Fonts>
-              {renderOrder()}
+              <RenderOrder
+                cartList={cartList}
+                sumAllOrders={sumAllOrders}
+                serviceFee={serviceFee}
+              />
               <TouchableOpacity onPress={() => navigation.navigate('Cart')}>
                 <Fonts
                   type="boldLightGray"
@@ -201,9 +254,7 @@ const OrderConfirmation: FC<IProps> = ({navigation}) => {
               </Fonts>
               <View style={styles.action}>
                 <Fonts type="boldBlack"> Total</Fonts>
-                <Fonts type="boldBlack">
-                  {sumAllOrders()}
-                </Fonts>
+                <Fonts type="boldBlack">{sumAllOrders()}</Fonts>
               </View>
               <Buttons
                 title="Checkout"

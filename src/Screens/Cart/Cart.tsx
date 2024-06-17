@@ -26,7 +26,7 @@ interface IProps {
 
 const Cart: FC<IProps> = ({navigation}) => {
   const styles = useMemo(() => createStyles(), []);
-  const {userCart, fee, cartItemId, cartData} = useSelector(
+  const {userCart,fee,cartData} = useSelector(
     (state: RootState) => state.order,
   );
   const [showModal, setShowModal] = useState(false);
@@ -45,9 +45,6 @@ const Cart: FC<IProps> = ({navigation}) => {
     }, 2000);
   };
 
-  const closeToast = () => {
-    setshowToastMsg(false);
-  };
   const handleItemIncrease = (index: number) => {
     const data = cartData?.data?.cart_items?.map((item, indx) => {
       if (index === indx) {
@@ -80,7 +77,6 @@ const Cart: FC<IProps> = ({navigation}) => {
   };
 
   const handleItemDecrease = (index: number) => {
-
     const data = cartData?.data?.cart_items?.map((item, indx) => {
       if (index === indx && item.quantity > 1) {
         return {
@@ -253,7 +249,7 @@ const Cart: FC<IProps> = ({navigation}) => {
         <CustomToast
           viewStyle={{backgroundColor: colors.SUCCESS}}
           textStyle={{fontWeight: '500', fontSize: 15}}
-          onPress={closeToast}>
+          onPress={() => setshowToastMsg(false)}>
           <Text>product has been removed from cart</Text>
         </CustomToast>
       )}

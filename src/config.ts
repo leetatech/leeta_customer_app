@@ -9,6 +9,7 @@ interface ApiUrls {
   feesType:string;
   cartAdd:string;
   cartItemQuantity:string;
+  listCart:string;
 
 }
 
@@ -25,6 +26,7 @@ export const apiUrl: ApiUrls = {
   feesType:`${BASE_URL}fees`, // PUT
   cartAdd:`${BASE_URL}cart/add`, //POST
   cartItemQuantity:`${BASE_URL}cart/item/quantity`, // PUT
+  listCart:`${BASE_URL}cart`, // PUT
 };
 
 export const appUserType = "customer"
