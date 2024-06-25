@@ -70,7 +70,7 @@ interface Metadata {
     paging: Paging;
 }
 
-export interface FeeResponse {
+export interface ProductFeeResponse {
     data?: {
         metadata: Metadata;
         data: DataItem[];
@@ -134,7 +134,7 @@ interface Metadata {
   };
 }
 
-export interface ServiceFeesResponse {
+export interface FeesResponse {
   data?: FeeItem[];
   metadata?: Metadata;
 }

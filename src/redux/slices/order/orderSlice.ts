@@ -1,6 +1,6 @@
 import {PayloadAction, createSlice} from '@reduxjs/toolkit';
-import {addTocart, triggerCartList, feeType, fees, productList, updateCartItemQuantity} from './orderServices';
-import {ProductListResponse, FeeResponse, CartItemResponsePayload, ServiceFeesResponse} from './types';
+import { addTocart, triggerCartList, productFee, serviceFee, productList, updateCartItemQuantity, CartData } from './orderServices';
+import {ProductListResponse, ProductFeeResponse, CartItemResponsePayload, FeesResponse } from './types';
 
 interface orderState {
   loading: boolean;
@@ -12,12 +12,12 @@ interface orderState {
   productWeight?: number;
   productQuantity?: number;
   userCart?: Array<Record<string, any>>;
-  feeTypeData?: FeeResponse;
+  feeTypeData?: ProductFeeResponse;
   fee?: number;
   cartData?: CartItemResponsePayload
   cartItemId?: string;
   newCartItemQuantity?: Record<string, string>
-  listFees?: ServiceFeesResponse
+  listFees?: FeesResponse
   serviceFee: number
   cartList:CartItemResponsePayload
 }
@@ -80,6 +80,8 @@ export const orderSlice = createSlice({
         state.productListData = action.payload;
         if (action.payload.data) {
           state.productId = action.payload.data.data[0].id;
+        }else {
+          console.log("PRODUCT_ID NOT IN FOUND",state.productId);
         }
       })
       .addCase(productList.rejected, state => {
@@ -87,20 +89,20 @@ export const orderSlice = createSlice({
         state.error = true;
       })
 
-      //FEE TYPE
-      .addCase(feeType.pending, state => {
+      //PRODUCT FEE
+      .addCase(productFee.pending, state => {
         state.loading = true;
         state.error = false;
       })
-      .addCase(feeType.fulfilled, (state, action) => {
+      .addCase(productFee.fulfilled, (state, action) => {
         state.loading = false;
         state.error = false;
-        state.feeTypeData = action.payload as FeeResponse;
+        state.feeTypeData = action.payload as ProductFeeResponse;
         if (action.payload.data) {
           state.fee = action.payload.data?.data[0].cost.cost_per_kg;
         }
       })
-      .addCase(feeType.rejected, state => {
+      .addCase(productFee.rejected, state => {
         state.loading = false;
         state.error = true;
       })
@@ -114,6 +116,7 @@ export const orderSlice = createSlice({
         state.loading = false;
         state.error = false;
         state.cartData = action.payload as CartItemResponsePayload;
+        console.log("Cart",state.cartData);
       }) 
       .addCase(addTocart.rejected, (state, action: PayloadAction<any>) => {
         state.loading = false;
@@ -140,19 +143,19 @@ export const orderSlice = createSlice({
       })
 
       //FEES
-      .addCase(fees.pending, state => {
+      .addCase(serviceFee.pending, state => {
         state.loading = true;
         state.error = false;
       })
-      .addCase(fees.fulfilled, (state, action) => {
+      .addCase(serviceFee.fulfilled, (state, action) => {
         state.loading = false;
         state.error = false;
         if(action.payload.data){
-          state.listFees = action.payload as ServiceFeesResponse
+          state.listFees = action.payload as FeesResponse
         }
   
       }) 
-      .addCase(fees.rejected, (state, action: PayloadAction<any>) => {
+      .addCase(serviceFee.rejected, (state, action: PayloadAction<any>) => {
         state.loading = false;
         state.error = true;
         state.errorCode = action.payload?.data?.error_code || 1;

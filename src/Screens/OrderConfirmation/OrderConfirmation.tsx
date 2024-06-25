@@ -95,6 +95,7 @@ const OrderConfirmation: FC<IProps> = ({navigation}) => {
   const {serviceFee, cartData, cartList} = useSelector(
     (state: RootState) => state.order,
   );
+  const {userFullName} = useSelector((state: RootState) => state.user);
   const dispatch = useDispatch();
 
   const handleCloseReceipt = () => {
@@ -195,7 +196,7 @@ const OrderConfirmation: FC<IProps> = ({navigation}) => {
         <View style={styles.checkbox_container}>
           <LOCATION_ICON />
           <View style={styles.address}>
-            <Fonts type="boldBlack">Becky Anderson</Fonts>
+            <Fonts type="boldBlack">{userFullName}</Fonts>
             <Fonts type="normalGrayText">
               plot 234, adeola odeku Lagos, Nigeria
             </Fonts>

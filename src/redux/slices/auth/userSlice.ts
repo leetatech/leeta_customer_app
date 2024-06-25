@@ -9,6 +9,7 @@ interface UserState {
   errorCode?: number;
   message?: string;
   userEmail?: string | null;
+  userFullName?:string | null,
 }
 
 const initialState: UserState = {
@@ -17,6 +18,7 @@ const initialState: UserState = {
   error: false,
   message: '',
   userEmail: null,
+  userFullName: null,
   errorCode: 0,
 };
 export const userSlice = createSlice({
@@ -25,6 +27,9 @@ export const userSlice = createSlice({
   reducers: {
     setemail: (state, action: PayloadAction<string | null>) => {
       state.userEmail = action.payload;
+    },
+    setFullName: (state, action: PayloadAction<string | null>) => {
+      state.userFullName = action.payload;
     },
     resetUserState: state => {
       state.errorCode = initialState.errorCode;
@@ -142,5 +147,5 @@ export const userSlice = createSlice({
   },
 });
 
-export const {setemail, resetUserState, resetUserData} = userSlice.actions;
+export const {setemail, resetUserState, resetUserData,setFullName} = userSlice.actions;
 export default userSlice.reducer;

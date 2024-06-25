@@ -13,8 +13,8 @@ import KeyboardAvoidingContainer from '../../Components/KeyboardAvoidingContaine
 import {useDispatch, useSelector} from 'react-redux';
 import {
   addTocart,
-  feeType,
-  fees,
+  productFee,
+  serviceFee,
   productList,
 } from '../../redux/slices/order/orderServices';
 import {
@@ -26,7 +26,7 @@ import {
 import {RootState} from '../../redux/rootReducer';
 import {
   CartItemResponsePayload,
-  ServiceFeesResponse,
+  FeesResponse,
 } from '../../redux/slices/order/types';
 
 interface IProps {
@@ -80,12 +80,14 @@ const Home: FC<IProps> = ({navigation}) => {
         cost: totalFeePerItem,
         product_id: productId!,
         quantity: productQuantity!,
-        weight:selectedWeight,
+        weight: selectedWeight,
       };
+      console.log('payload', payload);
+
       dispatch(addTocart(payload))
         .then(response => {
           const result = response.payload as CartItemResponsePayload;
-          if (response && result) {
+          if (response && result && payload.cost && payload.product_id && payload.quantity && payload.weight) {
             const cartItemIds = result?.data?.cart_items;
             if (cartItemIds) {
               cartItemIds.forEach(item => {
@@ -142,25 +144,20 @@ const Home: FC<IProps> = ({navigation}) => {
 
   const getProductListing = () => {
     const payload = {
-      filter: {
-        fields: [
-          {
-            name: 'string',
-            operator: 'isEqualTo',
-            value: 'string',
-          },
-        ],
-        operator: 'string',
-      },
       paging: {
         index: 0,
-        size: 0,
+        size: 10,
       },
     };
-    dispatch(productList(payload));
+    dispatch(productList(payload))
+      .then(response => {
+      })
+      .catch(error => {
+        console.error('Error getting Product Id:', error);
+      });
   };
 
-  const getFee = () => {
+  const getProductFee = () => {
     const payload = {
       filter: {
         fields: [
@@ -170,18 +167,36 @@ const Home: FC<IProps> = ({navigation}) => {
             value: 'PRODUCT_FEE',
           },
         ],
-        operator: 'OR',
+        operator: 'and',
       },
       paging: {
         index: 0,
-        size: 0,
+        size: 1,
       },
     };
 
-    dispatch(feeType(payload));
+    dispatch(productFee(payload))
+      .then(response => {
+        const result = response.payload as FeesResponse;
+        if (response && result && result.data) {
+          const feeItem = result.data as FeesResponse;
+          const productFee = feeItem.data!.find(
+            item => item.fee_type === 'PRODUCT_FEE',
+          );
+          if (productFee) {
+            const costPerType = productFee.cost.cost_per_type;
+            dispatch(setServiceFee(costPerType));
+          } else {
+            return null;
+          }
+        }
+      })
+      .catch(error => {
+        console.error('Error getting fees:', error);
+      });
   };
 
-  const listFees = () => {
+  const getServiceFee = () => {
     const payload = {
       filter: {
         fields: [
@@ -191,18 +206,18 @@ const Home: FC<IProps> = ({navigation}) => {
             value: 'SERVICE_FEE',
           },
         ],
-        operator: 'OR',
+        operator: 'and',
       },
       paging: {
         index: 0,
-        size: 0,
+        size: 1,
       },
     };
-    dispatch(fees(payload))
+    dispatch(serviceFee(payload))
       .then(response => {
-        const result = response.payload as ServiceFeesResponse;
+        const result = response.payload as FeesResponse;
         if (response && result && result.data) {
-          const feeItem = result.data as ServiceFeesResponse
+          const feeItem = result.data as FeesResponse;
           const serviceFee = feeItem.data!.find(
             item => item.fee_type === 'SERVICE_FEE',
           );
@@ -219,12 +234,10 @@ const Home: FC<IProps> = ({navigation}) => {
       });
   };
 
- 
-
   useEffect(() => {
     getProductListing();
-    getFee();
-    listFees();
+    getProductFee();
+    getServiceFee();
   }, []);
 
   return (

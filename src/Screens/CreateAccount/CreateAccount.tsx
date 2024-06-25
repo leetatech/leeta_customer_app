@@ -18,7 +18,7 @@ import {RootState} from '../../redux/rootReducer';
 import {useDispatch, useSelector} from 'react-redux';
 import {signup} from '../../redux/slices/auth/userServices';
 import CustomLoader from '../../Components/Loader/CustomLoader';
-import {resetUserData, resetUserState, setemail} from '../../redux/slices/auth/userSlice';
+import {resetUserData, resetUserState, setFullName, setemail} from '../../redux/slices/auth/userSlice';
 import {appUserType} from '../../config';
 import {applicationErrorCode} from '../../errors';
 
@@ -73,7 +73,7 @@ const CreateAccount: FC<IProps> = ({navigation}) => {
         user_type: formik.values.user_type,
       };
       dispatch(setemail(formik.values.email.trim()));
-
+      dispatch(setFullName(formik.values.full_name.trim()))
       dispatch(signup(payload));
     }
   };

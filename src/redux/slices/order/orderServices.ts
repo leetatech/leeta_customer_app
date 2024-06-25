@@ -3,7 +3,7 @@ import axios from 'axios';
 import {apiUrl} from '../../../config';
 import {apiCall} from '../../../utils';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import {ProductListResponse, FeeResponse, CartItemResponsePayload, ServiceFeesResponse} from './types';
+import {ProductListResponse, ProductFeeResponse, CartItemResponsePayload,FeesResponse } from './types';
 
 export interface FeeTypeData {
   filter: {
@@ -21,14 +21,14 @@ export interface FeeTypeData {
 }
 
 export interface ProductListingData {
-  filter: {
-    fields: {
-      name: string;
-      operator: string;
-      value: string;
-    }[];
-    operator: string;
-  };
+  // filter: {
+  //   fields: {
+  //     name: string;
+  //     operator: string;
+  //     value: string;
+  //   }[];
+  //   operator: string;
+  // };
   paging: {
     index: number;
     size: number;
@@ -101,8 +101,8 @@ export const productList = createAsyncThunk(
   },
 );
 
-export const feeType = createAsyncThunk(
-  'order/feeType',
+export const productFee = createAsyncThunk(
+  'order/productFee',
   async (feeType: FeeTypeData, {rejectWithValue}) => {
     try {
       const url = apiUrl.feesType;
@@ -112,7 +112,7 @@ export const feeType = createAsyncThunk(
         Authorization: `Bearer ${token}`,
       };
       const response = await apiCall(url, method, feeType, headers);
-      return response as FeeResponse;
+      return response as ProductFeeResponse;
     } catch (error) {
       if (axios.isAxiosError(error)) {
         return rejectWithValue(error.response?.data);
@@ -136,6 +136,7 @@ export const addTocart = createAsyncThunk(
         Authorization: `Bearer ${token}`,
       };
       const response = await apiCall(url, method, cart, headers);
+      console.log("cart result: " + response)
       return response as  CartItemResponsePayload;
     } catch (error) {
       if (axios.isAxiosError(error)) {
@@ -173,8 +174,8 @@ export const updateCartItemQuantity = createAsyncThunk(
   },
 );
 
-export const fees = createAsyncThunk(
-  'order/fees',
+export const serviceFee = createAsyncThunk(
+  'order/serviceFee',
   async (fee: FeesData, {rejectWithValue}) => {
     try {
       const url = apiUrl.feesType
@@ -184,7 +185,7 @@ export const fees = createAsyncThunk(
         Authorization: `Bearer ${token}`,
       };
       const response = await apiCall(url, method, fee, headers);
-      return response as  ServiceFeesResponse;
+      return response as  FeesResponse;
 
     } catch (error) {
       if (axios.isAxiosError(error)) {
