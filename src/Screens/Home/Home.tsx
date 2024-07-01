@@ -123,10 +123,12 @@ const Home: FC<IProps> = ({navigation}) => {
       quantity: productQuantity!,
       weight: productWeight!,
     };
+    console.log('payload', payload);
+
     dispatch(addTocart(payload))
       .then(response => {
         const result = response.payload as CartItemResponsePayload;
-        if (response && result) {
+        if (response && result && payload.cost && payload.product_id && payload.quantity && payload.weight) {
           const cartItemIds = result?.data?.cart_items;
           if (cartItemIds) {
             cartItemIds.forEach(item => {
@@ -250,7 +252,9 @@ const Home: FC<IProps> = ({navigation}) => {
             disabled={false}
             buttonStyle={undefined}
             textStyle={undefined}
-            onPress={() => setopenGasWeightOptions(true)}
+            // onPress={() => setopenGasWeightOptions(true)}
+            onPress={() => navigation.navigate('AddAddress')}
+
           />
         </View>
         <CustomModal visible={openGasWeightOptions}>

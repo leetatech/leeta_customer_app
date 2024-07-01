@@ -1,6 +1,6 @@
 import {PayloadAction, createSlice} from '@reduxjs/toolkit';
-import { addTocart, triggerCartList, productFee, serviceFee, productList, updateCartItemQuantity, CartData } from './orderServices';
-import {ProductListResponse, ProductFeeResponse, CartItemResponsePayload, FeesResponse } from './types';
+import { addTocart, triggerCartList, productFee, serviceFee, productList, updateCartItemQuantity, CartData, getState } from './orderServices';
+import {ProductListResponse, ProductFeeResponse, CartItemResponsePayload, FeesResponse, StateResponse } from './types';
 
 interface orderState {
   loading: boolean;
@@ -20,6 +20,10 @@ interface orderState {
   listFees?: FeesResponse
   serviceFee: number
   cartList:CartItemResponsePayload
+  states:StateResponse
+  userState?:string
+  userLga?: string
+  userMobile?: string
 }
 
 const initialState: orderState = {
@@ -40,7 +44,10 @@ const initialState: orderState = {
   listFees:{},
   serviceFee:0,
   cartList:{},
-
+  states:{},
+  userState:'',
+  userLga: '',
+  userMobile: ''
 };
 
 export const orderSlice = createSlice({
@@ -64,6 +71,18 @@ export const orderSlice = createSlice({
     },
     setServiceFee: (state, action) => {
       state.serviceFee = action.payload;
+    },
+    updateUserState: (state, action) => {
+      state.userState = action.payload;
+      console.log("STATE", state.userState);
+    },
+    updateUserLga: (state, action) => {
+      state.userLga = action.payload;
+      console.log("LGA", state.userLga);
+    },
+    updateUserMobile: (state, action) => {
+      state.userMobile = action.payload;
+      console.log("MOBILE", state.userMobile);
     }
   },
   extraReducers: builder => {
@@ -179,11 +198,29 @@ export const orderSlice = createSlice({
         state.message = action.payload.data.message;
       })
 
+      //GET STATE
+      .addCase(getState.pending, state => {
+        state.loading = true;
+        state.error = false;
+      })
+      .addCase(getState.fulfilled, (state, action) => {
+        state.loading = false;
+        state.error = false;
+        state.states = action.payload as StateResponse
+      })
+      .addCase(getState.rejected, (state, action: PayloadAction<any>) => {
+        state.loading = false;
+        state.error = true;
+        state.errorCode = action.payload?.data?.error_code || 1;
+        state.message = action.payload.data.message;
+        console.log("Error getting state",state.message)
+      })
+
     },
       
 });
 
-export const {setProductWeight, setProductQuantity, setUserCart, updateCart,setCartItemId, setServiceFee} =
+export const {setProductWeight, setProductQuantity, setUserCart, updateCart,setCartItemId, setServiceFee,updateUserState,updateUserLga,updateUserMobile} =
   orderSlice.actions;
 
 export default orderSlice.reducer;

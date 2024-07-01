@@ -16,8 +16,20 @@ export const apiCall = async <T>(
     });
     return response.data
   } catch (error) {
-    throw error;
+    if (axios.isAxiosError(error)) {
+      console.error('Axios error:', error.response?.data);
+      throw {
+        data: error.response?.data,
+        message: error.message,
+        isAxiosError: true,
+      };
+  }else {
+    console.error('General error:', error);
+    throw {
+      isAxiosError: false,
+    };
   }
+}
 };
 
 export const maskEmail = (email: string ) => {
@@ -26,5 +38,4 @@ export const maskEmail = (email: string ) => {
   const maskedPart = email.slice(visiblePart.length, atIndex).replace(/./g, '*');
   return `${visiblePart}${maskedPart}${email.slice(atIndex)}`;
   };
-
 

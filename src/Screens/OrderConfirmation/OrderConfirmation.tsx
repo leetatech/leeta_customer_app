@@ -144,19 +144,9 @@ const OrderConfirmation: FC<IProps> = ({navigation}) => {
 
   const listCart = () => {
     const payload = {
-      filter: {
-        fields: [
-          {
-            name: 'string',
-            operator: 'isEqualTo',
-            value: 'string',
-          },
-        ],
-        operator: 'OR',
-      },
       paging: {
         index: 0,
-        size: 0,
+        size: 10,
       },
     };
     dispatch(triggerCartList(payload))

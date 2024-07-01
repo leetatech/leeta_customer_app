@@ -19,7 +19,15 @@ const createStyles = () =>
       paddingVertical: 20,
       gap: 6,
     },
-
+    listSate :{
+ width: '100%',
+    gap:8
+    },
+    stateStyle:{
+lineHeight:28,
+alignSelf: 'center',
+width:100
+    }
  
   });
 

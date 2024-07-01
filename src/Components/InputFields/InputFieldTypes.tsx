@@ -1,4 +1,4 @@
-import React, {ReactNode} from 'react';
+import {ReactNode} from 'react';
 import {StyleProp, TextInputProps,  TextStyle,  ViewStyle,
 } from 'react-native';
 
@@ -7,13 +7,14 @@ interface ExtraInputProps {
   isPassword?: boolean;
   name: string;
   errors?: ReactNode;
-  icon?: React.ReactNode;
+  icon?: any;
   helperText?: string;
   inputStyle?: StyleProp<ViewStyle>;
   onFocusStyle?: StyleProp<ViewStyle>;
   defaultValueStyle?: StyleProp<TextStyle>;
   onFocus?: () => void,
   onBlur?: () => void
+  onPress?: () => void
 }
 
 export type InputProps = TextInputProps & ExtraInputProps;
