@@ -3,12 +3,12 @@ import {Image, Text, TextInput, View} from 'react-native';
 import createStyles from './styles';
 import {InputProps} from './InputFieldTypes';
 import {colors} from '../../Constants/Colors';
-import { TouchableOpacity } from 'react-native-gesture-handler';
-
+import {TouchableOpacity} from 'react-native-gesture-handler';
 
 const StyledTextInput: FC<InputProps> = ({
   label,
   icon,
+  image,
   name,
   errors,
   helperText,
@@ -19,7 +19,6 @@ const StyledTextInput: FC<InputProps> = ({
   onFocus,
   onBlur,
   ...props
- 
 }) => {
   const styles = useMemo(() => createStyles(), []);
   const [isFocused, setIsFocused] = useState<boolean>(false);
@@ -40,6 +39,7 @@ const StyledTextInput: FC<InputProps> = ({
     <View>
       <Text style={styles.label}>{label}</Text>
       <View style={[styles.input, inputStyle, isFocused && onFocusStyle]}>
+        {icon}
         <TextInput
           onFocus={handleFocus}
           onBlur={handleBlur}
@@ -47,10 +47,12 @@ const StyledTextInput: FC<InputProps> = ({
           style={defaultValueStyle}
           {...props}
         />
-        <TouchableOpacity onPress={onPress}>
-        {icon && <Image source={icon}  />}
-        </TouchableOpacity>
-        
+
+        {image && (
+          <TouchableOpacity onPress={onPress}>
+            <Image source={image} />
+          </TouchableOpacity>
+        )}
       </View>
     </View>
   );

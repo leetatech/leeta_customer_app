@@ -12,6 +12,7 @@ interface ExtraInputProps {
   inputStyle?: StyleProp<ViewStyle>;
   onFocusStyle?: StyleProp<ViewStyle>;
   defaultValueStyle?: StyleProp<TextStyle>;
+  image?: any;
   onFocus?: () => void,
   onBlur?: () => void
   onPress?: () => void
