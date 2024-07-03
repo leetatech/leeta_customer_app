@@ -1,4 +1,5 @@
 import {StyleSheet} from 'react-native';
+import {colors} from '../../Constants/Colors';
 
 const createStyles = () =>
   StyleSheet.create({
@@ -10,8 +11,8 @@ const createStyles = () =>
       paddingTop: 10,
       gap: 5,
     },
-    button_container :{
-      paddingTop: 15
+    button_container: {
+      paddingTop: 15,
     },
     checkboxContainer: {
       flexDirection: 'row',
@@ -19,16 +20,25 @@ const createStyles = () =>
       paddingVertical: 20,
       gap: 6,
     },
-    listSate :{
- width: '100%',
-    gap:8
+    listSate: {
+      width: '100%',
+      gap: 8,
     },
-    stateStyle:{
-lineHeight:28,
-alignSelf: 'center',
-width:100
-    }
- 
+    item_neutral: {
+      lineHeight: 28,
+      alignSelf: 'center',
+      width: 100,
+    },
+    selectedItemStyle: {
+      backgroundColor: colors.XLGRAY,
+      borderRadius: 20,
+    },
+    item_selected: {
+      lineHeight: 28,
+      alignSelf: 'center',
+      width: 100,
+      color: colors.BLACK,
+    },
   });
 
 export default createStyles;

@@ -20,20 +20,6 @@ export interface FeeTypeData {
   };
 }
 
-export interface ProductListingData {
-  // filter: {
-  //   fields: {
-  //     name: string;
-  //     operator: string;
-  //     value: string;
-  //   }[];
-  //   operator: string;
-  // };
-  paging: {
-    index: number;
-    size: number;
-  };
-}
 export interface CartData {
   cost: number,
   product_id: string,
@@ -77,9 +63,24 @@ export interface PaginationData {
   };
 }
 
+export interface DeliveryFeeData {
+  filter: {
+    fields: {
+      name: string;
+      operator: string;
+      value: string;
+    }[];
+    operator: string;
+  };
+  paging: {
+    index: number;
+    size: number;
+  };
+}
+
 export const productList = createAsyncThunk(
   'order/productList',
-  async (productList: ProductListingData, {rejectWithValue}) => {
+  async (productList: PaginationData, {rejectWithValue}) => {
     try {
       const url = apiUrl.productList;
       const method = 'put';
@@ -136,7 +137,6 @@ export const addTocart = createAsyncThunk(
         Authorization: `Bearer ${token}`,
       };
       const response = await apiCall(url, method, cart, headers);
-      console.log("cart result: " + response)
       return response as  CartItemResponsePayload;
     } catch (error) {
       if (axios.isAxiosError(error)) {
@@ -235,6 +235,30 @@ export const getState = createAsyncThunk(
       };
       const response = await apiCall(url, method,undefined, headers);
       return response as StateResponse
+    } catch (error) {
+      if (axios.isAxiosError(error)) {
+        return rejectWithValue(error.response?.data);
+      } else if (error instanceof Error) {
+        return rejectWithValue(error.message);
+      } else {
+        throw error;
+      }
+    }
+  },
+);
+
+export const deliveryFee = createAsyncThunk(
+  'order/deliveryFee',
+  async (deliveryFeePayload: DeliveryFeeData, {rejectWithValue}) => {
+    try {
+      const url = apiUrl.feesType;
+      const method = 'put';
+      const token = await AsyncStorage.getItem('userToken');
+      const headers = {
+        Authorization: `Bearer ${token}`,
+      };
+      const response = await apiCall(url, method, deliveryFeePayload, headers);
+      return response 
     } catch (error) {
       if (axios.isAxiosError(error)) {
         return rejectWithValue(error.response?.data);

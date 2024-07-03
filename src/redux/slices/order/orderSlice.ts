@@ -1,6 +1,21 @@
 import {PayloadAction, createSlice} from '@reduxjs/toolkit';
-import { addTocart, triggerCartList, productFee, serviceFee, productList, updateCartItemQuantity, CartData, getState } from './orderServices';
-import {ProductListResponse, ProductFeeResponse, CartItemResponsePayload, FeesResponse, StateResponse } from './types';
+import {
+  addTocart,
+  triggerCartList,
+  productFee,
+  serviceFee,
+  productList,
+  updateCartItemQuantity,
+  getState,
+  deliveryFee,
+} from './orderServices';
+import {
+  ProductListResponse,
+  ProductFeeResponse,
+  CartItemResponsePayload,
+  FeesResponse,
+  StateResponse,
+} from './types';
 
 interface orderState {
   loading: boolean;
@@ -14,16 +29,16 @@ interface orderState {
   userCart?: Array<Record<string, any>>;
   feeTypeData?: ProductFeeResponse;
   fee?: number;
-  cartData?: CartItemResponsePayload
+  cartData?: CartItemResponsePayload;
   cartItemId?: string;
-  newCartItemQuantity?: Record<string, string>
-  listFees?: FeesResponse
-  serviceFee: number
-  cartList:CartItemResponsePayload
-  states:StateResponse
-  userState?:string
-  userLga?: string
-  userMobile?: string
+  newCartItemQuantity?: Record<string, string>;
+  listFees?: FeesResponse;
+  serviceFee: number;
+  cartList: CartItemResponsePayload;
+  states: StateResponse;
+  userState?: string;
+  userLga?: string;
+  generatedDeliveryFee?: any;
 }
 
 const initialState: orderState = {
@@ -38,16 +53,16 @@ const initialState: orderState = {
   userCart: [],
   feeTypeData: {},
   fee: 0,
-  cartData:{},
-  cartItemId:"",
-  newCartItemQuantity:{},
-  listFees:{},
-  serviceFee:0,
-  cartList:{},
-  states:{},
-  userState:'',
+  cartData: {},
+  cartItemId: '',
+  newCartItemQuantity: {},
+  listFees: {},
+  serviceFee: 0,
+  cartList: {},
+  states: {},
+  userState: '',
   userLga: '',
-  userMobile: ''
+  generatedDeliveryFee: {},
 };
 
 export const orderSlice = createSlice({
@@ -74,16 +89,10 @@ export const orderSlice = createSlice({
     },
     updateUserState: (state, action) => {
       state.userState = action.payload;
-      console.log("STATE", state.userState);
     },
     updateUserLga: (state, action) => {
       state.userLga = action.payload;
-      console.log("LGA", state.userLga);
     },
-    updateUserMobile: (state, action) => {
-      state.userMobile = action.payload;
-      console.log("MOBILE", state.userMobile);
-    }
   },
   extraReducers: builder => {
     builder
@@ -99,8 +108,6 @@ export const orderSlice = createSlice({
         state.productListData = action.payload;
         if (action.payload.data) {
           state.productId = action.payload.data.data[0].id;
-        }else {
-          console.log("PRODUCT_ID NOT IN FOUND",state.productId);
         }
       })
       .addCase(productList.rejected, state => {
@@ -135,8 +142,7 @@ export const orderSlice = createSlice({
         state.loading = false;
         state.error = false;
         state.cartData = action.payload as CartItemResponsePayload;
-        console.log("Cart",state.cartData);
-      }) 
+      })
       .addCase(addTocart.rejected, (state, action: PayloadAction<any>) => {
         state.loading = false;
         state.error = true;
@@ -152,14 +158,20 @@ export const orderSlice = createSlice({
       .addCase(updateCartItemQuantity.fulfilled, (state, action) => {
         state.loading = false;
         state.error = false;
-        state.newCartItemQuantity = action.payload!.data as Record<string, string>;
-      }) 
-      .addCase(updateCartItemQuantity.rejected, (state, action: PayloadAction<any>) => {
-        state.loading = false;
-        state.error = true;
-        state.errorCode = action.payload?.data?.error_code || 1;
-        state.message = action.payload.data.message;
+        state.newCartItemQuantity = action.payload!.data as Record<
+          string,
+          string
+        >;
       })
+      .addCase(
+        updateCartItemQuantity.rejected,
+        (state, action: PayloadAction<any>) => {
+          state.loading = false;
+          state.error = true;
+          state.errorCode = action.payload?.data?.error_code || 1;
+          state.message = action.payload.data.message;
+        },
+      )
 
       //FEES
       .addCase(serviceFee.pending, state => {
@@ -169,11 +181,10 @@ export const orderSlice = createSlice({
       .addCase(serviceFee.fulfilled, (state, action) => {
         state.loading = false;
         state.error = false;
-        if(action.payload.data){
-          state.listFees = action.payload as FeesResponse
+        if (action.payload.data) {
+          state.listFees = action.payload as FeesResponse;
         }
-  
-      }) 
+      })
       .addCase(serviceFee.rejected, (state, action: PayloadAction<any>) => {
         state.loading = false;
         state.error = true;
@@ -191,12 +202,15 @@ export const orderSlice = createSlice({
         state.error = false;
         state.cartList = action.payload.data as CartItemResponsePayload;
       })
-      .addCase(triggerCartList.rejected, (state, action: PayloadAction<any>) => {
-        state.loading = false;
-        state.error = true;
-        state.errorCode = action.payload?.data?.error_code || 1;
-        state.message = action.payload.data.message;
-      })
+      .addCase(
+        triggerCartList.rejected,
+        (state, action: PayloadAction<any>) => {
+          state.loading = false;
+          state.error = true;
+          state.errorCode = action.payload?.data?.error_code || 1;
+          state.message = action.payload.data.message;
+        },
+      )
 
       //GET STATE
       .addCase(getState.pending, state => {
@@ -206,21 +220,43 @@ export const orderSlice = createSlice({
       .addCase(getState.fulfilled, (state, action) => {
         state.loading = false;
         state.error = false;
-        state.states = action.payload as StateResponse
+        state.states = action.payload as StateResponse;
       })
       .addCase(getState.rejected, (state, action: PayloadAction<any>) => {
         state.loading = false;
         state.error = true;
         state.errorCode = action.payload?.data?.error_code || 1;
         state.message = action.payload.data.message;
-        console.log("Error getting state",state.message)
       })
 
-    },
-      
+      //DELIVERY FEE
+      .addCase(deliveryFee.pending, state => {
+        state.loading = true;
+        state.error = false;
+      })
+      .addCase(deliveryFee.fulfilled, (state, action) => {
+        state.loading = false;
+        state.error = false;
+        state.generatedDeliveryFee = action.payload as any;
+      })
+      .addCase(deliveryFee.rejected, (state, action: PayloadAction<any>) => {
+        state.loading = false;
+        state.error = true;
+        state.errorCode = action.payload?.data?.error_code || 1;
+        state.message = action.payload.data.message;
+      });
+  },
 });
 
-export const {setProductWeight, setProductQuantity, setUserCart, updateCart,setCartItemId, setServiceFee,updateUserState,updateUserLga,updateUserMobile} =
-  orderSlice.actions;
+export const {
+  setProductWeight,
+  setProductQuantity,
+  setUserCart,
+  updateCart,
+  setCartItemId,
+  setServiceFee,
+  updateUserState,
+  updateUserLga,
+} = orderSlice.actions;
 
 export default orderSlice.reducer;

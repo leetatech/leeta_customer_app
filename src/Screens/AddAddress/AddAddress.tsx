@@ -1,5 +1,5 @@
-import React, {FC, useEffect, useMemo, useRef, useState} from 'react';
-import {FlatList,TouchableOpacity, View} from 'react-native';
+import React, {FC,useMemo, useRef, useState} from 'react';
+import {TouchableOpacity, View} from 'react-native';
 import FormMainContainer from '../../Components/FormMainContainer/FormMainContainer';
 import ScreenTitle from '../../Components/ScreenTitle/ScreenTitle';
 import {NavigationProp, ParamListBase} from '@react-navigation/native';
@@ -11,13 +11,16 @@ import Fontisto from 'react-native-vector-icons/Fontisto';
 import Fonts from '../../Constants/Fonts';
 import {TouchableWithoutFeedback, Keyboard} from 'react-native';
 import {ScrollView} from 'react-native-gesture-handler';
-import {getState} from '../../redux/slices/order/orderServices';
+import { getState} from '../../redux/slices/order/orderServices';
 import {useDispatch, useSelector} from 'react-redux';
 import {DOWN_ARROW} from '../../Assets';
 import {StateResponse} from '../../redux/slices/order/types';
 import CustomModal from '../../Components/Modal/CustomModal';
 import {RootState} from '../../redux/rootReducer';
-import { updateUserLga, updateUserState } from '../../redux/slices/order/orderSlice';
+import {
+  updateUserLga,
+  updateUserState,
+} from '../../redux/slices/order/orderSlice';
 
 interface IProps {
   navigation: NavigationProp<ParamListBase>;
@@ -37,6 +40,8 @@ const AddAddress: FC<IProps> = ({navigation}) => {
   const [toggleModal, setToggleModal] = useState(false);
   const [allDataGotten, setAllDataGotten] = useState<string[]>([]);
   const [selectedDropdown, setSelectedDropdown] = useState<string>('');
+  const [selectedItem, setSelectedItem] = useState<string>('');
+
   const dispatch = useDispatch();
 
   const focusedInputRef = useRef<string | null>(null);
@@ -75,19 +80,31 @@ const AddAddress: FC<IProps> = ({navigation}) => {
   };
 
   const handleSelectedstate = (item: string) => {
+    setSelectedItem(item);
     const selectedState = states.data?.find(state => state.name === item);
     const lgas = selectedState?.lgas;
     setAllDataGotten(lgas!);
     setUserState(item);
-    dispatch(updateUserState(item))
+    dispatch(updateUserState(item));
     setToggleModal(false);
   };
 
   const handleSelectedLga = (item: string) => {
+    setSelectedItem(item);
     setUserLga(item);
-    dispatch(updateUserLga(item))
+    dispatch(updateUserLga(item));
     setToggleModal(false);
   };
+
+  const getFormattedState = (state:string) => {
+    if (!state) return '';
+    return state.charAt(0) + state.slice(1).toLowerCase();
+  };
+
+  const updateDeliveryDetails = () => {
+    navigation.navigate('OrderConfirmation');
+  };
+
   return (
     <>
       <FormMainContainer>
@@ -128,13 +145,13 @@ const AddAddress: FC<IProps> = ({navigation}) => {
               <StyledTextInput
                 placeholder="State"
                 name="State"
-                value={userState.toLowerCase()}
+                value={getFormattedState(userState)}
                 onChangeText={newState => setUserState(newState)}
                 onBlur={() => handleScreenTitle('State', false)}
                 onFocus={() => handleScreenTitle('State', true)}
                 style={{color: colors.DGRAY, fontWeight: '500', fontSize: 17}}
                 onFocusStyle={{borderColor: colors.ORANGE}}
-                icon={DOWN_ARROW}
+                image={DOWN_ARROW}
                 onPress={getAllState}
               />
               {userState && (
@@ -147,7 +164,7 @@ const AddAddress: FC<IProps> = ({navigation}) => {
                   onFocus={() => handleScreenTitle('More Information', true)}
                   style={{color: colors.DGRAY, fontWeight: '500', fontSize: 17}}
                   onFocusStyle={{borderColor: colors.ORANGE}}
-                  icon={DOWN_ARROW}
+                  image={DOWN_ARROW}
                   onPress={getAllLgasForSelectedState}
                 />
               )}
@@ -183,32 +200,37 @@ const AddAddress: FC<IProps> = ({navigation}) => {
               disabled={false}
               buttonStyle={undefined}
               textStyle={undefined}
-              onPress={() => navigation.navigate('OrderConfirmation')}
+              onPress={updateDeliveryDetails}
             />
           </View>
         </ScrollView>
       </FormMainContainer>
-      <CustomModal visible={toggleModal} style={{height: 300}}>
-        <View style={styles.listSate}>
-          <FlatList
-            data={allDataGotten}
-            keyExtractor={index => index.toString()}
-            renderItem={({index,item}) => (
-              <TouchableOpacity
-                onPress={
-                  selectedDropdown === 'state'
-                    ? () => handleSelectedstate(item)
-                    : () => handleSelectedLga(item)
-                } key={index}>
-                <Fonts type="normalGrayText" style={styles.stateStyle}>
-                  {item}
-                </Fonts>
-              </TouchableOpacity>
-            )}
-            showsVerticalScrollIndicator={false}
-          />
-        </View>
-      </CustomModal>
+      <CustomModal visible={toggleModal} style={{ height: 400 }}>
+      <View style={styles.listSate}>
+        <ScrollView showsVerticalScrollIndicator={false}>
+          {allDataGotten.map((item, index) => (
+            <TouchableOpacity
+              key={index}
+              onPress={
+                selectedDropdown === 'state'
+                  ? () => handleSelectedstate(item)
+                  : () => handleSelectedLga(item)
+              }
+              style={[
+                selectedItem === item && styles.selectedItemStyle,
+              ]}
+            >
+              <Fonts
+                type="normalGrayText"
+                style={selectedItem === item ? styles.item_selected : styles.item_neutral}
+              >
+                {item}
+              </Fonts>
+            </TouchableOpacity>
+          ))}
+        </ScrollView>
+      </View>
+    </CustomModal>
     </>
   );
 };

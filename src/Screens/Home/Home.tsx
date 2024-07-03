@@ -187,45 +187,9 @@ const Home: FC<IProps> = ({navigation}) => {
           );
           if (productFee) {
             const costPerType = productFee.cost.cost_per_type;
-            dispatch(setServiceFee(costPerType));
-          } else {
-            return null;
-          }
-        }
-      })
-      .catch(error => {
-        console.error('Error getting fees:', error);
-      });
-  };
-
-  const getServiceFee = () => {
-    const payload = {
-      filter: {
-        fields: [
-          {
-            name: 'fee_type',
-            operator: 'isEqualTo',
-            value: 'SERVICE_FEE',
-          },
-        ],
-        operator: 'and',
-      },
-      paging: {
-        index: 0,
-        size: 1,
-      },
-    };
-    dispatch(serviceFee(payload))
-      .then(response => {
-        const result = response.payload as FeesResponse;
-        if (response && result && result.data) {
-          const feeItem = result.data as FeesResponse;
-          const serviceFee = feeItem.data!.find(
-            item => item.fee_type === 'SERVICE_FEE',
-          );
-          if (serviceFee) {
-            const costPerType = serviceFee.cost.cost_per_type;
-            dispatch(setServiceFee(costPerType));
+            return costPerType
+            // console.log("PRODUCT FEE",costPerType)
+            // dispatch(setServiceFee(costPerType));
           } else {
             return null;
           }
@@ -239,7 +203,6 @@ const Home: FC<IProps> = ({navigation}) => {
   useEffect(() => {
     getProductListing();
     getProductFee();
-    getServiceFee();
   }, []);
 
   return (
@@ -252,9 +215,7 @@ const Home: FC<IProps> = ({navigation}) => {
             disabled={false}
             buttonStyle={undefined}
             textStyle={undefined}
-            // onPress={() => setopenGasWeightOptions(true)}
-            onPress={() => navigation.navigate('AddAddress')}
-
+            onPress={() => setopenGasWeightOptions(true)}
           />
         </View>
         <CustomModal visible={openGasWeightOptions}>
