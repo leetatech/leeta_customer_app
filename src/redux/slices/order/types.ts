@@ -70,7 +70,7 @@ interface Metadata {
     paging: Paging;
 }
 
-export interface FeeResponse {
+export interface ProductFeeResponse {
     data?: {
         metadata: Metadata;
         data: DataItem[];
@@ -134,7 +134,24 @@ interface Metadata {
   };
 }
 
-export interface ServiceFeesResponse {
+export interface FeesResponse {
   data?: FeeItem[];
   metadata?: Metadata;
+}
+
+//state reponse type
+interface State {
+  id: string;
+  name: string;
+  region: string;
+  capital: string;
+  lgas: string[];
+  slogan: string;
+  towns: string[];
+  status_ts: number;
+  ts: number;
+}
+
+export interface StateResponse {
+  data?: State[];
 }

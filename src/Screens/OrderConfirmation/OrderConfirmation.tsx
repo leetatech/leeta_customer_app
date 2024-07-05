@@ -21,19 +21,59 @@ import CustomModal from '../../Components/Modal/CustomModal';
 import {Receipt} from '../../Components/Receipt/Receipt';
 import {useDispatch, useSelector} from 'react-redux';
 import {RootState} from '../../redux/rootReducer';
-import {CartItemResponsePayload} from '../../redux/slices/order/types';
-import {triggerCartList} from '../../redux/slices/order/orderServices';
+import {
+  CartItemResponsePayload,
+  FeesResponse,
+} from '../../redux/slices/order/types';
+import {
+  deliveryFee,
+  triggerCartList,
+  serviceFee,
+} from '../../redux/slices/order/orderServices';
 import CustomLoader from '../../Components/Loader/CustomLoader';
+import {setServiceFee} from '../../redux/slices/order/orderSlice';
 
 interface IProps {
-  navigation: NavigationProp<ParamListBase>;
+  navigation: NavigationProp<ParamListBase> 
 }
 interface Order {
   cartList: CartItemResponsePayload;
   sumAllOrders: () => string;
-  serviceFee: number;
+  serviceFeePerOrder: number;
+  deliveryFeePerOrder: number;
 }
-const RenderOrder = ({cartList, sumAllOrders, serviceFee}: Order) => {
+
+const RenderDeliveryAddress: FC<IProps> = ({navigation}) => {
+  const styles = useMemo(() => createStyles(), []);
+return (
+  <View style={styles.card_style}>
+    <Fonts type="boldLightGray">Delivery Address</Fonts>
+    <View style={styles.payment_container}>
+      <View style={styles.checkbox_container}>
+        <LOCATION_ICON />
+        <View style={styles.address}>
+          <Fonts type="boldBlack">John Doe</Fonts>
+          <Fonts type="normalGrayText">
+            plot 234, adeola odeku Lagos, Nigeria
+          </Fonts>
+          <Fonts type="normalGrayText">+23456789021</Fonts>
+        </View>
+      </View>
+      <TouchableOpacity onPress={() => navigation.navigate('AddAddress')}>
+        <RIGHT_ICON />
+      </TouchableOpacity>
+    </View>
+  </View>
+)
+
+};
+
+const RenderOrder = ({
+  cartList,
+  sumAllOrders,
+  serviceFeePerOrder,
+  deliveryFeePerOrder,
+}: Order) => {
   const styles = useMemo(() => createStyles(), []);
   return (
     <View style={styles.card_style}>
@@ -78,10 +118,30 @@ const RenderOrder = ({cartList, sumAllOrders, serviceFee}: Order) => {
           </View>
           <View style={styles.text_spacing}>
             <Fonts type="normalBlackText">{sumAllOrders()}</Fonts>
-            <Fonts type="normalBlackText">₦1500</Fonts>
-            <Fonts type="normalBlackText">₦{serviceFee}</Fonts>
+            <Fonts type="normalBlackText">₦{deliveryFeePerOrder}</Fonts>
+            <Fonts type="normalBlackText">₦{serviceFeePerOrder}</Fonts>
           </View>
         </View>
+      </View>
+    </View>
+  );
+};
+
+const RenderPaymentMethod = () => {
+  const styles = useMemo(() => createStyles(), []);
+  return (
+    <View>
+      <Fonts type="boldLightGray">Payment Method</Fonts>
+      <View style={styles.payment_container}>
+        <View style={styles.checkbox_container}>
+          <TouchableOpacity>
+            <CHECKBOX_ICON />
+          </TouchableOpacity>
+          <Fonts type="semiBoldBlack">Pay On Delivery</Fonts>
+        </View>
+        <TouchableOpacity>
+          <CARD_ICON />
+        </TouchableOpacity>
       </View>
     </View>
   );
@@ -92,9 +152,9 @@ const OrderConfirmation: FC<IProps> = ({navigation}) => {
   const [showModal, setShowModal] = useState(false);
   const bounceValue = new Animated.Value(1);
   const [viewReceipt, setViewReceipt] = useState(false);
-  const {serviceFee, cartData, cartList} = useSelector(
-    (state: RootState) => state.order,
-  );
+  const [saveDeliveryFee, setSaveDeliveryFee] = useState<number>(0);
+  const [saveServiceFee, setSaveServiceFee] = useState<number>(0);
+  const {cartData, cartList,userLga} = useSelector((state: RootState) => state.order);
   const dispatch = useDispatch();
 
   const handleCloseReceipt = () => {
@@ -135,27 +195,28 @@ const OrderConfirmation: FC<IProps> = ({navigation}) => {
 
   const sumAllOrders = () => {
     const totalAmount = cartData?.data?.cart_items.reduce((total, item) => {
-      return total + item.cost;
+      return total + item.cost 
     }, 0);
     const formattedTotalAmount = `₦${totalAmount?.toFixed(2)}`;
     return formattedTotalAmount;
   };
 
+  const getOrderSummary = () => {
+    const totalCartAmount = cartData?.data?.cart_items.reduce((total, item) => {
+      return total + item.cost;
+    }, 0) || 0;
+
+    const totalAmount = totalCartAmount + saveDeliveryFee + saveServiceFee;
+    const formattedTotalAmount = `₦${totalAmount.toFixed(2)}`;
+
+    return formattedTotalAmount;
+  };
+
   const listCart = () => {
     const payload = {
-      filter: {
-        fields: [
-          {
-            name: 'string',
-            operator: 'isEqualTo',
-            value: 'string',
-          },
-        ],
-        operator: 'OR',
-      },
       paging: {
         index: 0,
-        size: 0,
+        size: 10,
       },
     };
     dispatch(triggerCartList(payload))
@@ -171,47 +232,100 @@ const OrderConfirmation: FC<IProps> = ({navigation}) => {
       });
   };
 
-  const renderPaymentMethod = () => (
-    <View>
-      <Fonts type="boldLightGray">Payment Method</Fonts>
-      <View style={styles.payment_container}>
-        <View style={styles.checkbox_container}>
-          <TouchableOpacity>
-            <CHECKBOX_ICON />
-          </TouchableOpacity>
-          <Fonts type="semiBoldBlack">Pay On Delivery</Fonts>
-        </View>
-        <TouchableOpacity>
-          <CARD_ICON />
-        </TouchableOpacity>
-      </View>
-    </View>
-  );
+  const getDeliveryFee = () => {
+    if (!userLga) {
+      console.error("userLga is not available");
+      return;
+    }
+    const payload = {
+      filter: {
+        fields: [
+          {
+            name: 'fee_type',
+            operator: 'isEqualTo',
+            value: 'DELIVERY_FEE',
+          },
+          {
+            name: 'lga',
+            operator: 'isEqualTo',
+            value: userLga!,
+          },
+        ],
+        operator: 'and',
+      },
+      paging: {
+        index: 0,
+        size: 1,
+      },
+    };
+    dispatch(deliveryFee(payload))
+      .then(response => {
+        const result = response.payload as any;
+        if (response && result) {
+          const feeItem = result.data as any;
+          const generateDeliveryFee = feeItem.data!.find(
+            (item: {fee_type: string}) => item.fee_type === 'DELIVERY_FEE',
+          );
+          if (generateDeliveryFee) {
+            const deliveryFee = generateDeliveryFee.cost.cost_per_type;
+            setSaveDeliveryFee(deliveryFee);
+          } else {
+            return null;
+          }
+        }
+      })
+      .catch(error => {
+        console.error('Error getting delivery fees', error);
+      });
+  };
 
-  const renderDeliveryAddress = () => (
-    <View style={styles.card_style}>
-      <Fonts type="boldLightGray">Delivery Address</Fonts>
-      <View style={styles.payment_container}>
-        <View style={styles.checkbox_container}>
-          <LOCATION_ICON />
-          <View style={styles.address}>
-            <Fonts type="boldBlack">Becky Anderson</Fonts>
-            <Fonts type="normalGrayText">
-              plot 234, adeola odeku Lagos, Nigeria
-            </Fonts>
-            <Fonts type="normalGrayText">+23456789021</Fonts>
-          </View>
-        </View>
-        <TouchableOpacity onPress={() => navigation.navigate('AddAddress')}>
-          <RIGHT_ICON />
-        </TouchableOpacity>
-      </View>
-    </View>
-  );
+  const getServiceFee = () => {
+    const payload = {
+      filter: {
+        fields: [
+          {
+            name: 'fee_type',
+            operator: 'isEqualTo',
+            value: 'SERVICE_FEE',
+          },
+        ],
+        operator: 'and',
+      },
+      paging: {
+        index: 0,
+        size: 10,
+      },
+    };
+    dispatch(serviceFee(payload))
+      .then(response => {
+        const result = response.payload as FeesResponse;
+        if (response && result && result.data) {
+          const feeItem = result.data as FeesResponse;
+          const serviceFee = feeItem.data!.find(
+            item => item.fee_type === 'SERVICE_FEE',
+          );
+          if (serviceFee) {
+            const costPerType = serviceFee.cost.cost_per_type;
+            setSaveServiceFee(costPerType);
+            dispatch(setServiceFee(costPerType));
+          } else {
+            return null;
+          }
+        }
+      })
+      .catch(error => {
+        console.error('Error getting fees:', error);
+      });
+  };
 
   useEffect(() => {
     listCart();
-  }, []);
+    getServiceFee();
+    if (userLga) {
+      getDeliveryFee();
+    }
+    
+  }, [userLga]);
 
   return (
     <>
@@ -220,18 +334,19 @@ const OrderConfirmation: FC<IProps> = ({navigation}) => {
           <View style={styles.main_container}>
             <ScreenTitle
               screenTitle="ORDER CONFIRMATION"
-              onPress={navigation.goBack}
+              onPress={navigation!.goBack}
             />
             <View>
-              {renderPaymentMethod()}
-              {renderDeliveryAddress()}
+              <RenderPaymentMethod />
+              <RenderDeliveryAddress navigation={navigation} />
               <Fonts type="boldLightGray" style={{paddingTop: 15}}>
                 Your Cart
               </Fonts>
               <RenderOrder
                 cartList={cartList}
                 sumAllOrders={sumAllOrders}
-                serviceFee={serviceFee}
+                serviceFeePerOrder={saveServiceFee!}
+                deliveryFeePerOrder={saveDeliveryFee!}
               />
               <TouchableOpacity onPress={() => navigation.navigate('Cart')}>
                 <Fonts
@@ -254,11 +369,11 @@ const OrderConfirmation: FC<IProps> = ({navigation}) => {
               </Fonts>
               <View style={styles.action}>
                 <Fonts type="boldBlack"> Total</Fonts>
-                <Fonts type="boldBlack">{sumAllOrders()}</Fonts>
+                <Fonts type="boldBlack">{saveDeliveryFee && saveServiceFee ? getOrderSummary() : sumAllOrders()}</Fonts>
               </View>
               <Buttons
                 title="Checkout"
-                disabled={false}
+                disabled={!userLga || !saveServiceFee}
                 textStyle={undefined}
                 buttonStyle={undefined}
                 onPress={handleModalVisibility}

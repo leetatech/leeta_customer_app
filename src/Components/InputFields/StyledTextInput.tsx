@@ -1,18 +1,21 @@
 import React, {FC, useMemo, useState} from 'react';
-import {Text, TextInput, View} from 'react-native';
+import {Image, Text, TextInput, View} from 'react-native';
 import createStyles from './styles';
 import {InputProps} from './InputFieldTypes';
 import {colors} from '../../Constants/Colors';
+import {TouchableOpacity} from 'react-native-gesture-handler';
 
 const StyledTextInput: FC<InputProps> = ({
   label,
   icon,
+  image,
   name,
   errors,
   helperText,
   inputStyle,
   onFocusStyle,
   defaultValueStyle,
+  onPress,
   onFocus,
   onBlur,
   ...props
@@ -44,6 +47,12 @@ const StyledTextInput: FC<InputProps> = ({
           style={defaultValueStyle}
           {...props}
         />
+
+        {image && (
+          <TouchableOpacity onPress={onPress}>
+            <Image source={image} />
+          </TouchableOpacity>
+        )}
       </View>
     </View>
   );

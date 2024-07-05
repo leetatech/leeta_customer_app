@@ -3,7 +3,7 @@ import axios from 'axios';
 import {apiUrl} from '../../../config';
 import {apiCall} from '../../../utils';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import {ProductListResponse, FeeResponse, CartItemResponsePayload, ServiceFeesResponse} from './types';
+import {ProductListResponse, ProductFeeResponse, CartItemResponsePayload,FeesResponse, StateResponse } from './types';
 
 export interface FeeTypeData {
   filter: {
@@ -20,20 +20,6 @@ export interface FeeTypeData {
   };
 }
 
-export interface ProductListingData {
-  filter: {
-    fields: {
-      name: string;
-      operator: string;
-      value: string;
-    }[];
-    operator: string;
-  };
-  paging: {
-    index: number;
-    size: number;
-  };
-}
 export interface CartData {
   cost: number,
   product_id: string,
@@ -63,6 +49,21 @@ export interface FeesData {
 }
 
 export interface PaginationData {
+  // filter: {
+  //   fields: {
+  //     name: string;
+  //     operator: string;
+  //     value: string;
+  //   }[];
+  //   operator: string;
+  // };
+  paging: {
+    index: number;
+    size: number;
+  };
+}
+
+export interface DeliveryFeeData {
   filter: {
     fields: {
       name: string;
@@ -79,7 +80,7 @@ export interface PaginationData {
 
 export const productList = createAsyncThunk(
   'order/productList',
-  async (productList: ProductListingData, {rejectWithValue}) => {
+  async (productList: PaginationData, {rejectWithValue}) => {
     try {
       const url = apiUrl.productList;
       const method = 'put';
@@ -101,8 +102,8 @@ export const productList = createAsyncThunk(
   },
 );
 
-export const feeType = createAsyncThunk(
-  'order/feeType',
+export const productFee = createAsyncThunk(
+  'order/productFee',
   async (feeType: FeeTypeData, {rejectWithValue}) => {
     try {
       const url = apiUrl.feesType;
@@ -112,7 +113,7 @@ export const feeType = createAsyncThunk(
         Authorization: `Bearer ${token}`,
       };
       const response = await apiCall(url, method, feeType, headers);
-      return response as FeeResponse;
+      return response as ProductFeeResponse;
     } catch (error) {
       if (axios.isAxiosError(error)) {
         return rejectWithValue(error.response?.data);
@@ -173,8 +174,8 @@ export const updateCartItemQuantity = createAsyncThunk(
   },
 );
 
-export const fees = createAsyncThunk(
-  'order/fees',
+export const serviceFee = createAsyncThunk(
+  'order/serviceFee',
   async (fee: FeesData, {rejectWithValue}) => {
     try {
       const url = apiUrl.feesType
@@ -184,7 +185,7 @@ export const fees = createAsyncThunk(
         Authorization: `Bearer ${token}`,
       };
       const response = await apiCall(url, method, fee, headers);
-      return response as  ServiceFeesResponse;
+      return response as  FeesResponse;
 
     } catch (error) {
       if (axios.isAxiosError(error)) {
@@ -210,6 +211,54 @@ export const triggerCartList = createAsyncThunk(
       };
       const response = await apiCall(url, method, cartList, headers);
       return response as CartItemResponsePayload
+    } catch (error) {
+      if (axios.isAxiosError(error)) {
+        return rejectWithValue(error.response?.data);
+      } else if (error instanceof Error) {
+        return rejectWithValue(error.message);
+      } else {
+        throw error;
+      }
+    }
+  },
+);
+
+export const getState = createAsyncThunk(
+  'order/getState',
+  async (_, { rejectWithValue }) => {
+    try {
+      const url = apiUrl.getStates;
+      const method = 'get';
+      const token = await AsyncStorage.getItem('userToken');
+      const headers = {
+        Authorization: `Bearer ${token}`,
+      };
+      const response = await apiCall(url, method,undefined, headers);
+      return response as StateResponse
+    } catch (error) {
+      if (axios.isAxiosError(error)) {
+        return rejectWithValue(error.response?.data);
+      } else if (error instanceof Error) {
+        return rejectWithValue(error.message);
+      } else {
+        throw error;
+      }
+    }
+  },
+);
+
+export const deliveryFee = createAsyncThunk(
+  'order/deliveryFee',
+  async (deliveryFeePayload: DeliveryFeeData, {rejectWithValue}) => {
+    try {
+      const url = apiUrl.feesType;
+      const method = 'put';
+      const token = await AsyncStorage.getItem('userToken');
+      const headers = {
+        Authorization: `Bearer ${token}`,
+      };
+      const response = await apiCall(url, method, deliveryFeePayload, headers);
+      return response 
     } catch (error) {
       if (axios.isAxiosError(error)) {
         return rejectWithValue(error.response?.data);

@@ -15,9 +15,10 @@ const createStyles = () =>
       borderColor: colors.LGRAY,
       paddingVertical:15,
       paddingHorizontal:8,
-      justifyContent: 'center',
-      alignContent: 'center',
-      font:"300"
+      font:"300",
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      alignItems: 'center',
     },
     error: {
       color: colors.RED,
