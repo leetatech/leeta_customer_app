@@ -8,6 +8,7 @@ import {
   updateCartItemQuantity,
   getState,
   deliveryFee,
+  triggerDeleteCartItem,
 } from './orderServices';
 import {
   ProductListResponse,
@@ -29,7 +30,7 @@ interface orderState {
   userCart?: Array<Record<string, any>>;
   feeTypeData?: ProductFeeResponse;
   fee?: number;
-  cartData?: CartItemResponsePayload;
+  cartData: CartItemResponsePayload;
   cartItemId?: string;
   newCartItemQuantity?: Record<string, string>;
   listFees?: FeesResponse;
@@ -79,7 +80,13 @@ export const orderSlice = createSlice({
       state.userCart?.push(action.payload);
     },
     updateCart: (state, action) => {
-      state.cartData = action.payload;
+      const { payload: itemId } = action;
+      if (!state.cartData?.data?.cart_items) {
+        return;
+      }
+      state.cartData.data.cart_items = state.cartData.data.cart_items.filter(
+        item => item.id !== itemId
+      );
     },
     setCartItemId: (state, action) => {
       state.cartItemId = action.payload;
@@ -244,7 +251,27 @@ export const orderSlice = createSlice({
         state.error = true;
         state.errorCode = action.payload?.data?.error_code || 1;
         state.message = action.payload.data.message;
-      });
+      })
+
+      //DELETE CART ITEM
+      .addCase(triggerDeleteCartItem.pending, state => {
+        state.loading = true;
+        state.error = false;
+      })
+      .addCase(triggerDeleteCartItem.fulfilled, (state, action) => {
+        state.loading = false;
+        state.error = false;
+        state.message = action.payload?.data
+      })
+      .addCase(
+        triggerDeleteCartItem.rejected,
+        (state, action: PayloadAction<any>) => {
+          state.loading = false;
+          state.error = true;
+          state.errorCode = action.payload?.data?.error_code || 1;
+          state.message = action.payload.data.message;
+        },
+      );
   },
 });
 

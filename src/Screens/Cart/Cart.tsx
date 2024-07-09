@@ -18,7 +18,10 @@ import CustomToast from '../../Components/Toast/CustomToast';
 import {useDispatch, useSelector} from 'react-redux';
 import {RootState} from '../../redux/rootReducer';
 import {updateCart} from '../../redux/slices/order/orderSlice';
-import {updateCartItemQuantity} from '../../redux/slices/order/orderServices';
+import {
+  triggerDeleteCartItem,
+  updateCartItemQuantity,
+} from '../../redux/slices/order/orderServices';
 
 interface IProps {
   navigation: NavigationProp<ParamListBase>;
@@ -26,20 +29,30 @@ interface IProps {
 
 const Cart: FC<IProps> = ({navigation}) => {
   const styles = useMemo(() => createStyles(), []);
-  const {userCart,fee,cartData} = useSelector(
-    (state: RootState) => state.order,
-  );
+  let {fee, cartData} = useSelector((state: RootState) => state.order);
   const [showModal, setShowModal] = useState(false);
   const [showToastMsg, setshowToastMsg] = useState(false);
-  const [selectedItem, setSelectedItem] = useState<number>(-1);
+  const [selectedItem, setSelectedItem] = useState<string>('');
+  const [toastMessage, setToastMessage] = useState('');
+  const [toastType, setToastType] = useState<'success' | 'error'>('success');
+
   const dispatch = useDispatch();
 
-  const removeCartItem = () => {
-    setShowModal(false);
+  const handleDeleteItem = async () => {
+    try {
+      await dispatch(triggerDeleteCartItem(selectedItem));
+      setShowModal(false);
+      displayToastMessage('Item deleted successfully.', 'success');
+      dispatch(updateCart(selectedItem));
+    } catch (error: any) {
+      setShowModal(false);
+      displayToastMessage(`Failed to delete item, please try again`, 'error');
+    }
+  };
+  const displayToastMessage = (message: string, type: 'success' | 'error') => {
+    setToastMessage(message);
+    setToastType(type);
     setshowToastMsg(true);
-    const data = [...userCart!];
-    data.splice(selectedItem, 1);
-    dispatch(updateCart(data));
     setTimeout(() => {
       setshowToastMsg(false);
     }, 2000);
@@ -52,7 +65,6 @@ const Cart: FC<IProps> = ({navigation}) => {
           ...item,
           quantity: item.quantity + 1,
           cost: (item.quantity + 1) * fee! * item.weight,
-
         };
       }
       return item;
@@ -84,7 +96,6 @@ const Cart: FC<IProps> = ({navigation}) => {
           ...item,
           quantity: item.quantity - 1,
           cost: (item.quantity - 1) * fee! * item.weight,
-
         };
       }
       return item;
@@ -157,7 +168,7 @@ const Cart: FC<IProps> = ({navigation}) => {
                       <TouchableOpacity
                         onPress={() => {
                           setShowModal(true);
-                          setSelectedItem(index);
+                          setSelectedItem(item.id);
                         }}>
                         <Text style={styles.bold_txt}>Remove</Text>
                       </TouchableOpacity>
@@ -243,16 +254,19 @@ const Cart: FC<IProps> = ({navigation}) => {
               borderWidth: 1,
             }}
             textStyle={{color: colors.ORANGE, fontSize: 17}}
-            onPress={removeCartItem}
+            onPress={() => handleDeleteItem()}
           />
         </View>
       </Modal>
       {showToastMsg && (
         <CustomToast
-          viewStyle={{backgroundColor: colors.SUCCESS}}
-          textStyle={{fontWeight: '500', fontSize: 15}}
+          viewStyle={{
+            backgroundColor:
+              toastType === 'success' ? colors.SUCCESS : colors.LYELLOW,
+          }}
+          textStyle={{fontWeight: '500', fontSize: 15, color:toastType === 'success' ? colors.BLACK : colors.GRAY}}
           onPress={() => setshowToastMsg(false)}>
-          <Text>product has been removed from cart</Text>
+          <Text>{toastMessage}</Text>
         </CustomToast>
       )}
     </>

@@ -270,3 +270,27 @@ export const deliveryFee = createAsyncThunk(
     }
   },
 );
+
+export const triggerDeleteCartItem = createAsyncThunk(
+  'order/triggerDeleteCartItem',
+  async (id: string, {rejectWithValue}) => {
+    try {
+      const url = `${apiUrl.deleteCartItem}/${id}`;
+      const method = 'delete';
+      const token = await AsyncStorage.getItem('userToken');
+      const headers = {
+        Authorization: `Bearer ${token}`,
+      };
+      const response = await apiCall(url, method, id, headers);
+      return response as Record<string, string>;
+    } catch (error) {
+      if (axios.isAxiosError(error)) {
+        return rejectWithValue(error.response?.data);
+      } else if (error instanceof Error) {
+        return rejectWithValue(error.message);
+      } else {
+        throw error;
+      }
+    }
+  },
+);
