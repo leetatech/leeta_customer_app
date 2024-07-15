@@ -9,6 +9,7 @@ import {
   getState,
   deliveryFee,
   triggerDeleteCartItem,
+  triggerCheckout,
 } from './orderServices';
 import {
   ProductListResponse,
@@ -40,6 +41,8 @@ interface orderState {
   userState?: string;
   userLga?: string;
   generatedDeliveryFee?: any;
+  checkoutData?:any
+  cartId?: string;
 }
 
 const initialState: orderState = {
@@ -64,6 +67,8 @@ const initialState: orderState = {
   userState: '',
   userLga: '',
   generatedDeliveryFee: {},
+  checkoutData:{},
+  cartId: '',
 };
 
 export const orderSlice = createSlice({
@@ -99,6 +104,10 @@ export const orderSlice = createSlice({
     },
     updateUserLga: (state, action) => {
       state.userLga = action.payload;
+    },
+    setUserCartId: (state, action) => {
+      state.cartId = action.payload;
+      console.log(state.cartId)
     },
   },
   extraReducers: builder => {
@@ -271,6 +280,30 @@ export const orderSlice = createSlice({
           state.errorCode = action.payload?.data?.error_code || 1;
           state.message = action.payload.data.message;
         },
+      )
+
+      //CHECKOUT
+      .addCase(triggerCheckout.pending, state => {
+        state.loading = true;
+        state.error = false;
+      })
+      .addCase(triggerCheckout.fulfilled, (state, action) => {
+        state.loading = false;
+        state.error = false;
+        state.message = action.payload?.data
+        state.checkoutData = action.payload
+        console.log('CHECKOUT_SUCCESS', state.checkoutData)
+      })
+      .addCase(
+        triggerCheckout.rejected,
+        (state, action: PayloadAction<any>) => {
+          state.loading = false;
+          state.error = true;
+          state.errorCode = action.payload?.data?.error_code || 1;
+          state.message = action.payload.data.message;
+          console.log('CHECKOUT_UNSUCCESS',state.message)
+
+        },
       );
   },
 });
@@ -284,6 +317,7 @@ export const {
   setServiceFee,
   updateUserState,
   updateUserLga,
+  setUserCartId
 } = orderSlice.actions;
 
 export default orderSlice.reducer;

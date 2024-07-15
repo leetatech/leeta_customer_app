@@ -1,5 +1,5 @@
 import React, {FC, useEffect, useMemo, useState} from 'react';
-import {Animated, TouchableOpacity, View} from 'react-native';
+import {Animated, TouchableOpacity, View, Image} from 'react-native';
 import {NavigationProp, ParamListBase} from '@react-navigation/native';
 import {ScrollView} from 'react-native-gesture-handler';
 import createStyles from './styles';
@@ -29,12 +29,20 @@ import {
   deliveryFee,
   triggerCartList,
   serviceFee,
+  triggerCheckout,
 } from '../../redux/slices/order/orderServices';
 import CustomLoader from '../../Components/Loader/CustomLoader';
-import {setServiceFee} from '../../redux/slices/order/orderSlice';
+import {
+  setServiceFee,
+  setUserCartId,
+} from '../../redux/slices/order/orderSlice';
+import CustomToast from '../../Components/Toast/CustomToast';
+import {ADD} from '../../Assets';
 
 interface IProps {
-  navigation: NavigationProp<ParamListBase> 
+  navigation: NavigationProp<ParamListBase>;
+  deliveryAddress?: number;
+
 }
 interface Order {
   cartList: CartItemResponsePayload;
@@ -43,29 +51,36 @@ interface Order {
   deliveryFeePerOrder: number;
 }
 
-const RenderDeliveryAddress: FC<IProps> = ({navigation}) => {
-  const styles = useMemo(() => createStyles(), []);
-return (
-  <View style={styles.card_style}>
-    <Fonts type="boldLightGray">Delivery Address</Fonts>
-    <View style={styles.payment_container}>
-      <View style={styles.checkbox_container}>
-        <LOCATION_ICON />
-        <View style={styles.address}>
-          <Fonts type="boldBlack">John Doe</Fonts>
-          <Fonts type="normalGrayText">
-            plot 234, adeola odeku Lagos, Nigeria
-          </Fonts>
-          <Fonts type="normalGrayText">+23456789021</Fonts>
-        </View>
-      </View>
-      <TouchableOpacity onPress={() => navigation.navigate('AddAddress')}>
-        <RIGHT_ICON />
-      </TouchableOpacity>
-    </View>
-  </View>
-)
 
+const RenderDeliveryAddress: FC<IProps> = ({navigation,deliveryAddress}) => {
+  const styles = useMemo(() => createStyles(), []);
+  return (
+    <View style={styles.card_style}>
+      <Fonts type="boldLightGray">Delivery Address</Fonts>
+      {deliveryAddress ? (
+        <View style={styles.payment_container}>
+        <View style={styles.checkbox_container}>
+          <LOCATION_ICON />
+          <View style={styles.address}>
+            <Fonts type="boldBlack">John Doe</Fonts>
+            <Fonts type="normalGrayText">
+              plot 234, adeola odeku Lagos, Nigeria
+            </Fonts>
+            <Fonts type="normalGrayText">+23456789021</Fonts>
+          </View>
+        </View>
+        <TouchableOpacity onPress={() => navigation.navigate('AddAddress')}>
+          <RIGHT_ICON />
+        </TouchableOpacity>
+      </View>
+      ) :  <View style={styles.checkbox_container}>
+      <TouchableOpacity onPress={() => navigation.navigate('AddAddress')}>
+        <Image source={ADD} />
+      </TouchableOpacity>
+      <Fonts type="boldBlack">Add address</Fonts>
+    </View>} 
+    </View>
+  );
 };
 
 const RenderOrder = ({
@@ -154,7 +169,10 @@ const OrderConfirmation: FC<IProps> = ({navigation}) => {
   const [viewReceipt, setViewReceipt] = useState(false);
   const [saveDeliveryFee, setSaveDeliveryFee] = useState<number>(0);
   const [saveServiceFee, setSaveServiceFee] = useState<number>(0);
-  const {cartData, cartList,userLga} = useSelector((state: RootState) => state.order);
+  const {cartData, cartList, userLga, userState} = useSelector(
+    (state: RootState) => state.order,
+  );
+  const [showCheckoutMsg, setShowCheckoutMsg] = useState(false);
   const dispatch = useDispatch();
 
   const handleCloseReceipt = () => {
@@ -185,9 +203,6 @@ const OrderConfirmation: FC<IProps> = ({navigation}) => {
     transform: [{scale: bounceValue}],
   };
 
-  const handleModalVisibility = () => {
-    setShowModal(true);
-  };
   const handleNavigateToHomeScreen = () => {
     setShowModal(false);
     navigation.navigate('BottomNavigator');
@@ -195,16 +210,17 @@ const OrderConfirmation: FC<IProps> = ({navigation}) => {
 
   const sumAllOrders = () => {
     const totalAmount = cartData?.data?.cart_items.reduce((total, item) => {
-      return total + item.cost 
+      return total + item.cost;
     }, 0);
     const formattedTotalAmount = `₦${totalAmount?.toFixed(2)}`;
     return formattedTotalAmount;
   };
 
   const getOrderSummary = () => {
-    const totalCartAmount = cartData?.data?.cart_items.reduce((total, item) => {
-      return total + item.cost;
-    }, 0) || 0;
+    const totalCartAmount =
+      cartData?.data?.cart_items.reduce((total, item) => {
+        return total + item.cost;
+      }, 0) || 0;
 
     const totalAmount = totalCartAmount + saveDeliveryFee + saveServiceFee;
     const formattedTotalAmount = `₦${totalAmount.toFixed(2)}`;
@@ -234,7 +250,7 @@ const OrderConfirmation: FC<IProps> = ({navigation}) => {
 
   const getDeliveryFee = () => {
     if (!userLga) {
-      console.error("userLga is not available");
+      console.error('userLga is not available');
       return;
     }
     const payload = {
@@ -318,18 +334,79 @@ const OrderConfirmation: FC<IProps> = ({navigation}) => {
       });
   };
 
+  const getCartid = () => {
+    const cartId = cartData?.data?.id;
+    console.log('DISPATCH CART ID', cartId);
+    console.log('user lga', userLga);
+    console.log('user state', userState);
+    dispatch(setUserCartId(cartId));
+    return cartId;
+  };
+
+  const handleCheckout = () => {
+    if (!cartData?.data?.id && !userLga && !useState) {
+      setShowCheckoutMsg(true);
+      console.error('incomplete data');
+      return;
+    } else {
+      const cartId = cartData?.data?.id;
+      console.log('cart id', cartId);
+      const payload = {
+        cart_id: cartId as string,
+        delivery_details: {
+          address: {
+            city: userLga as string,
+            closest_landmark: '',
+            coordinate: {
+              latitude: 0,
+              longitude: 0,
+            },
+            full_address: '',
+            lga: userLga as string,
+            state: userState as string,
+            verified: true,
+          },
+          email: '',
+          name: '',
+          phone: '',
+        },
+        delivery_fee: saveDeliveryFee,
+        payment_method: '',
+        service_fee: saveServiceFee,
+        total_fee: 2000,
+      };
+      dispatch(triggerCheckout(payload)).then(response => {
+        try {
+          const result = response.payload as any;
+          if (response && result && result.data) {
+            setViewReceipt(true);
+            setShowModal(true);
+            setShowCheckoutMsg(false);
+          } else {
+            return null;
+          }
+        } catch (error) {}
+      });
+    }
+  };
+
   useEffect(() => {
     listCart();
     getServiceFee();
     if (userLga) {
       getDeliveryFee();
     }
-    
+    getCartid();
   }, [userLga]);
 
   return (
     <>
       <FormMainContainer>
+        {showCheckoutMsg && (
+          <CustomToast>
+            <Fonts type="smallText">Checkout unseccessfull</Fonts>
+          </CustomToast>
+        )}
         <ScrollView scrollEnabled={true} showsVerticalScrollIndicator={false}>
           <View style={styles.main_container}>
             <ScreenTitle
@@ -338,7 +415,7 @@ const OrderConfirmation: FC<IProps> = ({navigation}) => {
             />
             <View>
               <RenderPaymentMethod />
-              <RenderDeliveryAddress navigation={navigation} />
+              <RenderDeliveryAddress navigation={navigation} deliveryAddress={saveDeliveryFee}/>
               <Fonts type="boldLightGray" style={{paddingTop: 15}}>
                 Your Cart
               </Fonts>
@@ -369,14 +446,18 @@ const OrderConfirmation: FC<IProps> = ({navigation}) => {
               </Fonts>
               <View style={styles.action}>
                 <Fonts type="boldBlack"> Total</Fonts>
-                <Fonts type="boldBlack">{saveDeliveryFee && saveServiceFee ? getOrderSummary() : sumAllOrders()}</Fonts>
+                <Fonts type="boldBlack">
+                  {saveDeliveryFee && saveServiceFee
+                    ? getOrderSummary()
+                    : sumAllOrders()}
+                </Fonts>
               </View>
               <Buttons
                 title="Checkout"
                 disabled={!userLga || !saveServiceFee}
                 textStyle={undefined}
                 buttonStyle={undefined}
-                onPress={handleModalVisibility}
+                onPress={handleCheckout}
               />
             </View>
           </View>

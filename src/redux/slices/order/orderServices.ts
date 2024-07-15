@@ -3,7 +3,13 @@ import axios from 'axios';
 import {apiUrl} from '../../../config';
 import {apiCall} from '../../../utils';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import {ProductListResponse, ProductFeeResponse, CartItemResponsePayload,FeesResponse, StateResponse } from './types';
+import {
+  ProductListResponse,
+  ProductFeeResponse,
+  CartItemResponsePayload,
+  FeesResponse,
+  StateResponse,
+} from './types';
 
 export interface FeeTypeData {
   filter: {
@@ -21,16 +27,14 @@ export interface FeeTypeData {
 }
 
 export interface CartData {
-  cost: number,
-  product_id: string,
-  quantity: number,
-  weight: number
+  cost: number;
+  product_id: string;
+  quantity: number;
+  weight: number;
 }
 export interface CartItemQuantityData {
-  
-  cart_item_id: string,
-    quantity: number
-  
+  cart_item_id: string;
+  quantity: number;
 }
 
 export interface FeesData {
@@ -76,6 +80,31 @@ export interface DeliveryFeeData {
     index: number;
     size: number;
   };
+}
+
+export interface CheckoutData {
+  cart_id: string;
+  delivery_details: {
+    address: {
+      city: string;
+      closest_landmark: string;
+      coordinate: {
+        latitude: number;
+        longitude: number;
+      };
+      full_address: string;
+      lga: string;
+      state: string;
+      verified: boolean;
+    };
+    email: string;
+    name: string;
+    phone: string;
+  };
+  delivery_fee: number;
+  payment_method: string;
+  service_fee: number;
+  total_fee: number;
 }
 
 export const productList = createAsyncThunk(
@@ -130,14 +159,14 @@ export const addTocart = createAsyncThunk(
   'order/addTocart',
   async (cart: CartData, {rejectWithValue}) => {
     try {
-      const url = apiUrl.cartAdd
+      const url = apiUrl.cartAdd;
       const method = 'post';
       const token = await AsyncStorage.getItem('userToken');
       const headers = {
         Authorization: `Bearer ${token}`,
       };
       const response = await apiCall(url, method, cart, headers);
-      return response as  CartItemResponsePayload;
+      return response as CartItemResponsePayload;
     } catch (error) {
       if (axios.isAxiosError(error)) {
         return rejectWithValue(error.response?.data);
@@ -161,7 +190,7 @@ export const updateCartItemQuantity = createAsyncThunk(
         Authorization: `Bearer ${token}`,
       };
       const response = await apiCall(url, method, cartItemQuantity, headers);
-      return response as  Record<string, Record<string, string> | string>;
+      return response as Record<string, Record<string, string> | string>;
     } catch (error) {
       if (axios.isAxiosError(error)) {
         return rejectWithValue(error.response?.data);
@@ -178,15 +207,14 @@ export const serviceFee = createAsyncThunk(
   'order/serviceFee',
   async (fee: FeesData, {rejectWithValue}) => {
     try {
-      const url = apiUrl.feesType
+      const url = apiUrl.feesType;
       const method = 'put';
       const token = await AsyncStorage.getItem('userToken');
       const headers = {
         Authorization: `Bearer ${token}`,
       };
       const response = await apiCall(url, method, fee, headers);
-      return response as  FeesResponse;
-
+      return response as FeesResponse;
     } catch (error) {
       if (axios.isAxiosError(error)) {
         return rejectWithValue(error.response?.data);
@@ -203,14 +231,14 @@ export const triggerCartList = createAsyncThunk(
   'order/cartList',
   async (cartList: PaginationData, {rejectWithValue}) => {
     try {
-      const url = apiUrl.listCart
+      const url = apiUrl.listCart;
       const method = 'put';
       const token = await AsyncStorage.getItem('userToken');
       const headers = {
         Authorization: `Bearer ${token}`,
       };
       const response = await apiCall(url, method, cartList, headers);
-      return response as CartItemResponsePayload
+      return response as CartItemResponsePayload;
     } catch (error) {
       if (axios.isAxiosError(error)) {
         return rejectWithValue(error.response?.data);
@@ -225,7 +253,7 @@ export const triggerCartList = createAsyncThunk(
 
 export const getState = createAsyncThunk(
   'order/getState',
-  async (_, { rejectWithValue }) => {
+  async (_, {rejectWithValue}) => {
     try {
       const url = apiUrl.getStates;
       const method = 'get';
@@ -233,8 +261,8 @@ export const getState = createAsyncThunk(
       const headers = {
         Authorization: `Bearer ${token}`,
       };
-      const response = await apiCall(url, method,undefined, headers);
-      return response as StateResponse
+      const response = await apiCall(url, method, undefined, headers);
+      return response as StateResponse;
     } catch (error) {
       if (axios.isAxiosError(error)) {
         return rejectWithValue(error.response?.data);
@@ -258,7 +286,7 @@ export const deliveryFee = createAsyncThunk(
         Authorization: `Bearer ${token}`,
       };
       const response = await apiCall(url, method, deliveryFeePayload, headers);
-      return response 
+      return response;
     } catch (error) {
       if (axios.isAxiosError(error)) {
         return rejectWithValue(error.response?.data);
@@ -283,6 +311,30 @@ export const triggerDeleteCartItem = createAsyncThunk(
       };
       const response = await apiCall(url, method, id, headers);
       return response as Record<string, string>;
+    } catch (error) {
+      if (axios.isAxiosError(error)) {
+        return rejectWithValue(error.response?.data);
+      } else if (error instanceof Error) {
+        return rejectWithValue(error.message);
+      } else {
+        throw error;
+      }
+    }
+  },
+);
+
+export const triggerCheckout = createAsyncThunk(
+  'order/triggerCheckout',
+  async (checkout: CheckoutData, {rejectWithValue}) => {
+    try {
+      const url = apiUrl.checkout;
+      const method = 'post';
+      const token = await AsyncStorage.getItem('userToken');
+      const headers = {
+        Authorization: `Bearer ${token}`,
+      };
+      const response = await apiCall(url, method, checkout, headers);
+      return response as any;
     } catch (error) {
       if (axios.isAxiosError(error)) {
         return rejectWithValue(error.response?.data);

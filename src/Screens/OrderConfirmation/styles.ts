@@ -8,18 +8,18 @@ const createStyles = () =>
     },
     text_spacing: {
       gap: 3,
-
     },
     checkbox_container: {
       flexDirection: 'row',
-      justifyContent: 'center',
       gap: 8,
+      alignItems: 'center',
+      paddingVertical: 10,
+
     },
     payment_container: {
       flexDirection: 'row',
       justifyContent: 'space-between',
       alignItems: 'center',
-      paddingVertical: 15,
     },
     card_style: {
       paddingVertical: 15,
@@ -29,7 +29,6 @@ const createStyles = () =>
     address: {
       width: 200,
       gap: 3,
-      paddingTop:8
     },
     amount_container: {
       flexDirection: 'row',
@@ -96,6 +95,9 @@ const createStyles = () =>
       color: colors.ORANGE,
       fontSize: 17,
     },
+    icon_style:{
+   marginTop:3
+    }
 
   });
 
