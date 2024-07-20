@@ -35,14 +35,16 @@ interface orderState {
   cartItemId?: string;
   newCartItemQuantity?: Record<string, string>;
   listFees?: FeesResponse;
-  serviceFee: number;
+  serviceFeePerOrder: number;
   cartList: CartItemResponsePayload;
   states: StateResponse;
   userState?: string;
   userLga?: string;
   generatedDeliveryFee?: any;
-  checkoutData?:any
+  checkoutData?: any;
   cartId?: string;
+  userDeliveryInformation: Record<string, string>;
+  userDeliveryFee?: number;
 }
 
 const initialState: orderState = {
@@ -61,14 +63,23 @@ const initialState: orderState = {
   cartItemId: '',
   newCartItemQuantity: {},
   listFees: {},
-  serviceFee: 0,
+  serviceFeePerOrder: 0,
   cartList: {},
   states: {},
   userState: '',
   userLga: '',
   generatedDeliveryFee: {},
-  checkoutData:{},
+  checkoutData: {},
   cartId: '',
+  userDeliveryInformation: {
+    contactName: '',
+    phoneNumber: '',
+    address: '',
+    userState: '',
+    userLga: '',
+    additionalInfo: '',
+  },
+  userDeliveryFee: 0,
 };
 
 export const orderSlice = createSlice({
@@ -85,19 +96,19 @@ export const orderSlice = createSlice({
       state.userCart?.push(action.payload);
     },
     updateCart: (state, action) => {
-      const { payload: itemId } = action;
+      const {payload: itemId} = action;
       if (!state.cartData?.data?.cart_items) {
         return;
       }
       state.cartData.data.cart_items = state.cartData.data.cart_items.filter(
-        item => item.id !== itemId
+        item => item.id !== itemId,
       );
     },
     setCartItemId: (state, action) => {
       state.cartItemId = action.payload;
     },
     setServiceFee: (state, action) => {
-      state.serviceFee = action.payload;
+      state.serviceFeePerOrder = action.payload;
     },
     updateUserState: (state, action) => {
       state.userState = action.payload;
@@ -107,7 +118,16 @@ export const orderSlice = createSlice({
     },
     setUserCartId: (state, action) => {
       state.cartId = action.payload;
-      console.log(state.cartId)
+    },
+    updateUserDeliveryFee: (state, action) => {
+      state.userDeliveryFee = action.payload;
+    },
+
+    setUserDeliveryInformation: (state, action) => {
+      state.userDeliveryInformation = {
+        ...state.userDeliveryInformation,
+        ...action.payload,
+      };
     },
   },
   extraReducers: builder => {
@@ -270,7 +290,7 @@ export const orderSlice = createSlice({
       .addCase(triggerDeleteCartItem.fulfilled, (state, action) => {
         state.loading = false;
         state.error = false;
-        state.message = action.payload?.data
+        state.message = action.payload?.data;
       })
       .addCase(
         triggerDeleteCartItem.rejected,
@@ -290,9 +310,8 @@ export const orderSlice = createSlice({
       .addCase(triggerCheckout.fulfilled, (state, action) => {
         state.loading = false;
         state.error = false;
-        state.message = action.payload?.data
-        state.checkoutData = action.payload
-        console.log('CHECKOUT_SUCCESS', state.checkoutData)
+        state.message = action.payload?.data;
+        state.checkoutData = action.payload;
       })
       .addCase(
         triggerCheckout.rejected,
@@ -301,8 +320,6 @@ export const orderSlice = createSlice({
           state.error = true;
           state.errorCode = action.payload?.data?.error_code || 1;
           state.message = action.payload.data.message;
-          console.log('CHECKOUT_UNSUCCESS',state.message)
-
         },
       );
   },
@@ -317,7 +334,9 @@ export const {
   setServiceFee,
   updateUserState,
   updateUserLga,
-  setUserCartId
+  setUserCartId,
+  setUserDeliveryInformation,
+  updateUserDeliveryFee,
 } = orderSlice.actions;
 
 export default orderSlice.reducer;

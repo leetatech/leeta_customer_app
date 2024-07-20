@@ -14,6 +14,7 @@ const createStyles = () =>
       gap: 8,
       alignItems: 'center',
       paddingVertical: 10,
+      width: 300
 
     },
     payment_container: {

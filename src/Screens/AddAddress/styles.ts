@@ -6,7 +6,6 @@ const createStyles = () =>
     main_container: {
       flex: 1,
     },
-
     form_main_container: {
       paddingTop: 10,
       gap: 5,
@@ -20,24 +19,64 @@ const createStyles = () =>
       paddingVertical: 20,
       gap: 6,
     },
-    listSate: {
+    modal_container: {
+      height: 350,
+      justifyContent: 'center',
+      alignContent: 'center',
+    },
+
+    items_container: {
       width: '100%',
-      gap: 8,
+      paddingVertical: 20,
+      alignItems: 'center',
+      justifyContent: 'center',
     },
-    item_neutral: {
-      lineHeight: 28,
-      alignSelf: 'center',
-      width: 100,
+    item_text: {
+      color: colors.GRAY,
     },
-    selectedItemStyle: {
+    pressed_item_text: {
+      color: colors.ORANGE,
+    },
+    active_item_text: {
+      color: 'black',
+    },
+    item: {
+      height: 40,
+      justifyContent: 'center',
+    },
+
+    highlightOverlay: {
+      position: 'absolute',
+      top: 150,
+      left: 0,
+      right: 0,
+      height: 35,
       backgroundColor: colors.XLGRAY,
-      borderRadius: 20,
+      zIndex: -1,
+      borderRadius: 15,
+      marginHorizontal: 10,
     },
-    item_selected: {
-      lineHeight: 28,
-      alignSelf: 'center',
-      width: 100,
-      color: colors.BLACK,
+    overlayTop: {
+      alignItems: 'center',
+      justifyContent: 'center',
+      height: 100,
+      position: 'absolute',
+      top: 0,
+      left: 0,
+      right: 0,
+      opacity: 0.7,
+      borderTopRightRadius: 10,
+      borderTopLeftRadius: 10,
+    },
+    overlayBottom: {
+      alignItems: 'center',
+      justifyContent: 'center',
+      position: 'absolute',
+      bottom: 0,
+      left: 0,
+      right: 0,
+      height: 100,
+      opacity: 0.7,
     },
   });
 
