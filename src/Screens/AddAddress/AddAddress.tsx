@@ -1,5 +1,6 @@
-import React, {FC,useMemo, useRef, useState} from 'react';
+import React, {FC, useMemo, useRef, useState} from 'react';
 import {TouchableOpacity, View} from 'react-native';
+import {Modalize} from 'react-native-modalize';
 import FormMainContainer from '../../Components/FormMainContainer/FormMainContainer';
 import ScreenTitle from '../../Components/ScreenTitle/ScreenTitle';
 import {NavigationProp, ParamListBase} from '@react-navigation/native';
@@ -11,16 +12,22 @@ import Fontisto from 'react-native-vector-icons/Fontisto';
 import Fonts from '../../Constants/Fonts';
 import {TouchableWithoutFeedback, Keyboard} from 'react-native';
 import {ScrollView} from 'react-native-gesture-handler';
-import { getState} from '../../redux/slices/order/orderServices';
+import {
+  DeliveryFeeData,
+  deliveryFee,
+  getState,
+} from '../../redux/slices/order/orderServices';
 import {useDispatch, useSelector} from 'react-redux';
 import {DOWN_ARROW} from '../../Assets';
 import {StateResponse} from '../../redux/slices/order/types';
-import CustomModal from '../../Components/Modal/CustomModal';
 import {RootState} from '../../redux/rootReducer';
 import {
+  setUserDeliveryInformation,
+  updateUserDeliveryFee,
   updateUserLga,
   updateUserState,
 } from '../../redux/slices/order/orderSlice';
+import CustomLoader from '../../Components/Loader/CustomLoader';
 
 interface IProps {
   navigation: NavigationProp<ParamListBase>;
@@ -37,17 +44,18 @@ const AddAddress: FC<IProps> = ({navigation}) => {
   const [userLga, setUserLga] = useState('');
   const [moreInfo, setMoreInfo] = useState('');
   const [screenTitle, setScreenTitle] = useState('Delivery Details');
-  const [toggleModal, setToggleModal] = useState(false);
   const [allDataGotten, setAllDataGotten] = useState<string[]>([]);
   const [selectedDropdown, setSelectedDropdown] = useState<string>('');
-  const [selectedItem, setSelectedItem] = useState<string>('');
-
+  const [loading, setLoading] = useState(false);
+  const [isFocused, setIsFocused] = useState(false);
+  const [highlightedIndex, setHighlightedIndex] = useState<string | null>(null);
+  const [pressedIndex, setPressedIndex] = useState<number | null>(null);
+  const modalizeRef = useRef<Modalize>(null);
   const dispatch = useDispatch();
 
   const focusedInputRef = useRef<string | null>(null);
   const handleScreenTitle = (inputName: string, isFocused: boolean) => {
     setScreenTitle(isFocused ? 'Edit Details' : 'Delivery Details');
-
     if (isFocused) {
       focusedInputRef.current = inputName;
     } else {
@@ -55,6 +63,27 @@ const AddAddress: FC<IProps> = ({navigation}) => {
     }
   };
 
+  const handleTextChange = (newMobile: string) => {
+    if (/^\+234\d*$/.test(newMobile) && newMobile.length <= 14) {
+      setMobile(newMobile);
+    }
+  };
+
+  const handleFocus = () => {
+    setIsFocused(true);
+    if (mobile === '') {
+      setMobile('+234');
+    }
+    handleScreenTitle('mobile Number', true);
+  };
+
+  const handleBlur = () => {
+    setIsFocused(false);
+    if (mobile === '+234') {
+      setMobile('');
+    }
+    handleScreenTitle('mobile Number', false);
+  };
   const getAllState = async () => {
     dispatch(getState())
       .then(response => {
@@ -63,8 +92,7 @@ const AddAddress: FC<IProps> = ({navigation}) => {
           const allStateNames = result.data.map(state => state.name);
           setAllDataGotten(allStateNames);
           setSelectedDropdown('state');
-
-          setToggleModal(true);
+          modalizeRef.current?.open();
         } else {
           return null;
         }
@@ -75,34 +103,98 @@ const AddAddress: FC<IProps> = ({navigation}) => {
   };
 
   const getAllLgasForSelectedState = () => {
-    setToggleModal(true);
+    modalizeRef.current?.open();
     setSelectedDropdown('lga');
   };
 
   const handleSelectedstate = (item: string) => {
-    setSelectedItem(item);
     const selectedState = states.data?.find(state => state.name === item);
     const lgas = selectedState?.lgas;
     setAllDataGotten(lgas!);
     setUserState(item);
+    setHighlightedIndex(item);
     dispatch(updateUserState(item));
-    setToggleModal(false);
+    modalizeRef.current?.close();
   };
 
   const handleSelectedLga = (item: string) => {
-    setSelectedItem(item);
     setUserLga(item);
+    setHighlightedIndex(item);
+
     dispatch(updateUserLga(item));
-    setToggleModal(false);
+    modalizeRef.current?.close();
   };
 
-  const getFormattedState = (state:string) => {
+  const getFormattedState = (state: string) => {
     if (!state) return '';
     return state.charAt(0) + state.slice(1).toLowerCase();
   };
 
   const updateDeliveryDetails = () => {
-    navigation.navigate('OrderConfirmation');
+    const deliveryInfoPayload = {
+      contactName: name,
+      phoneNumber: mobile,
+      address: address,
+      userState: userState,
+      userLga: userLga,
+      additionalInfo: moreInfo,
+      isDefault: checked,
+    };
+    dispatch(setUserDeliveryInformation(deliveryInfoPayload));
+    setLoading(true);
+    setTimeout(() => {
+      setLoading(false);
+      getDeliveryFee();
+      navigation.navigate('OrderConfirmation');
+    }, 2000);
+  };
+
+  const getDeliveryFee = async () => {
+    if (!userLga) {
+      console.error('userLga is not available');
+      return;
+    }
+    const payload: DeliveryFeeData = {
+      filter: {
+        fields: [
+          {
+            name: 'fee_type',
+            operator: 'isEqualTo',
+            value: 'DELIVERY_FEE',
+          },
+          {
+            name: 'lga',
+            operator: 'isEqualTo',
+            value: userLga!,
+          },
+        ],
+        operator: 'and',
+      },
+      paging: {
+        index: 0,
+        size: 1,
+      },
+    };
+    dispatch(deliveryFee(payload))
+      .then(response => {
+        const result = response.payload as any;
+
+        if (response && result) {
+          const feeItem = result.data as any;
+          const generateDeliveryFee = feeItem.data!.find(
+            (item: {fee_type: string}) => item.fee_type === 'DELIVERY_FEE',
+          );
+          if (generateDeliveryFee) {
+            const deliveryFee = generateDeliveryFee.cost.cost_per_type;
+            dispatch(updateUserDeliveryFee(deliveryFee));
+          } else {
+            return null;
+          }
+        }
+      })
+      .catch(error => {
+        console.error('Error getting delivery fees', error);
+      });
   };
 
   return (
@@ -112,6 +204,7 @@ const AddAddress: FC<IProps> = ({navigation}) => {
           <ScreenTitle screenTitle={screenTitle} onPress={navigation.goBack} />
           <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
             <View>
+              {loading && <CustomLoader />}
               <StyledTextInput
                 placeholder="Contact Name"
                 name="contact Name"
@@ -126,9 +219,9 @@ const AddAddress: FC<IProps> = ({navigation}) => {
                 placeholder="Phone Number"
                 name="mobile Number"
                 value={mobile}
-                onChangeText={newMobile => setMobile(newMobile)}
-                onBlur={() => handleScreenTitle('mobile Number', false)}
-                onFocus={() => handleScreenTitle('mobile Number', true)}
+                onChangeText={handleTextChange}
+                onBlur={handleBlur}
+                onFocus={handleFocus}
                 style={{color: colors.DGRAY, fontWeight: '500', fontSize: 17}}
                 onFocusStyle={{borderColor: colors.ORANGE}}
               />
@@ -197,7 +290,7 @@ const AddAddress: FC<IProps> = ({navigation}) => {
           <View style={styles.button_container}>
             <Buttons
               title="Continue"
-              disabled={false}
+              disabled={!name || !mobile || !address || !userLga || !userState}
               buttonStyle={undefined}
               textStyle={undefined}
               onPress={updateDeliveryDetails}
@@ -205,32 +298,44 @@ const AddAddress: FC<IProps> = ({navigation}) => {
           </View>
         </ScrollView>
       </FormMainContainer>
-      <CustomModal visible={toggleModal} style={{ height: 400 }}>
-      <View style={styles.listSate}>
-        <ScrollView showsVerticalScrollIndicator={false}>
+
+      <Modalize
+        ref={modalizeRef}
+        modalHeight={350}
+        scrollViewProps={{
+          showsVerticalScrollIndicator: false,
+        }}>
+        <View style={styles.items_container}>
           {allDataGotten.map((item, index) => (
             <TouchableOpacity
               key={index}
+              onPressIn={() => setPressedIndex(index)}
+              onPressOut={() => setPressedIndex(null)}
               onPress={
                 selectedDropdown === 'state'
                   ? () => handleSelectedstate(item)
                   : () => handleSelectedLga(item)
               }
               style={[
-                selectedItem === item && styles.selectedItemStyle,
-              ]}
-            >
+                styles.item,
+                highlightedIndex === item ? styles.highlightOverlay : null,
+              ]}>
               <Fonts
                 type="normalGrayText"
-                style={selectedItem === item ? styles.item_selected : styles.item_neutral}
-              >
-                {item}
+                style={[
+                  styles.item_text,
+                  pressedIndex === index
+                    ? styles.pressed_item_text
+                    : highlightedIndex === item
+                    ? styles.active_item_text
+                    : null,
+                ]}>
+                {item.toUpperCase()}
               </Fonts>
             </TouchableOpacity>
           ))}
-        </ScrollView>
-      </View>
-    </CustomModal>
+        </View>
+      </Modalize>
     </>
   );
 };

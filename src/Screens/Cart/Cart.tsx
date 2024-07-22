@@ -1,4 +1,4 @@
-import React, {FC, useMemo, useState} from 'react';
+import React, {FC, useEffect, useMemo, useState} from 'react';
 import {Text, View, TouchableOpacity, ScrollView, Image} from 'react-native';
 import FormMainContainer from '../../Components/Layouts/PaddedLayout';
 import {
@@ -17,11 +17,13 @@ import Modal from 'react-native-modal';
 import CustomToast from '../../Components/Toast/CustomToast';
 import {useDispatch, useSelector} from 'react-redux';
 import {RootState} from '../../redux/rootReducer';
-import {updateCart} from '../../redux/slices/order/orderSlice';
+import {setServiceFee, updateCart} from '../../redux/slices/order/orderSlice';
 import {
+  serviceFee,
   triggerDeleteCartItem,
   updateCartItemQuantity,
 } from '../../redux/slices/order/orderServices';
+import { FeesResponse } from '../../redux/slices/order/types';
 
 interface IProps {
   navigation: NavigationProp<ParamListBase>;
@@ -127,6 +129,48 @@ const Cart: FC<IProps> = ({navigation}) => {
     const formattedTotalAmount = `₦${totalAmount?.toFixed(2)}`;
     return formattedTotalAmount;
   };
+
+  const getServiceFee = () => {
+    const payload = {
+      filter: {
+        fields: [
+          {
+            name: 'fee_type',
+            operator: 'isEqualTo',
+            value: 'SERVICE_FEE',
+          },
+        ],
+        operator: 'and',
+      },
+      paging: {
+        index: 0,
+        size: 10,
+      },
+    };
+    dispatch(serviceFee(payload))
+      .then(response => {
+        const result = response.payload as FeesResponse;
+        if (response && result && result.data) {
+          const feeItem = result.data as FeesResponse;
+          const serviceFee = feeItem.data!.find(
+            item => item.fee_type === 'SERVICE_FEE',
+          );
+          if (serviceFee) {
+            const costPerType = serviceFee.cost.cost_per_type;
+            dispatch(setServiceFee(costPerType));
+          } else {
+            return null;
+          }
+        }
+      })
+      .catch(error => {
+        console.error('Error getting service:', error);
+      });
+  };
+
+  useEffect(() => {
+    getServiceFee();
+  }, []);
 
   return (
     <>

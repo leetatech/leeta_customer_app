@@ -69,11 +69,18 @@ export interface PaginationData {
 
 export interface DeliveryFeeData {
   filter: {
-    fields: {
-      name: string;
-      operator: string;
-      value: string;
-    }[];
+    fields: [
+      {
+        name: string,
+        operator: 'isEqualTo',
+        value: string,
+      },
+      {
+        name: string,
+        operator: 'isEqualTo',
+        value: string,
+      },
+    ],
     operator: string;
   };
   paging: {
