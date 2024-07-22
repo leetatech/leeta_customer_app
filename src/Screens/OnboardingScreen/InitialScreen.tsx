@@ -14,7 +14,7 @@ const InitialScreen: FC<IProps> = ({navigation}) => {
     try {
       const onboardingStatus = await AsyncStorage.getItem('userOnboarding');
       const routeName =
-        onboardingStatus === 'true' ? 'BottomNavigator' : 'Slider';
+        onboardingStatus === 'true' ? 'AddAddress' : 'Slider';
       navigation.reset({
         index: 0,
         routes: [{name: routeName}],

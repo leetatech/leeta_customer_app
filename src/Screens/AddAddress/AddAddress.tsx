@@ -1,4 +1,5 @@
 import React, {FC, useMemo, useRef, useState} from 'react';
+import React, {FC, useMemo, useRef, useState} from 'react';
 import {TouchableOpacity, View} from 'react-native';
 import {Modalize} from 'react-native-modalize';
 import FormMainContainer from '../../Components/FormMainContainer/FormMainContainer';
@@ -17,11 +18,18 @@ import {
   deliveryFee,
   getState,
 } from '../../redux/slices/order/orderServices';
+import {
+  DeliveryFeeData,
+  deliveryFee,
+  getState,
+} from '../../redux/slices/order/orderServices';
 import {useDispatch, useSelector} from 'react-redux';
 import {DOWN_ARROW} from '../../Assets';
 import {StateResponse} from '../../redux/slices/order/types';
 import {RootState} from '../../redux/rootReducer';
 import {
+  setUserDeliveryInformation,
+  updateUserDeliveryFee,
   setUserDeliveryInformation,
   updateUserDeliveryFee,
   updateUserLga,
@@ -84,6 +92,27 @@ const AddAddress: FC<IProps> = ({navigation}) => {
     }
     handleScreenTitle('mobile Number', false);
   };
+  const handleTextChange = (newMobile: string) => {
+    if (/^\+234\d*$/.test(newMobile) && newMobile.length <= 14) {
+      setMobile(newMobile);
+    }
+  };
+
+  const handleFocus = () => {
+    setIsFocused(true);
+    if (mobile === '') {
+      setMobile('+234');
+    }
+    handleScreenTitle('mobile Number', true);
+  };
+
+  const handleBlur = () => {
+    setIsFocused(false);
+    if (mobile === '+234') {
+      setMobile('');
+    }
+    handleScreenTitle('mobile Number', false);
+  };
   const getAllState = async () => {
     dispatch(getState())
       .then(response => {
@@ -125,6 +154,7 @@ const AddAddress: FC<IProps> = ({navigation}) => {
     modalizeRef.current?.close();
   };
 
+  const getFormattedState = (state: string) => {
   const getFormattedState = (state: string) => {
     if (!state) return '';
     return state.charAt(0) + state.slice(1).toLowerCase();
@@ -222,6 +252,9 @@ const AddAddress: FC<IProps> = ({navigation}) => {
                 onChangeText={handleTextChange}
                 onBlur={handleBlur}
                 onFocus={handleFocus}
+                onChangeText={handleTextChange}
+                onBlur={handleBlur}
+                onFocus={handleFocus}
                 style={{color: colors.DGRAY, fontWeight: '500', fontSize: 17}}
                 onFocusStyle={{borderColor: colors.ORANGE}}
               />
@@ -291,6 +324,7 @@ const AddAddress: FC<IProps> = ({navigation}) => {
             <Buttons
               title="Continue"
               disabled={!name || !mobile || !address || !userLga || !userState}
+              disabled={!name || !mobile || !address || !userLga || !userState}
               buttonStyle={undefined}
               textStyle={undefined}
               onPress={updateDeliveryDetails}
@@ -309,6 +343,8 @@ const AddAddress: FC<IProps> = ({navigation}) => {
           {allDataGotten.map((item, index) => (
             <TouchableOpacity
               key={index}
+              onPressIn={() => setPressedIndex(index)}
+              onPressOut={() => setPressedIndex(null)}
               onPressIn={() => setPressedIndex(index)}
               onPressOut={() => setPressedIndex(null)}
               onPress={
