@@ -23,7 +23,8 @@ import {
   triggerDeleteCartItem,
   updateCartItemQuantity,
 } from '../../redux/slices/order/orderServices';
-import { FeesResponse } from '../../redux/slices/order/types';
+import {FeesResponse} from '../../redux/slices/order/types';
+import CustomLoader from '../../Components/Loader/CustomLoader';
 
 interface IProps {
   navigation: NavigationProp<ParamListBase>;
@@ -31,7 +32,7 @@ interface IProps {
 
 const Cart: FC<IProps> = ({navigation}) => {
   const styles = useMemo(() => createStyles(), []);
-  let {fee, cartData} = useSelector((state: RootState) => state.order);
+  let {fee, cartData, loading} = useSelector((state: RootState) => state.order);
   const [showModal, setShowModal] = useState(false);
   const [showToastMsg, setshowToastMsg] = useState(false);
   const [selectedItem, setSelectedItem] = useState<string>('');
@@ -184,6 +185,8 @@ const Cart: FC<IProps> = ({navigation}) => {
 
         {cartData?.data?.cart_items && cartData.data?.cart_items.length > 0 ? (
           <>
+            {loading && <CustomLoader />}
+
             <ScrollView
               scrollEnabled={true}
               showsVerticalScrollIndicator={false}>
@@ -308,7 +311,11 @@ const Cart: FC<IProps> = ({navigation}) => {
             backgroundColor:
               toastType === 'success' ? colors.SUCCESS : colors.LYELLOW,
           }}
-          textStyle={{fontWeight: '500', fontSize: 15, color:toastType === 'success' ? colors.BLACK : colors.GRAY}}
+          textStyle={{
+            fontWeight: '500',
+            fontSize: 15,
+            color: toastType === 'success' ? colors.BLACK : colors.GRAY,
+          }}
           onPress={() => setshowToastMsg(false)}>
           <Text>{toastMessage}</Text>
         </CustomToast>

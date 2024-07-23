@@ -14,8 +14,7 @@ const createStyles = () =>
       gap: 8,
       alignItems: 'center',
       paddingVertical: 10,
-      width: 300
-
+      width: 300,
     },
     payment_container: {
       flexDirection: 'row',
@@ -41,7 +40,6 @@ const createStyles = () =>
     },
     order_summary_container: {
       paddingTop: 20,
-
     },
     action: {
       flexDirection: 'row',
@@ -51,21 +49,13 @@ const createStyles = () =>
     terms_container: {
       gap: 5,
     },
-    close_icon: {
-      position: 'absolute',
-      top: 50,
-      right: 10,
-    },
-    close_container: {
-      flexDirection: 'row',
-      justifyContent: 'space-between',
-      paddingBottom: 10,
-      paddingTop: 50,
-      paddingHorizontal: 20,
+    error_modal_container: {
+      justifyContent: 'center',
+      alignItems: 'center',
+      paddingVertical: 30,
     },
     success_msg_container: {
-      marginTop: 30,
-      justifyContent: 'center',
+      marginTop: 100,
       alignItems: 'center',
       gap: 6,
     },
@@ -96,10 +86,9 @@ const createStyles = () =>
       color: colors.ORANGE,
       fontSize: 17,
     },
-    icon_style:{
-   marginTop:3
-    }
-
+    icon_style: {
+      marginTop: 3,
+    },
   });
 
 export default createStyles;

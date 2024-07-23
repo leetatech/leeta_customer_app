@@ -310,7 +310,7 @@ export const orderSlice = createSlice({
       .addCase(triggerCheckout.fulfilled, (state, action) => {
         state.loading = false;
         state.error = false;
-        state.message = action.payload?.data;
+        state.message = action.payload?.data.message;
         state.checkoutData = action.payload;
       })
       .addCase(
@@ -318,8 +318,13 @@ export const orderSlice = createSlice({
         (state, action: PayloadAction<any>) => {
           state.loading = false;
           state.error = true;
-          state.errorCode = action.payload?.data?.error_code || 1;
-          state.message = action.payload.data.message;
+          const payload = action.payload;
+          if (payload && payload.data) {
+            state.errorCode = payload.data.error_code || 1;
+            state.message = payload.data.message;
+          }else if (typeof payload === 'string') {
+            state.message = payload;
+           } 
         },
       );
   },

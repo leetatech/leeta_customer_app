@@ -341,10 +341,10 @@ export const triggerCheckout = createAsyncThunk(
         Authorization: `Bearer ${token}`,
       };
       const response = await apiCall(url, method, checkout, headers);
-      return response as any;
+      return response as any
     } catch (error) {
       if (axios.isAxiosError(error)) {
-        return rejectWithValue(error.response?.data);
+        return rejectWithValue(error.response || error.response);
       } else if (error instanceof Error) {
         return rejectWithValue(error.message);
       } else {

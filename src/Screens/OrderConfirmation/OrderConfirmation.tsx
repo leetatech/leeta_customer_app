@@ -11,7 +11,6 @@ import {
   CYLINDER,
   LOCATION_ICON,
   RIGHT_ICON,
-  SUCCESS,
 } from '../../Assets/svgImages';
 import Fonts from '../../Constants/Fonts';
 import {colors} from '../../Constants/Colors';
@@ -30,6 +29,7 @@ import {ADD} from '../../Assets';
 import {capitalizeFirstLetter} from '../../utils';
 import CustomToast from '../../Components/Toast/CustomToast';
 import Fontisto from 'react-native-vector-icons/Fontisto';
+import LottieView from 'lottie-react-native';
 
 interface IProps {
   navigation: NavigationProp<ParamListBase>;
@@ -40,6 +40,10 @@ interface Order {
   sumAllOrders: () => string;
   serviceFeePerOrder: number;
   deliveryFeePerOrder: number;
+}
+interface Payment {
+  pyamentMethod?: boolean;
+  onPress?: () => void;
 }
 
 const RenderDeliveryAddress: FC<IProps> = ({navigation, deliveryCost}) => {
@@ -145,24 +149,19 @@ const RenderOrder = ({
   );
 };
 
-const RenderPaymentMethod = () => {
+const RenderPaymentMethod: FC<Payment> = ({pyamentMethod, onPress}) => {
   const styles = useMemo(() => createStyles(), []);
-  const [selectPaymentMethod, setSelectPaymentMethod] = useState(false);
-
-  const selctedPaymentMethod = () => {
-    setSelectPaymentMethod(!selectPaymentMethod);
-  };
   return (
     <View>
       <Fonts type="boldLightGray">Payment Method</Fonts>
       <View style={styles.payment_container}>
         <View style={styles.checkbox_container}>
-          <TouchableOpacity onPress={selctedPaymentMethod}>
+          <TouchableOpacity onPress={onPress}>
             <Fontisto
-              name={selectPaymentMethod ? 'check' : 'checkbox-passive'}
+              name={pyamentMethod ? 'check' : 'checkbox-passive'}
               size={10}
               style={{
-                color: selectPaymentMethod ? colors.ORANGE : colors.BLACK,
+                color: pyamentMethod ? colors.ORANGE : colors.BLACK,
               }}
             />
           </TouchableOpacity>
@@ -192,17 +191,20 @@ const OrderConfirmation: FC<IProps> = ({navigation}) => {
     loading,
     serviceFeePerOrder,
   } = useSelector((state: RootState) => state.order);
-  const [showCheckoutMsg, setShowCheckoutMsg] = useState(false);
+  const [errorMsg, setErrorMsg] = useState('');
+  const [showErrorMsg, setShowErrorMsg] = useState(false);
   const dispatch = useDispatch();
   const rotateValue = useRef(new Animated.Value(0)).current;
+  const [selectPaymentMethod, setSelectPaymentMethod] = useState(false);
+  const [noPaymentMethod, setNoPaymentMethod] = useState(false);
 
   const startRotation = () => {
     Animated.loop(
       Animated.timing(rotateValue, {
         toValue: 1,
         duration: 3000,
-        easing: Easing.linear,
-   
+        easing: Easing.quad,
+
         useNativeDriver: true,
       }),
     ).start();
@@ -262,61 +264,66 @@ const OrderConfirmation: FC<IProps> = ({navigation}) => {
   };
 
   const handleShowModal = () => {
-    setLoader(true);
-    setTimeout(() => {
-      setLoader(false);
-      setShowModal(true);
-    }, 2000);
+    if (!selectPaymentMethod) {
+      setNoPaymentMethod(true);
+      setTimeout(() => {
+        setNoPaymentMethod(false);
+      }, 2000);
+    } else {
+      setLoader(true);
+      setTimeout(() => {
+        setLoader(false);
+        setShowModal(true);
+      }, 2000);
+    }
   };
 
   const handleCheckout = async () => {
-    if (!cartData?.data?.id && !userLga && !userState) {
-      return;
-    } else {
-      const cartId = cartData?.data?.id;
-      const payload = {
-        cart_id: cartId as string,
-        delivery_details: {
-          address: {
-            city: userLga as string,
-            closest_landmark: '',
-            coordinate: {
-              latitude: 0,
-              longitude: 0,
-            },
-            full_address: '',
-            lga: userLga as string,
-            state: userState as string,
-            verified: true,
+    if (!cartData?.data?.id || !userLga || !userState) return;
+    const cartId = cartData?.data?.id;
+    const payload = {
+      cart_id: cartId as string,
+      delivery_details: {
+        address: {
+          city: userLga as string,
+          closest_landmark: '',
+          coordinate: {
+            latitude: 0,
+            longitude: 0,
           },
-          email: '',
-          name: userDeliveryInformation.contactName,
-          phone: userDeliveryInformation.phoneNumber,
+          full_address: '',
+          lga: userLga as string,
+          state: userState as string,
+          verified: true,
         },
-        delivery_fee: userDeliveryFee!,
-        payment_method: 'Pay on delivery',
-        service_fee: serviceFeePerOrder,
-        total_fee: orderSummary,
-      };
-      dispatch(triggerCheckout(payload)).then(response => {
-        try {
-          const result = response.payload as any;
-          if (response && result && result.data) {
-            setViewReceipt(true);
-          } else {
-            setShowCheckoutMsg(true);
-            setTimeout(() => {
-              setShowCheckoutMsg(false);
-            }, 2000);
-          }
-        } catch (error) {
-          console.error('Error triggering checkout:', error);
-          setShowCheckoutMsg(true);
-          setTimeout(() => {
-            setShowCheckoutMsg(false);
-          }, 2000);
-        }
-      });
+        email: '',
+        name: userDeliveryInformation.contactName,
+        phone: userDeliveryInformation.phoneNumber,
+      },
+      delivery_fee: userDeliveryFee!,
+      payment_method: 'Pay on delivery',
+      service_fee: serviceFeePerOrder,
+      total_fee: orderSummary,
+    };
+    try {
+      const response = await dispatch(triggerCheckout(payload));
+      const result = response.payload as any;
+      if (result && result.data) {
+        setViewReceipt(true);
+      } else {
+        setShowErrorMsg(true);
+        setTimeout(() => {
+          setShowErrorMsg(false);
+        }, 5000);
+      }
+    } catch (error) {
+      console.error('Error triggering checkout:', (error as any).data?.message);
+      const errorMessage = (error as any).data?.message;
+      setErrorMsg(errorMessage);
+      setShowErrorMsg(true);
+      setTimeout(() => {
+        setShowErrorMsg(false);
+      }, 5000);
     }
   };
 
@@ -331,6 +338,9 @@ const OrderConfirmation: FC<IProps> = ({navigation}) => {
       setShowModal(false);
       navigation.navigate('SignIn');
     }, 2000);
+  };
+  const selctedPaymentMethod = () => {
+    setSelectPaymentMethod(!selectPaymentMethod);
   };
 
   useEffect(() => {
@@ -353,7 +363,10 @@ const OrderConfirmation: FC<IProps> = ({navigation}) => {
               onPress={navigation!.goBack}
             />
             <View>
-              <RenderPaymentMethod />
+              <RenderPaymentMethod
+                onPress={selctedPaymentMethod}
+                pyamentMethod={selectPaymentMethod}
+              />
               <RenderDeliveryAddress
                 navigation={navigation}
                 deliveryCost={userDeliveryFee}
@@ -407,17 +420,23 @@ const OrderConfirmation: FC<IProps> = ({navigation}) => {
           </View>
         </ScrollView>
       </FormMainContainer>
+      <CustomModal
+        visible={noPaymentMethod}
+        style={styles.error_modal_container}>
+        <Fonts type="normalGrayText">please select a payment method.</Fonts>
+      </CustomModal>
 
       <CustomModal visible={showModal} style={styles.modal_container}>
         {viewReceipt && (
           <>
             <FormMainContainer>
               <View style={styles.success_msg_container}>
-                <View style={styles.iconContainer}>
-                  {/* <Animated.View style={animatedStyle}> */}
-                    <SUCCESS />
-                  {/* </Animated.View> */}
-                </View>
+                <LottieView
+                  source={require('../../Assets/success_animation.json')}
+                  autoPlay
+                  loop
+                  style={{width: 150, height: 150}}
+                />
                 <Fonts type="boldBlack" style={styles.refill_msg}>
                   THANKS
                 </Fonts>
@@ -435,19 +454,20 @@ const OrderConfirmation: FC<IProps> = ({navigation}) => {
                   textStyle={styles.view_receipt_text}
                   onPress={viewOrder}
                 />
-                  <Buttons
-                title="Back to Homescreen"
-                disabled={false}
-                buttonStyle={undefined}
-                textStyle={{fontSize: 17}}
-                onPress={()=>navigation.navigate('BottomNavigator')}
-              />
+                <Buttons
+                  title="Back to Homescreen"
+                  disabled={false}
+                  buttonStyle={undefined}
+                  textStyle={{fontSize: 17}}
+                  onPress={() => navigation.navigate('BottomNavigator')}
+                />
               </View>
             </FormMainContainer>
           </>
         )}
         {!viewReceipt && (
           <FormMainContainer>
+            {showErrorMsg && <CustomToast>{errorMsg}</CustomToast>}
             <View style={styles.success_msg_container}>
               <View style={styles.iconContainer}>
                 <Animated.View style={animatedStyle}>

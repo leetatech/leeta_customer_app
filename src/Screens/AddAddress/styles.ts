@@ -19,7 +19,11 @@ const createStyles = () =>
       paddingVertical: 20,
       gap: 6,
     },
-
+    modal_container: {
+      paddingTop: 40,
+      paddingBottom: 30,
+      backgroundColor: colors.WHITE,
+    },
     items_container: {
       paddingVertical: 30,
       alignItems: 'center',
@@ -35,19 +39,18 @@ const createStyles = () =>
       color: 'black',
     },
     item: {
-      height: 40,
+      height: 30,
       justifyContent: 'center',
     },
     highlightOverlay: {
-      width:'100%',
-      alignItems:'center',
+      width: '100%',
+      alignItems: 'center',
       height: 35,
       backgroundColor: colors.XLGRAY,
       zIndex: -1,
       borderRadius: 15,
       marginHorizontal: 10,
     },
-
   });
 
 export default createStyles;

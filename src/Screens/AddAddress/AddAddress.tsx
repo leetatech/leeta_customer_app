@@ -302,6 +302,11 @@ const AddAddress: FC<IProps> = ({navigation}) => {
       <Modalize
         ref={modalizeRef}
         modalHeight={350}
+        modalStyle={{
+          paddingTop: 40,
+          paddingBottom: 30,
+          backgroundColor: colors.WHITE,
+        }}
         scrollViewProps={{
           showsVerticalScrollIndicator: false,
         }}>
