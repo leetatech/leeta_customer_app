@@ -268,7 +268,7 @@ const OrderConfirmation: FC<IProps> = ({navigation}) => {
       setNoPaymentMethod(true);
       setTimeout(() => {
         setNoPaymentMethod(false);
-      }, 8000);
+      }, 2000);
     } else {
       setLoader(true);
       setTimeout(() => {
