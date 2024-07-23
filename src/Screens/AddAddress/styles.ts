@@ -25,7 +25,6 @@ const createStyles = () =>
       backgroundColor: colors.WHITE,
     },
     items_container: {
-      paddingVertical: 30,
       alignItems: 'center',
       justifyContent: 'center',
     },
@@ -43,14 +42,13 @@ const createStyles = () =>
       justifyContent: 'center',
     },
     highlightOverlay: {
-      width: '100%',
+      width: '90%',
       alignItems: 'center',
       height: 35,
       backgroundColor: colors.XLGRAY,
       zIndex: -1,
       borderRadius: 15,
-      marginHorizontal: 10,
-    },
+        },
   });
 
 export default createStyles;

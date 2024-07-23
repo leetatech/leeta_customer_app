@@ -268,7 +268,7 @@ const OrderConfirmation: FC<IProps> = ({navigation}) => {
       setNoPaymentMethod(true);
       setTimeout(() => {
         setNoPaymentMethod(false);
-      }, 2000);
+      }, 8000);
     } else {
       setLoader(true);
       setTimeout(() => {
@@ -423,7 +423,7 @@ const OrderConfirmation: FC<IProps> = ({navigation}) => {
       <CustomModal
         visible={noPaymentMethod}
         style={styles.error_modal_container}>
-        <Fonts type="normalGrayText">please select a payment method.</Fonts>
+        <Fonts type="normalGrayText">Please select a payment method.</Fonts>
       </CustomModal>
 
       <CustomModal visible={showModal} style={styles.modal_container}>
