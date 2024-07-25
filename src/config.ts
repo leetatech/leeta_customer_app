@@ -12,6 +12,7 @@ interface ApiUrls {
   listCart:string;
   getStates: string;
   deleteCartItem:string;
+  checkout:string;
 
 }
 
@@ -30,7 +31,8 @@ export const apiUrl: ApiUrls = {
   cartItemQuantity:`${BASE_URL}cart/item/quantity`, // PUT
   listCart:`${BASE_URL}cart`, // PUT
   getStates:`${BASE_URL}state`, // GET
-  deleteCartItem :`${BASE_URL}cart/item` //DELETE
+  deleteCartItem :`${BASE_URL}cart/item`, //DELETE
+  checkout: `${BASE_URL}cart/checkout` //POST
 };
 
 export const appUserType = "customer"

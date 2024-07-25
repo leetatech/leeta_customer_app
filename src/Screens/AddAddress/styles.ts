@@ -6,7 +6,6 @@ const createStyles = () =>
     main_container: {
       flex: 1,
     },
-
     form_main_container: {
       paddingTop: 10,
       gap: 5,
@@ -20,25 +19,36 @@ const createStyles = () =>
       paddingVertical: 20,
       gap: 6,
     },
-    listSate: {
-      width: '100%',
-      gap: 8,
+    modal_container: {
+      paddingTop: 40,
+      paddingBottom: 30,
+      backgroundColor: colors.WHITE,
     },
-    item_neutral: {
-      lineHeight: 28,
-      alignSelf: 'center',
-      width: 100,
+    items_container: {
+      alignItems: 'center',
+      justifyContent: 'center',
     },
-    selectedItemStyle: {
+    item_text: {
+      color: colors.GRAY,
+    },
+    pressed_item_text: {
+      color: colors.ORANGE,
+    },
+    active_item_text: {
+      color: 'black',
+    },
+    item: {
+      height: 30,
+      justifyContent: 'center',
+    },
+    highlightOverlay: {
+      width: '90%',
+      alignItems: 'center',
+      height: 35,
       backgroundColor: colors.XLGRAY,
-      borderRadius: 20,
-    },
-    item_selected: {
-      lineHeight: 28,
-      alignSelf: 'center',
-      width: 100,
-      color: colors.BLACK,
-    },
+      zIndex: -1,
+      borderRadius: 15,
+        },
   });
 
 export default createStyles;

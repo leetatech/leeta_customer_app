@@ -12,6 +12,8 @@ const DOWNLOAD_ICON = require('./Images/download_icon.png');
 const EMAIL_ICON = require('./Images/email_icon.png');
 const BACKGROUND_IMAGE = require('./Images/background_image.png');
 const DOWN_ARROW = require('./Images/arrow_down.png');
+const ADD = require('./Images/add.png');
+
 
 export {
   LOGO,
@@ -28,4 +30,5 @@ export {
   EMAIL_ICON,
   BACKGROUND_IMAGE,
   DOWN_ARROW,
+  ADD
 };

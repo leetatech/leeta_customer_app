@@ -9,6 +9,7 @@ import {
   getState,
   deliveryFee,
   triggerDeleteCartItem,
+  triggerCheckout,
 } from './orderServices';
 import {
   ProductListResponse,
@@ -34,12 +35,16 @@ interface orderState {
   cartItemId?: string;
   newCartItemQuantity?: Record<string, string>;
   listFees?: FeesResponse;
-  serviceFee: number;
+  serviceFeePerOrder: number;
   cartList: CartItemResponsePayload;
   states: StateResponse;
   userState?: string;
   userLga?: string;
   generatedDeliveryFee?: any;
+  checkoutData?: any;
+  cartId?: string;
+  userDeliveryInformation: Record<string, string>;
+  userDeliveryFee?: number;
 }
 
 const initialState: orderState = {
@@ -58,12 +63,23 @@ const initialState: orderState = {
   cartItemId: '',
   newCartItemQuantity: {},
   listFees: {},
-  serviceFee: 0,
+  serviceFeePerOrder: 0,
   cartList: {},
   states: {},
   userState: '',
   userLga: '',
   generatedDeliveryFee: {},
+  checkoutData: {},
+  cartId: '',
+  userDeliveryInformation: {
+    contactName: '',
+    phoneNumber: '',
+    address: '',
+    userState: '',
+    userLga: '',
+    additionalInfo: '',
+  },
+  userDeliveryFee: 0,
 };
 
 export const orderSlice = createSlice({
@@ -80,25 +96,38 @@ export const orderSlice = createSlice({
       state.userCart?.push(action.payload);
     },
     updateCart: (state, action) => {
-      const { payload: itemId } = action;
+      const {payload: itemId} = action;
       if (!state.cartData?.data?.cart_items) {
         return;
       }
       state.cartData.data.cart_items = state.cartData.data.cart_items.filter(
-        item => item.id !== itemId
+        item => item.id !== itemId,
       );
     },
     setCartItemId: (state, action) => {
       state.cartItemId = action.payload;
     },
     setServiceFee: (state, action) => {
-      state.serviceFee = action.payload;
+      state.serviceFeePerOrder = action.payload;
     },
     updateUserState: (state, action) => {
       state.userState = action.payload;
     },
     updateUserLga: (state, action) => {
       state.userLga = action.payload;
+    },
+    setUserCartId: (state, action) => {
+      state.cartId = action.payload;
+    },
+    updateUserDeliveryFee: (state, action) => {
+      state.userDeliveryFee = action.payload;
+    },
+
+    setUserDeliveryInformation: (state, action) => {
+      state.userDeliveryInformation = {
+        ...state.userDeliveryInformation,
+        ...action.payload,
+      };
     },
   },
   extraReducers: builder => {
@@ -261,7 +290,7 @@ export const orderSlice = createSlice({
       .addCase(triggerDeleteCartItem.fulfilled, (state, action) => {
         state.loading = false;
         state.error = false;
-        state.message = action.payload?.data
+        state.message = action.payload?.data;
       })
       .addCase(
         triggerDeleteCartItem.rejected,
@@ -270,6 +299,32 @@ export const orderSlice = createSlice({
           state.error = true;
           state.errorCode = action.payload?.data?.error_code || 1;
           state.message = action.payload.data.message;
+        },
+      )
+
+      //CHECKOUT
+      .addCase(triggerCheckout.pending, state => {
+        state.loading = true;
+        state.error = false;
+      })
+      .addCase(triggerCheckout.fulfilled, (state, action) => {
+        state.loading = false;
+        state.error = false;
+        state.message = action.payload?.data.message;
+        state.checkoutData = action.payload;
+      })
+      .addCase(
+        triggerCheckout.rejected,
+        (state, action: PayloadAction<any>) => {
+          state.loading = false;
+          state.error = true;
+          const payload = action.payload;
+          if (payload && payload.data) {
+            state.errorCode = payload.data.error_code || 1;
+            state.message = payload.data.message;
+          }else if (typeof payload === 'string') {
+            state.message = payload;
+           } 
         },
       );
   },
@@ -284,6 +339,9 @@ export const {
   setServiceFee,
   updateUserState,
   updateUserLga,
+  setUserCartId,
+  setUserDeliveryInformation,
+  updateUserDeliveryFee,
 } = orderSlice.actions;
 
 export default orderSlice.reducer;
