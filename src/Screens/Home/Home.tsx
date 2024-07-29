@@ -14,13 +14,11 @@ import {useDispatch, useSelector} from 'react-redux';
 import {
   addTocart,
   productFee,
-  serviceFee,
   productList,
 } from '../../redux/slices/order/orderServices';
 import {
   setCartItemId,
   setProductWeight,
-  setServiceFee,
   setUserCart,
 } from '../../redux/slices/order/orderSlice';
 import {RootState} from '../../redux/rootReducer';
@@ -63,68 +61,27 @@ const Home: FC<IProps> = ({navigation}) => {
     setInputWeight(false);
   };
 
-  const handleInputWeight = (index: number) => {
-    if (index === weightOptions.length - 1) {
-      setInputWeight(true);
-    } else {
-      const selectedWeight = weightOptions[index];
-      dispatch(setProductWeight(weightOptions[index]));
-      const totalFeePerItem = fee! * selectedWeight;
-      const updatedCartItems = {
-        ...cartItems,
-        weight: `${selectedWeight} Kg`,
-        amount: totalFeePerItem,
-      };
-      dispatch(setUserCart(updatedCartItems));
-      const payload = {
-        cost: totalFeePerItem,
-        product_id: productId!,
-        quantity: productQuantity!,
-        weight: selectedWeight,
-      };
-      console.log('payload', payload);
-
-      dispatch(addTocart(payload))
-        .then(response => {
-          const result = response.payload as CartItemResponsePayload;
-          if (response && result && payload.cost && payload.product_id && payload.quantity && payload.weight) {
-            const cartItemIds = result?.data?.cart_items;
-            if (cartItemIds) {
-              cartItemIds.forEach(item => {
-                dispatch(setCartItemId(item.id));
-              });
-            }
-            navigation.navigate('Cart');
-            setopenGasWeightOptions(false);
-          }
-        })
-        .catch(error => {
-          console.error('Error adding items to cart:', error);
-        });
-    }
-  };
-
+ 
   const handleChange = (e: string) => {
     setWeightInput(Number(e));
   };
 
-  const handleNavigation = () => {
-    dispatch(setProductWeight(weightInput));
-    const totalFeePerItem = fee! * weightInput;
+  const updateCartAndNavigate = (weight: number) => {
+    const totalFeePerItem = fee! * weight;
     const updatedCartItems = {
       ...cartItems,
-      weight: `${weightInput} Kg`,
+      weight: `${weight} Kg`,
       amount: totalFeePerItem,
     };
+    dispatch(setProductWeight(weight));
     dispatch(setUserCart(updatedCartItems));
     const payload = {
       cost: totalFeePerItem,
       product_id: productId!,
       quantity: productQuantity!,
-      weight: productWeight!,
+      weight: weight,
     };
     console.log('payload', payload);
-
     dispatch(addTocart(payload))
       .then(response => {
         const result = response.payload as CartItemResponsePayload;
@@ -142,6 +99,19 @@ const Home: FC<IProps> = ({navigation}) => {
       .catch(error => {
         console.error('Error adding items to cart:', error);
       });
+  };
+  
+  const handleInputWeight = (index: number) => {
+    if (index === weightOptions.length - 1) {
+      setInputWeight(true);
+    } else {
+      const selectedWeight = weightOptions[index];
+      updateCartAndNavigate(selectedWeight);
+    }
+  };
+  
+  const handleNavigation = () => {
+    updateCartAndNavigate(weightInput);
   };
 
   const getProductListing = () => {
@@ -188,8 +158,7 @@ const Home: FC<IProps> = ({navigation}) => {
           if (productFee) {
             const costPerType = productFee.cost.cost_per_type;
             return costPerType
-            // console.log("PRODUCT FEE",costPerType)
-            // dispatch(setServiceFee(costPerType));
+           
           } else {
             return null;
           }

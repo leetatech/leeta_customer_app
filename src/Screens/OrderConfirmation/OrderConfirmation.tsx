@@ -220,7 +220,7 @@ const OrderConfirmation: FC<IProps> = ({navigation}) => {
   };
 
   const sumAllOrders = () => {
-    const totalAmount = cartData?.data?.cart_items.reduce((total, item) => {
+    const totalAmount = cartList?.data?.cart_items.reduce((total, item) => {
       return total + item.cost;
     }, 0);
     const formattedTotalAmount = `₦${totalAmount?.toFixed(2)}`;
@@ -229,7 +229,7 @@ const OrderConfirmation: FC<IProps> = ({navigation}) => {
 
   const getOrderSummary = () => {
     const totalCartAmount =
-      cartData?.data?.cart_items.reduce((total, item) => {
+    cartList?.data?.cart_items.reduce((total, item) => {
         return total + item.cost;
       }, 0) || 0;
     const deliveryFee = userDeliveryFee || 0;
@@ -258,7 +258,7 @@ const OrderConfirmation: FC<IProps> = ({navigation}) => {
       });
   };
   const getCartid = () => {
-    const cartId = cartData?.data?.id;
+    const cartId = cartList?.data?.id;
     dispatch(setUserCartId(cartId));
     return cartId;
   };
@@ -279,8 +279,8 @@ const OrderConfirmation: FC<IProps> = ({navigation}) => {
   };
 
   const handleCheckout = async () => {
-    if (!cartData?.data?.id || !userLga || !userState) return;
-    const cartId = cartData?.data?.id;
+    if (!cartList?.data?.id || !userLga || !userState) return;
+    const cartId = cartList?.data?.id;
     const payload = {
       cart_id: cartId as string,
       delivery_details: {
