@@ -20,10 +20,11 @@ import {RootState} from '../../redux/rootReducer';
 import {setServiceFee, updateCart} from '../../redux/slices/order/orderSlice';
 import {
   serviceFee,
+  triggerCartList,
   triggerDeleteCartItem,
   updateCartItemQuantity,
 } from '../../redux/slices/order/orderServices';
-import {FeesResponse} from '../../redux/slices/order/types';
+import {CartItemResponsePayload, FeesResponse} from '../../redux/slices/order/types';
 import CustomLoader from '../../Components/Loader/CustomLoader';
 
 interface IProps {
@@ -32,7 +33,7 @@ interface IProps {
 
 const Cart: FC<IProps> = ({navigation}) => {
   const styles = useMemo(() => createStyles(), []);
-  let {fee, cartData, loading} = useSelector((state: RootState) => state.order);
+  let {fee,loading,cartList} = useSelector((state: RootState) => state.order);
   const [showModal, setShowModal] = useState(false);
   const [showToastMsg, setshowToastMsg] = useState(false);
   const [selectedItem, setSelectedItem] = useState<string>('');
@@ -49,7 +50,14 @@ const Cart: FC<IProps> = ({navigation}) => {
       dispatch(updateCart(selectedItem));
     } catch (error: any) {
       setShowModal(false);
-      displayToastMessage(`Failed to delete item, please try again`, 'error');
+      if (error.response && error.response.data) {
+        const errorMessage = error.response.data.message;
+        displayToastMessage(`Failed to delete item: ${errorMessage}`, 'error');
+      } else if (error.message) {
+        displayToastMessage(`Failed to delete item: ${error.message}`, 'error');
+      } else {
+        displayToastMessage('Failed to delete item, please try again', 'error');
+      }
     }
   };
   const displayToastMessage = (message: string, type: 'success' | 'error') => {
@@ -62,7 +70,10 @@ const Cart: FC<IProps> = ({navigation}) => {
   };
 
   const handleItemIncrease = (index: number) => {
-    const data = cartData?.data?.cart_items?.map((item, indx) => {
+    if (!cartList || !cartList.data || !cartList.data.cart_items) {
+      return;
+    }
+    const updatedCartItems = cartList.data.cart_items.map((item, indx) => {
       if (index === indx) {
         return {
           ...item,
@@ -73,27 +84,26 @@ const Cart: FC<IProps> = ({navigation}) => {
       return item;
     });
 
-    if (data) {
-      const updatedItem = data[index];
-      dispatch(
-        updateCart({
-          ...cartData,
-          data: {
-            ...cartData?.data,
-            cart_items: data,
-          },
-        }),
-      );
-      const payload = {
-        cart_item_id: updatedItem.id,
-        quantity: updatedItem.quantity,
-      };
-      dispatch(updateCartItemQuantity(payload));
-    }
+    const updatedCartData = {
+      ...cartList,
+      data: {
+        ...cartList.data,
+        cart_items: updatedCartItems,
+      },
+    };
+
+    dispatch(updateCart(updatedCartData));
+
+    const updatedItem = updatedCartItems[index];
+    const payload = {
+      cart_item_id: updatedItem.id,
+      quantity: updatedItem.quantity,
+    };
+    dispatch(updateCartItemQuantity(payload));
   };
 
   const handleItemDecrease = (index: number) => {
-    const data = cartData?.data?.cart_items?.map((item, indx) => {
+    const data = cartList?.data?.cart_items?.map((item, indx) => {
       if (index === indx && item.quantity > 1) {
         return {
           ...item,
@@ -108,9 +118,9 @@ const Cart: FC<IProps> = ({navigation}) => {
       const updatedItem = data[index];
       dispatch(
         updateCart({
-          ...cartData,
+          ...cartList,
           data: {
-            ...cartData?.data,
+            ...cartList?.data,
             cart_items: data,
           },
         }),
@@ -124,7 +134,7 @@ const Cart: FC<IProps> = ({navigation}) => {
   };
 
   const sumAllOrders = () => {
-    const totalAmount = cartData?.data?.cart_items.reduce((total, item) => {
+    const totalAmount = cartList?.data?.cart_items.reduce((total, item) => {
       return total + item.cost;
     }, 0);
     const formattedTotalAmount = `₦${totalAmount?.toFixed(2)}`;
@@ -169,8 +179,29 @@ const Cart: FC<IProps> = ({navigation}) => {
       });
   };
 
+  const listCart = () => {
+    const payload = {
+      paging: {
+        index: 0,
+        size: 10,
+      },
+    };
+    dispatch(triggerCartList(payload))
+      .then(response => {
+        const result = response.payload as CartItemResponsePayload;
+        if (response && result && result.data) {
+        } else {
+          return null;
+        }
+      })
+      .catch(error => {
+        console.error('Error getting Cart list:', error);
+      });
+  };
+
   useEffect(() => {
     getServiceFee();
+    listCart()
   }, []);
 
   return (
@@ -182,15 +213,13 @@ const Cart: FC<IProps> = ({navigation}) => {
           </TouchableOpacity>
           <Text style={styles.description}>YOUR CART</Text>
         </View>
-
-        {cartData?.data?.cart_items && cartData.data?.cart_items.length > 0 ? (
+        {cartList?.data?.cart_items && cartList.data?.cart_items.length > 0 ? (
           <>
             {loading && <CustomLoader />}
-
             <ScrollView
               scrollEnabled={true}
               showsVerticalScrollIndicator={false}>
-              {cartData.data.cart_items?.map((item, index) => {
+              {cartList?.data?.cart_items?.map((item, index) => {
                 return (
                   <View key={index} style={styles.orders_container}>
                     <View style={styles.container}>
