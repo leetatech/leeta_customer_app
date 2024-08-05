@@ -248,6 +248,18 @@ const OrderConfirmation: FC<IProps> = ({navigation}) => {
     const formattedTotalAmount = `₦${totalAmount?.toFixed(2)}`;
     return formattedTotalAmount;
   };
+
+  const getOrderSummary = () => {
+    const totalCartAmount =
+    cartList?.data?.cart_items.reduce((total, item) => {
+        return total + item.cost;
+      }, 0) || 0;
+    const deliveryFee = userDeliveryFee || 0;
+    const serviceFee = serviceFeePerOrder || 0;
+    const total = totalCartAmount + deliveryFee + serviceFee;
+    setOrderSummary(total);
+  };
+
   const listCart = () => {
     const payload = {
       paging: {
@@ -380,6 +392,8 @@ const OrderConfirmation: FC<IProps> = ({navigation}) => {
   };
 
   const handleCheckout = async () => {
+
+    if (!cartList?.data?.id || !userLga || !userState) return;
     const cartId = cartList?.data?.id;
     const payload = {
       cart_id: cartId as string,

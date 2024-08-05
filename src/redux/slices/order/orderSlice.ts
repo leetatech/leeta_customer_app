@@ -96,13 +96,17 @@ export const orderSlice = createSlice({
       state.userCart?.push(action.payload);
     },
     updateCart: (state, action) => {
-      const {payload: itemId} = action;
-      if (!state.cartData?.data?.cart_items) {
+      const payload = action.payload;
+      if (!state.cartList?.data?.cart_items) {
         return;
       }
-      state.cartData.data.cart_items = state.cartData.data.cart_items.filter(
-        item => item.id !== itemId,
-      );
+      if (typeof payload === 'object' && payload.data) {
+        state.cartList.data.cart_items = payload.data.cart_items;
+      } else if (typeof payload === 'string') {
+        state.cartList.data.cart_items = state.cartList.data.cart_items.filter(
+          item => item.id.toString() !== payload,
+        );
+      }
     },
     setCartItemId: (state, action) => {
       state.cartItemId = action.payload;
