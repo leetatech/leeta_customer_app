@@ -1,4 +1,4 @@
-import React, {FC, useMemo, useRef, useState} from 'react';
+import React, {FC, useEffect, useMemo, useRef, useState} from 'react';
 import {TouchableOpacity, View} from 'react-native';
 import {Modalize} from 'react-native-modalize';
 import FormMainContainer from '../../Components/FormMainContainer/FormMainContainer';
@@ -13,8 +13,6 @@ import Fonts from '../../Constants/Fonts';
 import {TouchableWithoutFeedback, Keyboard} from 'react-native';
 import {ScrollView} from 'react-native-gesture-handler';
 import {
-  DeliveryFeeData,
-  deliveryFee,
   getState,
 } from '../../redux/slices/order/orderServices';
 import {useDispatch, useSelector} from 'react-redux';
@@ -22,12 +20,16 @@ import {DOWN_ARROW} from '../../Assets';
 import {StateResponse} from '../../redux/slices/order/types';
 import {RootState} from '../../redux/rootReducer';
 import {
-  setUserDeliveryInformation,
-  updateUserDeliveryFee,
   updateUserLga,
   updateUserState,
 } from '../../redux/slices/order/orderSlice';
 import CustomLoader from '../../Components/Loader/CustomLoader';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import {
+  UpdateUserData,
+  updateUserData,
+} from '../../redux/slices/auth/userServices';
+import CustomToast from '../../Components/Toast/CustomToast';
 
 interface IProps {
   navigation: NavigationProp<ParamListBase>;
@@ -37,11 +39,13 @@ const AddAddress: FC<IProps> = ({navigation}) => {
   const styles = useMemo(() => createStyles(), []);
   const {states} = useSelector((state: RootState) => state.order);
   const [checked, setChecked] = useState(true);
-  const [name, setName] = useState('');
+  const [firstName, setFirstName] = useState('');
+  const [lastName, setLastName] = useState('');
   const [mobile, setMobile] = useState('');
   const [address, setAddress] = useState('');
   const [userState, setUserState] = useState('');
   const [userLga, setUserLga] = useState('');
+  const [userEmail, setUserEmail] = useState('');
   const [moreInfo, setMoreInfo] = useState('');
   const [screenTitle, setScreenTitle] = useState('Delivery Details');
   const [allDataGotten, setAllDataGotten] = useState<string[]>([]);
@@ -51,6 +55,9 @@ const AddAddress: FC<IProps> = ({navigation}) => {
   const [highlightedIndex, setHighlightedIndex] = useState<string | null>(null);
   const [pressedIndex, setPressedIndex] = useState<number | null>(null);
   const modalizeRef = useRef<Modalize>(null);
+  const [showMsg, setShowMsg] = useState(false);
+  const [msg, setMsg] = useState('');
+
   const dispatch = useDispatch();
 
   const focusedInputRef = useRef<string | null>(null);
@@ -131,87 +138,119 @@ const AddAddress: FC<IProps> = ({navigation}) => {
   };
 
   const updateDeliveryDetails = () => {
-    const deliveryInfoPayload = {
-      contactName: name,
-      phoneNumber: mobile,
-      address: address,
-      userState: userState,
-      userLga: userLga,
-      additionalInfo: moreInfo,
-      isDefault: checked,
-    };
-    dispatch(setUserDeliveryInformation(deliveryInfoPayload));
     setLoading(true);
     setTimeout(() => {
       setLoading(false);
-      getDeliveryFee();
-      navigation.navigate('OrderConfirmation');
+      updateUserInformation();
     }, 2000);
   };
 
-  const getDeliveryFee = async () => {
-    if (!userLga) {
-      console.error('userLga is not available');
-      return;
-    }
-    const payload: DeliveryFeeData = {
-      filter: {
-        fields: [
-          {
-            name: 'fee_type',
-            operator: 'isEqualTo',
-            value: 'DELIVERY_FEE',
+  const updateUserInformation = async () => {
+    const payload: UpdateUserData = {
+      address: [
+        {
+          address_type: 'customer_resident_address',
+          city: '',
+          closest_landmark: '',
+          coordinate: {
+            latitude: 0,
+            longitude: 0,
           },
-          {
-            name: 'lga',
-            operator: 'isEqualTo',
-            value: userLga!,
-          },
-        ],
-        operator: 'and',
+          default_delivery_address: true,
+          full_address: address,
+          lga: userLga,
+          state: userState,
+          verified: true,
+        },
+      ],
+      dob: '',
+      email: {
+        address: userEmail,
+        verified: true,
       },
-      paging: {
-        index: 0,
-        size: 1,
+      first_name: firstName,
+      has_pin: true,
+      id: '',
+      is_blocked: true,
+      is_blocked_reason: '',
+      last_name: lastName,
+      phone: {
+        number: mobile,
+        primary: true,
+        verified: true,
       },
+      pin_blocked: true,
+      status: 'SIGNEDUP',
     };
-    dispatch(deliveryFee(payload))
+    dispatch(updateUserData(payload))
       .then(response => {
         const result = response.payload as any;
-
         if (response && result) {
-          const feeItem = result.data as any;
-          const generateDeliveryFee = feeItem.data!.find(
-            (item: {fee_type: string}) => item.fee_type === 'DELIVERY_FEE',
-          );
-          if (generateDeliveryFee) {
-            const deliveryFee = generateDeliveryFee.cost.cost_per_type;
-            dispatch(updateUserDeliveryFee(deliveryFee));
-          } else {
-            return null;
-          }
+          setMsg(result.data.message);
+          setShowMsg(true);
+          setTimeout(() => {
+            setShowMsg(false);
+            navigation.navigate('OrderConfirmation');
+          }, 2000);
+        } else {
+          return null;
         }
       })
       .catch(error => {
-        console.error('Error getting delivery fees', error);
+        console.error('Error updating user data', error);
       });
   };
+
+  const fetchUserAddress = async () => {
+    try {
+      const jsonValue = await AsyncStorage.getItem('userAddress');
+      const retrievedUserInfoormation =
+        jsonValue != null ? JSON.parse(jsonValue) : null;
+      if (retrievedUserInfoormation) {
+        setFirstName(retrievedUserInfoormation.first_name);
+        setLastName(retrievedUserInfoormation.last_name);
+        const lastIndex = retrievedUserInfoormation.address.length - 1;
+        setAddress(retrievedUserInfoormation.address[lastIndex]?.full_address);
+        setUserState(retrievedUserInfoormation.address[lastIndex]?.state);
+        setUserLga(retrievedUserInfoormation.address[lastIndex]?.lga);
+        setMobile(retrievedUserInfoormation?.phone.number);
+        setUserEmail(retrievedUserInfoormation?.email.address);
+      } else {
+        console.error('Unexpected data structure:', retrievedUserInfoormation);
+      }
+    } catch (error) {
+      console.error('Error retrieving data', error);
+    }
+  };
+  useEffect(() => {
+    fetchUserAddress();
+  }, []);
 
   return (
     <>
       <FormMainContainer>
+        <ScreenTitle screenTitle={screenTitle} onPress={navigation.goBack} />
         <ScrollView scrollEnabled={true} showsVerticalScrollIndicator={false}>
-          <ScreenTitle screenTitle={screenTitle} onPress={navigation.goBack} />
           <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
             <View>
               {loading && <CustomLoader />}
               <StyledTextInput
-                placeholder="Contact Name"
-                name="contact Name"
-                value={name}
-                onChangeText={newName => setName(newName)}
-                onBlur={() => handleScreenTitle('contact Name', false)}
-                onFocus={() => handleScreenTitle('contact Name', true)}
+                placeholder="First Name"
+                name="First Name"
+                value={firstName}
+                onChangeText={newFirstName => setFirstName(newFirstName)}
+                onBlur={() => handleScreenTitle('First Name', false)}
+                onFocus={() => handleScreenTitle('First Name', true)}
+                style={{color: colors.DGRAY, fontWeight: '500', fontSize: 17}}
+                onFocusStyle={{borderColor: colors.ORANGE}}
+              />
+              <StyledTextInput
+                placeholder="Last Name"
+                name="Last Name"
+                value={lastName}
+                onChangeText={newLastName => setLastName(newLastName)}
+                onBlur={() => handleScreenTitle('Last Name', false)}
+                onFocus={() => handleScreenTitle('Last Name', true)}
                 style={{color: colors.DGRAY, fontWeight: '500', fontSize: 17}}
                 onFocusStyle={{borderColor: colors.ORANGE}}
               />
@@ -290,7 +329,14 @@ const AddAddress: FC<IProps> = ({navigation}) => {
           <View style={styles.button_container}>
             <Buttons
               title="Continue"
-              disabled={!name || !mobile || !address || !userLga || !userState}
+              disabled={
+                !firstName ||
+                !lastName ||
+                !mobile ||
+                !address ||
+                !userLga ||
+                !userState
+              }
               buttonStyle={undefined}
               textStyle={undefined}
               onPress={updateDeliveryDetails}
@@ -341,6 +387,7 @@ const AddAddress: FC<IProps> = ({navigation}) => {
           ))}
         </View>
       </Modalize>
+      {showMsg && <CustomToast>{msg}</CustomToast>}
     </>
   );
 };

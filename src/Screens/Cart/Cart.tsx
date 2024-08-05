@@ -131,48 +131,6 @@ const Cart: FC<IProps> = ({navigation}) => {
     return formattedTotalAmount;
   };
 
-  const getServiceFee = () => {
-    const payload = {
-      filter: {
-        fields: [
-          {
-            name: 'fee_type',
-            operator: 'isEqualTo',
-            value: 'SERVICE_FEE',
-          },
-        ],
-        operator: 'and',
-      },
-      paging: {
-        index: 0,
-        size: 10,
-      },
-    };
-    dispatch(serviceFee(payload))
-      .then(response => {
-        const result = response.payload as FeesResponse;
-        if (response && result && result.data) {
-          const feeItem = result.data as FeesResponse;
-          const serviceFee = feeItem.data!.find(
-            item => item.fee_type === 'SERVICE_FEE',
-          );
-          if (serviceFee) {
-            const costPerType = serviceFee.cost.cost_per_type;
-            dispatch(setServiceFee(costPerType));
-          } else {
-            return null;
-          }
-        }
-      })
-      .catch(error => {
-        console.error('Error getting service:', error);
-      });
-  };
-
-  useEffect(() => {
-    getServiceFee();
-  }, []);
-
   return (
     <>
       <FormMainContainer>
