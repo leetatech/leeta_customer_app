@@ -1,6 +1,12 @@
-import React, {FC, useEffect, useMemo, useRef, useState} from 'react';
+import React, {
+  FC,
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
 import {Animated, TouchableOpacity, View, Image, Easing} from 'react-native';
-import {NavigationProp, ParamListBase} from '@react-navigation/native';
 import {ScrollView} from 'react-native-gesture-handler';
 import createStyles from './styles';
 import ScreenTitle from '../../Components/ScreenTitle/ScreenTitle';
@@ -18,60 +24,68 @@ import Buttons from '../../Components/Buttons/Buttons';
 import CustomModal from '../../Components/Modal/CustomModal';
 import {useDispatch, useSelector} from 'react-redux';
 import {RootState} from '../../redux/rootReducer';
-import {CartItemResponsePayload} from '../../redux/slices/order/types';
 import {
+  CartItemResponsePayload,
+  FeesResponse,
+} from '../../redux/slices/order/types';
+import {
+  DeliveryFeeData,
+  deliveryFee,
+  serviceFee,
   triggerCartList,
   triggerCheckout,
 } from '../../redux/slices/order/orderServices';
 import CustomLoader from '../../Components/Loader/CustomLoader';
-import {setUserCartId} from '../../redux/slices/order/orderSlice';
+import {
+  setServiceFee,
+  setUserCartId,
+  updateUserDeliveryFee,
+} from '../../redux/slices/order/orderSlice';
 import {ADD} from '../../Assets';
-import {capitalizeFirstLetter} from '../../utils';
 import CustomToast from '../../Components/Toast/CustomToast';
 import Fontisto from 'react-native-vector-icons/Fontisto';
 import LottieView from 'lottie-react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import {triggerGetUserData} from '../../redux/slices/auth/userServices';
+import {capitalizeFirstLetter} from '../../utils';
+import {IProps, Order, Payment, UserDataType} from './propTypes';
+import {useFocusEffect} from '@react-navigation/native';
+import { UserDataResponse } from '../../redux/slices/auth/type';
 
-interface IProps {
-  navigation: NavigationProp<ParamListBase>;
-  deliveryCost?: number | null;
-}
-interface Order {
-  cartList: CartItemResponsePayload;
-  sumAllOrders: () => string;
-  serviceFeePerOrder: number;
-  deliveryFeePerOrder: number;
-}
-interface Payment {
-  pyamentMethod?: boolean;
-  onPress?: () => void;
-}
-
-const RenderDeliveryAddress: FC<IProps> = ({navigation, deliveryCost}) => {
+const RenderDeliveryAddress: FC<IProps> = ({
+  navigation,
+  fullName,
+  address,
+  state,
+  phone,
+}) => {
   const styles = useMemo(() => createStyles(), []);
-  const {userDeliveryInformation} = useSelector(
-    (state: RootState) => state.order,
-  );
+  const [userData, setUserData] = useState(null);
+  useEffect(() => {
+    const fetchUserData = async () => {
+      try {
+        const jsonValue = await AsyncStorage.getItem('userInformation');
+        setUserData(jsonValue != null ? JSON.parse(jsonValue) : null);
+      } catch (error) {
+        console.error('Error retrieving data', error);
+      }
+    };
+    fetchUserData();
+  }, []);
   return (
     <View style={styles.card_style}>
       <Fonts type="boldLightGray">Delivery Address</Fonts>
-      {deliveryCost ? (
+      {userData ? (
         <View style={styles.payment_container}>
           <View style={styles.checkbox_container}>
             <LOCATION_ICON />
             <View style={styles.address}>
-              <Fonts type="boldBlack">
-                {userDeliveryInformation.contactName}
-              </Fonts>
+              <Fonts type="boldBlack">{fullName}</Fonts>
+              <Fonts type="normalGrayText">{address}</Fonts>
               <Fonts type="normalGrayText">
-                {userDeliveryInformation.address}
+                {capitalizeFirstLetter(state!)} Nigeria
               </Fonts>
-              <Fonts type="normalGrayText">
-                {capitalizeFirstLetter(userDeliveryInformation.userState)}{' '}
-                Nigeria
-              </Fonts>
-              <Fonts type="normalGrayText">
-                {userDeliveryInformation.phoneNumber}
-              </Fonts>
+              <Fonts type="normalGrayText">{phone}</Fonts>
             </View>
           </View>
           <TouchableOpacity onPress={() => navigation.navigate('AddAddress')}>
@@ -182,21 +196,29 @@ const OrderConfirmation: FC<IProps> = ({navigation}) => {
   const [viewReceipt, setViewReceipt] = useState(false);
   const [orderSummary, setOrderSummary] = useState<number>(0);
   const {
-    cartData,
     cartList,
     userLga,
     userState,
     userDeliveryFee,
-    userDeliveryInformation,
     loading,
     serviceFeePerOrder,
   } = useSelector((state: RootState) => state.order);
   const [errorMsg, setErrorMsg] = useState('');
   const [showErrorMsg, setShowErrorMsg] = useState(false);
+  const [orderServiceFee, setOrderServiceFee] = useState(0);
+  const [orderDeliveryFee, setOrderDeliveryFee] = useState(0);
   const dispatch = useDispatch();
   const rotateValue = useRef(new Animated.Value(0)).current;
   const [selectPaymentMethod, setSelectPaymentMethod] = useState(false);
   const [noPaymentMethod, setNoPaymentMethod] = useState(false);
+  const [retrieveUserData, setRetrieveUserData] = useState<UserDataType>({
+    fullName: '',
+    address: '',
+    state: '',
+    phone: '',
+    email:'',
+    lga: '',
+  });
 
   const startRotation = () => {
     Animated.loop(
@@ -262,7 +284,98 @@ const OrderConfirmation: FC<IProps> = ({navigation}) => {
     dispatch(setUserCartId(cartId));
     return cartId;
   };
-
+  const getServiceFee = () => {
+    const payload = {
+      filter: {
+        fields: [
+          {
+            name: 'fee_type',
+            operator: 'isEqualTo',
+            value: 'SERVICE_FEE',
+          },
+        ],
+        operator: 'and',
+      },
+      paging: {
+        index: 0,
+        size: 10,
+      },
+    };
+    dispatch(serviceFee(payload))
+      .then(response => {
+        const result = response.payload as FeesResponse;
+        if (response && result && result.data) {
+          const feeItem = result.data as FeesResponse;
+          const serviceFee = feeItem.data!.find(
+            item => item.fee_type === 'SERVICE_FEE',
+          );
+          if (serviceFee) {
+            const costPerType = serviceFee.cost.cost_per_type;
+            setOrderServiceFee(costPerType);
+            dispatch(setServiceFee(costPerType));
+          } else {
+            return null;
+          }
+        }
+      })
+      .catch(error => {
+        console.error('Error getting service:', error);
+      });
+  };
+  const getDeliveryFee = async () => {
+    if (!retrieveUserData.lga) return;
+    const payload: DeliveryFeeData = {
+      filter: {
+        fields: [
+          {
+            name: 'fee_type',
+            operator: 'isEqualTo',
+            value: 'DELIVERY_FEE',
+          },
+          {
+            name: 'lga',
+            operator: 'isEqualTo',
+            value: retrieveUserData.lga!,
+          },
+        ],
+        operator: 'and',
+      },
+      paging: {
+        index: 0,
+        size: 1,
+      },
+    };
+    dispatch(deliveryFee(payload))
+      .then(response => {
+        const result = response.payload as any;
+        if (response && result) {
+          const feeItem = result.data as any;
+          const generateDeliveryFee = feeItem.data!.find(
+            (item: {fee_type: string}) => item.fee_type === 'DELIVERY_FEE',
+          );
+          if (generateDeliveryFee) {
+            const deliveryFee = generateDeliveryFee.cost.cost_per_type;
+            setOrderDeliveryFee(deliveryFee);
+            dispatch(updateUserDeliveryFee(deliveryFee));
+          } else {
+            return null;
+          }
+        }
+      })
+      .catch(error => {
+        console.error('Error getting delivery fees', error);
+      });
+  };
+  const getOrderSummary = useCallback(() => {
+    const totalCartAmount =
+      cartList?.data?.cart_items.reduce((total, item) => {
+        return total + item.cost;
+      }, 0) || 0;
+    const deliveryFee = orderDeliveryFee;
+    const serviceFee = orderServiceFee;
+    const total = totalCartAmount + deliveryFee + serviceFee;
+    setOrderSummary(total);
+  }, [cartList, orderDeliveryFee, orderServiceFee]);
   const handleShowModal = () => {
     if (!selectPaymentMethod) {
       setNoPaymentMethod(true);
@@ -279,6 +392,7 @@ const OrderConfirmation: FC<IProps> = ({navigation}) => {
   };
 
   const handleCheckout = async () => {
+
     if (!cartList?.data?.id || !userLga || !userState) return;
     const cartId = cartList?.data?.id;
     const payload = {
@@ -291,14 +405,14 @@ const OrderConfirmation: FC<IProps> = ({navigation}) => {
             latitude: 0,
             longitude: 0,
           },
-          full_address: '',
+          full_address: retrieveUserData.address!,
           lga: userLga as string,
           state: userState as string,
           verified: true,
         },
-        email: '',
-        name: userDeliveryInformation.contactName,
-        phone: userDeliveryInformation.phoneNumber,
+        email: retrieveUserData.email!,
+        name: retrieveUserData.fullName!,
+        phone: retrieveUserData.phone!,
       },
       delivery_fee: userDeliveryFee!,
       payment_method: 'Pay on delivery',
@@ -343,25 +457,64 @@ const OrderConfirmation: FC<IProps> = ({navigation}) => {
     setSelectPaymentMethod(!selectPaymentMethod);
   };
 
+  const getUserData = () => {
+    dispatch(triggerGetUserData())
+      .then(response => {
+        const result = response.payload as UserDataResponse;
+        if (response && result && result.data) {
+          const lastIndex = result.data.address.length - 1;
+          const fullAddress = result.data.address[lastIndex]?.full_address;
+          const state = result.data.address[lastIndex]?.state;
+          const userEmail = result?.data.email.address;
+          const fullName = `${result?.data.first_name} ${result?.data.last_name}`;
+          const getUserLga = result.data.address[lastIndex]?.lga;
+          setRetrieveUserData({
+            fullName: fullName,
+            address: fullAddress,
+            state: state,
+            phone: result?.data.phone.number,
+            email: userEmail,
+            lga: getUserLga,
+          });
+        } else {
+          return null;
+        }
+      })
+      .catch(error => {
+        console.error('Error getting states:', error);
+      });
+  };
+
   useEffect(() => {
     startRotation();
   }, []);
+  useFocusEffect(
+    useCallback(() => {
+      getUserData();
+      getServiceFee();
+    }, []),
+  );
+  useEffect(() => {
+    getDeliveryFee();
+  }, [retrieveUserData.lga]);
 
   useEffect(() => {
     listCart();
     getCartid();
-    getOrderSummary();
-  }, [userDeliveryFee, serviceFeePerOrder]);
+    if (orderDeliveryFee && orderServiceFee) {
+      getOrderSummary();
+    }
+  }, [orderDeliveryFee, orderServiceFee]);
 
   return (
     <>
       <FormMainContainer>
+        <ScreenTitle
+          screenTitle="ORDER CONFIRMATION"
+          onPress={navigation!.goBack}
+        />
         <ScrollView scrollEnabled={true} showsVerticalScrollIndicator={false}>
           <View style={styles.main_container}>
-            <ScreenTitle
-              screenTitle="ORDER CONFIRMATION"
-              onPress={navigation!.goBack}
-            />
             <View>
               <RenderPaymentMethod
                 onPress={selctedPaymentMethod}
@@ -370,6 +523,10 @@ const OrderConfirmation: FC<IProps> = ({navigation}) => {
               <RenderDeliveryAddress
                 navigation={navigation}
                 deliveryCost={userDeliveryFee}
+                fullName={retrieveUserData.fullName}
+                address={retrieveUserData.address}
+                state={retrieveUserData.state}
+                phone={retrieveUserData.phone}
               />
               <Fonts type="boldLightGray" style={{paddingTop: 15}}>
                 Your Cart
@@ -377,8 +534,8 @@ const OrderConfirmation: FC<IProps> = ({navigation}) => {
               <RenderOrder
                 cartList={cartList}
                 sumAllOrders={sumAllOrders}
-                serviceFeePerOrder={serviceFeePerOrder!}
-                deliveryFeePerOrder={userDeliveryFee!}
+                serviceFeePerOrder={orderServiceFee}
+                deliveryFeePerOrder={orderDeliveryFee}
               />
               {loading && <CustomLoader />}
               {loader && <CustomLoader />}
@@ -404,14 +561,14 @@ const OrderConfirmation: FC<IProps> = ({navigation}) => {
               <View style={styles.action}>
                 <Fonts type="boldBlack"> Total</Fonts>
                 <Fonts type="boldBlack">
-                  {userDeliveryFee || serviceFeePerOrder
+                  {orderDeliveryFee || orderServiceFee
                     ? orderSummary
-                    : sumAllOrders()}
+                    : 'calculating...'}
                 </Fonts>
               </View>
               <Buttons
                 title="Checkout"
-                disabled={!userLga || !serviceFeePerOrder}
+                disabled={!orderSummary}
                 textStyle={undefined}
                 buttonStyle={undefined}
                 onPress={handleShowModal}

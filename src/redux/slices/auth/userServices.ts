@@ -3,7 +3,7 @@ import axios from 'axios';
 import {apiUrl} from '../../../config';
 import {apiCall} from '../../../utils';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-
+import { UserDataResponse } from './type';
 
 export interface UserData {
   full_name: string;
@@ -33,6 +33,40 @@ export interface ResetPasswordData {
 export interface ResendOtpData {
   email: string;
 }
+export interface UpdateUserData {
+  address: {
+    address_type: string;
+    city: string;
+    closest_landmark: string;
+    coordinate: {
+      latitude: number;
+      longitude: number;
+    };
+    default_delivery_address: boolean;
+    full_address: string;
+    lga: string;
+    state: string;
+    verified: boolean;
+  }[];
+  dob: string;
+  email: {
+    address: string;
+    verified: boolean;
+  };
+  first_name: string;
+  has_pin: boolean;
+  id: string;
+  is_blocked: boolean;
+  is_blocked_reason: string;
+  last_name: string;
+  phone: {
+    number: string;
+    primary: boolean;
+    verified: boolean;
+  };
+  pin_blocked: boolean;
+  status: string;
+}
 
 export const signup = createAsyncThunk(
   'user/signup',
@@ -43,8 +77,8 @@ export const signup = createAsyncThunk(
       const response: any = await apiCall(url, method, userDetails);
       if (response.data !== undefined) {
         await AsyncStorage.setItem('userToken', response.data.auth_token);
-      }else{
-        console.log("token undefined")
+      } else {
+        return null;
       }
       return response as Record<string, Record<string, string> | string>;
     } catch (error) {
@@ -72,7 +106,6 @@ export const verifyOtp = createAsyncThunk(
       };
       const response = await apiCall(url, method, verifyUser, headers);
       return response as Record<string, Record<string, string> | string>;
-
     } catch (error) {
       if (axios.isAxiosError(error)) {
         return rejectWithValue(error.response?.data);
@@ -89,13 +122,17 @@ export const login = createAsyncThunk(
   'user/login',
   async (loginDetails: loginUserData, {rejectWithValue}) => {
     try {
-      const url = apiUrl.logIn
+      const url = apiUrl.logIn;
       const method = 'post';
       const response: any = await apiCall(url, method, loginDetails);
       if (response.data !== undefined) {
         await AsyncStorage.setItem('userToken', response.data.auth_token);
-      }else{
-        console.log("token undefined")
+        await AsyncStorage.setItem(
+          'userInformation',
+          JSON.stringify(response.data),
+        );
+      } else {
+        return null;
       }
       return response as Record<string, Record<string, string> | string>;
     } catch (error) {
@@ -115,7 +152,7 @@ export const forgotPassword = createAsyncThunk(
   'user/forgotPassword',
   async (forgotPasswordDetails: ForgotPasswordData, {rejectWithValue}) => {
     try {
-      const url = apiUrl.forgotPassword
+      const url = apiUrl.forgotPassword;
       const method = 'post';
       const response: any = await apiCall(url, method, forgotPasswordDetails);
       return response as Record<string, Record<string, string> | string>;
@@ -157,7 +194,7 @@ export const resendOtp = createAsyncThunk(
   'user/resendOtp',
   async (resendOtpDetails: ResendOtpData, {rejectWithValue}) => {
     try {
-      const url = apiUrl.resendOtp
+      const url = apiUrl.resendOtp;
       const method = 'post';
       const response: any = await apiCall(url, method, resendOtpDetails);
       return response as Record<string, Record<string, string> | string>;
@@ -171,5 +208,66 @@ export const resendOtp = createAsyncThunk(
       }
     }
   },
+);
 
+//Get user data
+export const triggerGetUserData = createAsyncThunk(
+  'user/getUserData',
+  async (_, {rejectWithValue}) => {
+    try {
+      const url = apiUrl.user;
+      const method = 'get';
+      const token = await AsyncStorage.getItem('userToken');
+      const headers = {
+        Authorization: `Bearer ${token}`,
+      };
+      const response: any = await apiCall(url, method, undefined, headers);
+      if (response.data !== undefined) {
+        await AsyncStorage.setItem(
+          'userAddress',
+          JSON.stringify(response.data),
+        );
+      } else {
+        return null;
+      }
+      return response as  UserDataResponse
+    } catch (error) {
+      if (axios.isAxiosError(error)) {
+        return rejectWithValue(error.response?.data);
+      } else if (error instanceof Error) {
+        return rejectWithValue(error.message);
+      } else {
+        throw error;
+      }
+    }
+  },
+);
+//update user data
+export const updateUserData = createAsyncThunk(
+  'user/updateUserData',
+  async (userDataDetails: UpdateUserData, {rejectWithValue}) => {
+    try {
+      const url = apiUrl.user;
+      const method = 'put';
+      const token = await AsyncStorage.getItem('userToken');
+      const headers = {
+        Authorization: `Bearer ${token}`,
+      };
+      const response = await apiCall(
+        url,
+        method,
+        userDataDetails,
+        headers,
+      );
+      return response as Record<string, Record<string, string> | string>;
+    } catch (error) {
+      if (axios.isAxiosError(error)) {
+        return rejectWithValue(error.response?.data);
+      } else if (error instanceof Error) {
+        return rejectWithValue(error.message);
+      } else {
+        throw error;
+      }
+    }
+  },
 );

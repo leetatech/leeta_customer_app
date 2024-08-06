@@ -1,6 +1,15 @@
 import {PayloadAction, createSlice} from '@reduxjs/toolkit';
-import {forgotPassword, login, resendOtp, resetPassword, signup, verifyOtp} from './userServices';
-
+import {
+  forgotPassword,
+  login,
+  resendOtp,
+  resetPassword,
+  signup,
+  triggerGetUserData,
+  updateUserData,
+  verifyOtp,
+} from './userServices';
+import { UserDataResponse } from './type';
 
 interface UserState {
   userData: Record<string, string>;
@@ -9,7 +18,9 @@ interface UserState {
   errorCode?: number;
   message?: string;
   userEmail?: string | null;
-  userFullName?:string | null,
+  userFullName?: string | null;
+  updateUserInformation?: Record<string, string>;
+  retrieveUserInformation?: UserDataResponse
 }
 
 const initialState: UserState = {
@@ -20,6 +31,8 @@ const initialState: UserState = {
   userEmail: null,
   userFullName: null,
   errorCode: 0,
+  updateUserInformation: {},
+  retrieveUserInformation: {},
 };
 export const userSlice = createSlice({
   name: 'user',
@@ -57,7 +70,6 @@ export const userSlice = createSlice({
         state.error = true;
         state.errorCode = action.payload?.data?.error_code || 1;
         state.message = action.payload.data.message;
-
       })
 
       //verify otp slice
@@ -85,14 +97,12 @@ export const userSlice = createSlice({
         state.loading = false;
         state.error = false;
         state.userData = action.payload!.data as Record<string, string>;
-
       })
       .addCase(login.rejected, (state, action: PayloadAction<any>) => {
         state.loading = false;
         state.error = true;
         state.message = action.payload.data.message;
         state.errorCode = action.payload?.data?.error_code || 1;
-
       })
 
       //forgot password
@@ -142,10 +152,45 @@ export const userSlice = createSlice({
         state.loading = false;
         state.error = true;
         state.message = action.payload.data.message;
-      });
+      })
 
+      //GET USER DATA
+      .addCase(triggerGetUserData.pending, state => {
+        state.loading = true;
+        state.error = false;
+      })
+      .addCase(triggerGetUserData.fulfilled, (state, action) => {
+        state.loading = false;
+        state.error = false;
+        state.retrieveUserInformation = action.payload!.data as UserDataResponse
+      })
+      .addCase(
+        triggerGetUserData.rejected,
+        (state, action: PayloadAction<any>) => {
+          state.loading = false;
+          state.error = true;
+          state.message = action.payload.data.message;
+        },
+      )
+
+      //update user information
+      .addCase(updateUserData.pending, state => {
+        state.loading = true;
+        state.error = false;
+      })
+      .addCase(updateUserData.fulfilled, (state, action) => {
+        state.loading = false;
+        state.error = false;
+        state.updateUserInformation = action.payload!.data as Record<string, string>;
+      })
+      .addCase(updateUserData.rejected, (state, action: PayloadAction<any>) => {
+        state.loading = false;
+        state.error = true;
+        state.message = action.payload.data.message;
+      });
   },
 });
 
-export const {setemail, resetUserState, resetUserData,setFullName} = userSlice.actions;
+export const {setemail, resetUserState, resetUserData, setFullName} =
+  userSlice.actions;
 export default userSlice.reducer;

@@ -141,6 +141,7 @@ const Cart: FC<IProps> = ({navigation}) => {
     return formattedTotalAmount;
   };
 
+
   const getServiceFee = () => {
     const payload = {
       filter: {
