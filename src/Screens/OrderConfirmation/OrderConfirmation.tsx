@@ -249,16 +249,6 @@ const OrderConfirmation: FC<IProps> = ({navigation}) => {
     return formattedTotalAmount;
   };
 
-  const getOrderSummary = () => {
-    const totalCartAmount =
-    cartList?.data?.cart_items.reduce((total, item) => {
-        return total + item.cost;
-      }, 0) || 0;
-    const deliveryFee = userDeliveryFee || 0;
-    const serviceFee = serviceFeePerOrder || 0;
-    const total = totalCartAmount + deliveryFee + serviceFee;
-    setOrderSummary(total);
-  };
 
   const listCart = () => {
     const payload = {
