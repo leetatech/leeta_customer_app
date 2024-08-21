@@ -31,7 +31,7 @@ interface Coordinate {
     first_name: string;
     last_name: string;
     email: Email;
-    address: Address[];
+    addresses: Address[];
     phone: Phone;
     dob: string;
     has_pin: boolean;

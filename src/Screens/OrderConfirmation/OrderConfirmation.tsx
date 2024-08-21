@@ -382,8 +382,6 @@ const OrderConfirmation: FC<IProps> = ({navigation}) => {
   };
 
   const handleCheckout = async () => {
-
-    if (!cartList?.data?.id || !userLga || !userState) return;
     const cartId = cartList?.data?.id;
     const payload = {
       cart_id: cartId as string,
@@ -404,9 +402,9 @@ const OrderConfirmation: FC<IProps> = ({navigation}) => {
         name: retrieveUserData.fullName!,
         phone: retrieveUserData.phone!,
       },
-      delivery_fee: userDeliveryFee!,
+      delivery_fee: orderDeliveryFee,
       payment_method: 'Pay on delivery',
-      service_fee: serviceFeePerOrder,
+      service_fee: orderServiceFee,
       total_fee: orderSummary,
     };
     try {
@@ -452,12 +450,12 @@ const OrderConfirmation: FC<IProps> = ({navigation}) => {
       .then(response => {
         const result = response.payload as UserDataResponse;
         if (response && result && result.data) {
-          const lastIndex = result.data.address.length - 1;
-          const fullAddress = result.data.address[lastIndex]?.full_address;
-          const state = result.data.address[lastIndex]?.state;
+          const lastIndex = result.data.addresses.length - 1;
+          const fullAddress = result.data.addresses[lastIndex]?.full_address;
+          const state = result.data.addresses[lastIndex]?.state;
           const userEmail = result?.data.email.address;
           const fullName = `${result?.data.first_name} ${result?.data.last_name}`;
-          const getUserLga = result.data.address[lastIndex]?.lga;
+          const getUserLga = result.data.addresses[lastIndex]?.lga;
           setRetrieveUserData({
             fullName: fullName,
             address: fullAddress,

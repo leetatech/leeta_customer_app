@@ -34,7 +34,7 @@ export interface ResendOtpData {
   email: string;
 }
 export interface UpdateUserData {
-  address: {
+  addresses: {
     address_type: string;
     city: string;
     closest_landmark: string;

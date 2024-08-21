@@ -147,7 +147,7 @@ const AddAddress: FC<IProps> = ({navigation}) => {
 
   const updateUserInformation = async () => {
     const payload: UpdateUserData = {
-      address: [
+      addresses: [
         {
           address_type: 'customer_resident_address',
           city: '',
@@ -209,10 +209,10 @@ const AddAddress: FC<IProps> = ({navigation}) => {
       if (retrievedUserInfoormation) {
         setFirstName(retrievedUserInfoormation.first_name);
         setLastName(retrievedUserInfoormation.last_name);
-        const lastIndex = retrievedUserInfoormation.address.length - 1;
-        setAddress(retrievedUserInfoormation.address[lastIndex]?.full_address);
-        setUserState(retrievedUserInfoormation.address[lastIndex]?.state);
-        setUserLga(retrievedUserInfoormation.address[lastIndex]?.lga);
+        const lastIndex = retrievedUserInfoormation.addresses.length - 1;
+        setAddress(retrievedUserInfoormation.addresses[lastIndex]?.full_address);
+        setUserState(retrievedUserInfoormation.addresses[lastIndex]?.state);
+        setUserLga(retrievedUserInfoormation.addresses[lastIndex]?.lga);
         setMobile(retrievedUserInfoormation?.phone.number);
         setUserEmail(retrievedUserInfoormation?.email.address);
       } else {
@@ -258,7 +258,7 @@ const AddAddress: FC<IProps> = ({navigation}) => {
                 placeholder="Phone Number"
                 name="mobile Number"
                 value={mobile}
-                onChangeText={handleTextChange}
+                onChangeText={newMobile => setMobile(newMobile)}
                 onBlur={handleBlur}
                 onFocus={handleFocus}
                 style={{color: colors.DGRAY, fontWeight: '500', fontSize: 17}}
