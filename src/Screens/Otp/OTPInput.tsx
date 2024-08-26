@@ -63,7 +63,7 @@ const OTPInput: FC<IOTPInputProps> = props => {
         target: userEmail,
       };
       dispatch(verifyOtp(payload))
-        .then(response => {
+        .then((response: { payload: unknown; }) => {
           const result = response.payload as unknown as Record<
             string,
             Record<string, string>
@@ -130,7 +130,7 @@ const OTPInput: FC<IOTPInputProps> = props => {
       email: userEmail!,
     };
     dispatch(resendOtp(payload))
-      .then(response => {
+      .then((response: { payload: unknown; }) => {
         const result = response.payload as unknown as Record<
           string,
           Record<string, string>

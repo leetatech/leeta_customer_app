@@ -4,35 +4,50 @@ import createStyles from './styles';
 import {NavigationProp, ParamListBase} from '@react-navigation/native';
 import {LOGO} from '../../Assets';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import {guestSession} from '../../utils'
 
 interface IProps {
   navigation: NavigationProp<ParamListBase>;
 }
 const InitialScreen: FC<IProps> = ({navigation}) => {
 
-  const checkOnboardingStatus = async () => {
+  // Function to determine the onboarding status and navigate accordingly
+  const navigateBasedOnOnboardingStatus = async () => {
     try {
       const onboardingStatus = await AsyncStorage.getItem('userOnboarding');
-      const routeName =
-        onboardingStatus === 'true' ? 'BottomNavigator' : 'Slider';
+      const routeName = onboardingStatus === 'true' ? 'BottomNavigator' : 'Slider';
+
       navigation.reset({
         index: 0,
-        routes: [{name: routeName}],
+        routes: [{ name: routeName }],
       });
     } catch (error) {
       console.error('Error checking onboarding status:', error);
     }
   };
 
+  // Set up effect to handle user status on component mount
   useEffect(() => {
     const handleUserStatus = async () => {
-      let onboardingStatus = await AsyncStorage.getItem('userOnboarding');
-      console.log(`onboarding status: ${onboardingStatus});`);
-      if (!onboardingStatus) {
-        await AsyncStorage.setItem('userOnboarding', 'false');
+      try {
+        let onboardingStatus = await AsyncStorage.getItem('userOnboarding');
+        if (!onboardingStatus) {
+          await AsyncStorage.setItem('userOnboarding', 'false');
+          onboardingStatus = 'false';
+        }
+
+        console.log(`Onboarding status: ${onboardingStatus}`);
+
+        // Call refreshSession if needed
+        await guestSession();
+
+        // Delayed navigation to simulate a splash screen or initial loading
+        setTimeout(navigateBasedOnOnboardingStatus, 2000);
+      } catch (error) {
+        console.error('Error handling user status:', error);
       }
-      setTimeout(checkOnboardingStatus, 2000);
     };
+
     handleUserStatus();
   }, []);
 
