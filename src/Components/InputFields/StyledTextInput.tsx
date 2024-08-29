@@ -36,18 +36,17 @@ const StyledTextInput: FC<InputProps> = ({
     }
   };
   return (
-    <View>
+    <View style={styles.container}>
       <Text style={styles.label}>{label}</Text>
-      <View style={[styles.input, inputStyle, isFocused && onFocusStyle]}>
+      <View style={[styles.inputContainer, inputStyle, isFocused && onFocusStyle]}>
         {icon}
         <TextInput
           onFocus={handleFocus}
           onBlur={handleBlur}
           placeholderTextColor={colors.LGRAY}
-          style={defaultValueStyle}
+          style={[styles.textInput, defaultValueStyle]}
           {...props}
         />
-
         {image && (
           <TouchableOpacity onPress={onPress}>
             <Image source={image} />
