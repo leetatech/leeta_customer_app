@@ -469,7 +469,7 @@ const OrderConfirmation: FC<IProps> = ({navigation}) => {
         }
       })
       .catch(error => {
-        console.error('Error getting states:', error);
+        console.error('Error getting user data:', error);
       });
   };
 

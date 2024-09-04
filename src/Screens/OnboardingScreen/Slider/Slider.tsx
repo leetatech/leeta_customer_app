@@ -10,6 +10,7 @@ import {NavigationProp, ParamListBase} from '@react-navigation/native';
 import {TouchableOpacity} from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Fonts from '../../../Constants/Fonts';
+import DeviceInfo from 'react-native-device-info'
 
 interface IProps {
   navigation: NavigationProp<ParamListBase>;
@@ -26,6 +27,9 @@ const Slider: FC<IProps> = ({navigation}) => {
   const handleSkipOnboarding = async (): Promise<void> => {
     try {
       await AsyncStorage.setItem('userOnboarding', 'true');
+      const deviceId = DeviceInfo.getUniqueId();
+      console.log('Device ID:', deviceId);
+      await AsyncStorage.setItem('deviceID', await deviceId);
       navigation.navigate('BottomNavigator');
     } catch (error) {
       console.error('Error saving onboarding status:', error);
@@ -35,6 +39,9 @@ const Slider: FC<IProps> = ({navigation}) => {
   const handleNavigateToSignUp = async (): Promise<void> => {
     try {
       await AsyncStorage.setItem('userOnboarding', 'true');
+      const deviceId = DeviceInfo.getUniqueId();
+      console.log('Device ID:', deviceId);
+      await AsyncStorage.setItem('deviceID', await deviceId);
       navigation.navigate('CreateAccount');
     } catch (error) {
       console.error('Error saving onboarding status:', error);
