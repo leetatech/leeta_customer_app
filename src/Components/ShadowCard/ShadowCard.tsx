@@ -9,7 +9,7 @@ import {
 import createStyles from './styles';
 
 interface IProps {
-  text: string;
+  text?: string;
   imageSrc: ImageSourcePropType;
   alt: string;
   onPress?: () => void;
@@ -20,9 +20,8 @@ const ShadowCard: FC<IProps> = ({text, imageSrc, alt, onPress}) => {
   return (
     <View style={styles.order_card}>
       <View style={styles.img}>
-        <TouchableOpacity onPress={onPress} >
+        <TouchableOpacity onPress={onPress}>
           <Image source={imageSrc} alt={alt} />
-          {/* {imageSrc} */}
         </TouchableOpacity>
       </View>
 

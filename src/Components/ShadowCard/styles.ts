@@ -25,15 +25,15 @@ const createStyles = () =>
     screen_title: {
       fontWeight: 'bold',
       textAlign: 'center',
-      fontSize: 23,
-      paddingTop:10
+      fontSize: 18,
+      marginRight: 10,
+      letterSpacing:0.5
     },
 
     img: {
-      position:'absolute',
-      paddingTop:40,
-      paddingLeft:15
-     
+      position: 'absolute',
+      paddingTop: 50,
+      paddingLeft: 15,
     },
   });
 

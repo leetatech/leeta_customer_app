@@ -5,10 +5,10 @@ import {colors} from '../../Constants/Colors';
 const createStyles = () =>
   StyleSheet.create({
     container: {
-      paddingTop: 60,
+      paddingTop: 50,
       flex: 1,
       paddingVertical: 30,
-      paddingHorizontal: 20,
+      paddingHorizontal: 13,
       backgroundColor: colors.WHITE,
     },
   });

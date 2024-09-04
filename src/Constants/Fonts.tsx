@@ -4,7 +4,7 @@ import createStyles from './style';
 
 interface FontProps {
      style?: StyleProp<TextStyle>;
-     type?: 'boldLightGray' | 'semiBoldBlack' | 'boldBlack' | 'normalGrayText' | 'normalBlackText'| 'normalBoldText'|  'normalText'| 'smallText';
+     type?: 'boldLightGray' | 'semiBoldBlack' | 'boldBlack' | 'normalGrayText' | 'normalBlackText'| 'normalBoldText'|  'normalText'| 'smallText' | 'extraSmallText';
 
      children: React.ReactNode;
 }
@@ -30,6 +30,8 @@ const Fonts: FC<FontProps> = ({style, type = 'normal_gray_text', children }) => 
             return styles.normalText
             case 'normalBoldText' :
             return styles.normalBoldText
+            case 'extraSmallText' :
+              return styles.extra_small_text
 
        default:
          return styles.normalGrayText;
