@@ -1,14 +1,16 @@
-import {Platform, StyleSheet} from 'react-native';
+import {Platform, StyleSheet,Dimensions} from 'react-native';
 import {colors} from '../../Constants/Colors';
+let screenWidth = Dimensions.get('window').width;
 
+const isSmallDevice = screenWidth < 380;
 const createStyles = () =>
   StyleSheet.create({
-    order_card: {
+    nav_card: {
       backgroundColor: colors.WHITE,
-      paddingBottom: 30,
-      paddingTop: 60,
       paddingHorizontal: 15,
-      position: 'relative',
+      flexDirection: 'row',
+      alignItems: 'center',
+      paddingVertical: isSmallDevice ? 20 : 0,
       ...Platform.select({
         ios: {
           shadowColor: colors.LGRAY,
@@ -26,14 +28,9 @@ const createStyles = () =>
       fontWeight: 'bold',
       textAlign: 'center',
       fontSize: 18,
-      marginRight: 10,
-      letterSpacing:0.5
-    },
-
-    img: {
-      position: 'absolute',
-      paddingTop: 50,
-      paddingLeft: 15,
+      marginRight: 40,
+      letterSpacing:0.5,
+      flex: 1, 
     },
   });
 

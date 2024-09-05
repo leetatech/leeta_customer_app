@@ -6,10 +6,9 @@ import createStyles from './style';
 interface IProps {
   screenTitle : string;
   onPress: () => void;
-  titleStyle?:TextStyle,
 }
 
-const ScreenTitle: FC<IProps> = ({onPress, screenTitle,titleStyle}) => {
+const ScreenTitle: FC<IProps> = ({onPress, screenTitle}) => {
   const styles = useMemo(() => createStyles(), []);
 
   return (
@@ -17,7 +16,7 @@ const ScreenTitle: FC<IProps> = ({onPress, screenTitle,titleStyle}) => {
       <TouchableOpacity onPress={onPress}>
         <Image source={LEFT_ARROW} />
       </TouchableOpacity>
-      <Text style={[styles.description,titleStyle]}>{screenTitle}</Text>
+      <Text style={styles.description}>{screenTitle}</Text>
     </View>
   );
 };

@@ -52,7 +52,7 @@ const InitialScreen: FC<IProps> = ({navigation}) => {
     try {
       const onboardingStatus = await AsyncStorage.getItem('userOnboarding');
       const routeName =
-        onboardingStatus === 'true' ? 'BottomNavigator' : 'Slider';
+        onboardingStatus === 'true' ? 'SignIn' : 'Slider';
       navigation.reset({
         index: 0,
         routes: [{name: routeName}],
@@ -65,7 +65,6 @@ const InitialScreen: FC<IProps> = ({navigation}) => {
   useEffect(() => {
     const handleUserStatus = async () => {
       let onboardingStatus = await AsyncStorage.getItem('userOnboarding');
-      console.log(`onboarding status: ${onboardingStatus});`);
       if (!onboardingStatus) {
         await AsyncStorage.setItem('userOnboarding', 'false');
       }

@@ -8,6 +8,7 @@ const createStyles = () =>
       alignItems: 'center',
       paddingTop: 20,
       backgroundColor: colors.WHITE,
+      paddingHorizontal: 15,
     },
     title: {
       fontSize: 20,
@@ -64,8 +65,10 @@ const createStyles = () =>
     modal_container: {
       backgroundColor: colors.WHITE,
       paddingHorizontal: 15,
-      paddingVertical: 15,
+      paddingVertical:15,
       gap: 8,
+      borderTopEndRadius:15,
+      borderTopStartRadius:15
     },
     modal_title: {alignItems: 'center'},
     line_height:{

@@ -4,15 +4,13 @@ import {NavigationProp, ParamListBase} from '@react-navigation/native';
 import createStyles from './styles';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import {colors} from '../../Constants/Colors';
-import FormMainContainer from '../../Components/FormMainContainer/FormMainContainer';
-import {AVATAR, RIGHT_ICON} from '../../Assets/svgImages';
+import {AVATAR, NAVIGATOR, RIGHT_ICON} from '../../Assets/svgImages';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Buttons from '../../Components/Buttons/Buttons';
 import Fonts from '../../Constants/Fonts';
 import Modal from 'react-native-modal';
 import CustomLoader from '../../Components/Loader/CustomLoader';
-import ShadowCard from '../../Components/ShadowCard/ShadowCard';
-import {NAVIGATION_ARROW} from '../../Assets';
+import ShadowNavBar from '../../Components/NavBar/ShadowNavBar';
 
 interface IProps {
   navigation: NavigationProp<ParamListBase>;
@@ -38,7 +36,6 @@ const Settings: FC<IProps> = ({navigation}) => {
         const getUserLastName = checkDetails.body.last_name;
         setFullName(getUserFirstName + ' ' + getUserLastName);
         const getEmail = checkDetails.body.email.address;
-        console.log('****', getEmail);
         setEmail(getEmail);
         if (getUserFirstName !== null) {
           setStatus('Log Out');
@@ -70,39 +67,40 @@ const Settings: FC<IProps> = ({navigation}) => {
   }, []);
   return (
     <React.Fragment>
-      <ShadowCard
+      <ShadowNavBar
         text="Settings"
-        imageSrc={NAVIGATION_ARROW}
-        alt="icon"
         onPress={navigation.goBack}
+        size={34}
+        fill="#EAECF0"
+        pathData="M14.5 21L11 17M11 17L14.5 13M11 17H24"
+        imageSrc={NAVIGATOR}
+     
       />
-      <FormMainContainer>
-        <View style={styles.container}>
-          <TouchableOpacity>
-            <AVATAR />
-          </TouchableOpacity>
-          <View>
-            <Text style={styles.title}>{fullName}</Text>
-            <Text style={styles.description}>{email}</Text>
-          </View>
-          <View style={styles.settings_options_container}>
-            <TouchableOpacity
-              style={styles.logout_container}
-              onPress={() => setConfirmLogout(true)}>
-              <FontAwesome
-                name={status === 'Sign In' ? 'sign-in' : 'sign-out'}
-                size={24}
-                color={status === 'Sign In' ? colors.ORANGE : colors.LIGHT_RED}
-              />
-              <Text style={status === 'Sign In' ? styles.login : styles.logout}>
-                {status}
-              </Text>
-            </TouchableOpacity>
-
-            <RIGHT_ICON />
-          </View>
+      <View style={styles.container}>
+        <TouchableOpacity>
+          <AVATAR />
+        </TouchableOpacity>
+        <View>
+          <Text style={styles.title}>{fullName}</Text>
+          <Text style={styles.description}>{email}</Text>
         </View>
-      </FormMainContainer>
+        <View style={styles.settings_options_container}>
+          <TouchableOpacity
+            style={styles.logout_container}
+            onPress={() => setConfirmLogout(true)}>
+            <FontAwesome
+              name={status === 'Sign In' ? 'sign-in' : 'sign-out'}
+              size={24}
+              color={status === 'Sign In' ? colors.ORANGE : colors.LIGHT_RED}
+            />
+            <Text style={status === 'Sign In' ? styles.login : styles.logout}>
+              {status}
+            </Text>
+          </TouchableOpacity>
+
+          <RIGHT_ICON />
+        </View>
+      </View>
       <Modal
         isVisible={confirmLogout}
         propagateSwipe={true}
