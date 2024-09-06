@@ -1,5 +1,5 @@
 import React, {FC, useMemo} from 'react';
-import {Image, Text, TouchableOpacity, View} from 'react-native';
+import {Image, Text, TouchableOpacity, View,TextStyle,} from 'react-native';
 import {LEFT_ARROW} from '../../Assets';
 import createStyles from './style';
 

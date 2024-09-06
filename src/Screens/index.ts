@@ -12,5 +12,5 @@ export {default as Home} from './Home/Home';
 export {default as Cart} from './Cart/Cart';
 export {default as OrderConfirmation} from './OrderConfirmation/OrderConfirmation';
 export {default as AddAddress} from './AddAddress/AddAddress';
-
+export {default as Settings} from './Seetings/Settings';
 

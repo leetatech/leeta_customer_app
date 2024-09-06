@@ -37,6 +37,11 @@ const createStyles = () =>
         small_text :{
           color:colors.BLACK
         },
+        extra_small_text :{
+          color:colors.SLGRAY,
+          fontSize: 11,
+          fontWeight:'400'
+        },
         normalText :{
           color:colors.DBLACK,
           fontSize: 15,

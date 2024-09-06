@@ -65,7 +65,6 @@ const InitialScreen: FC<IProps> = ({navigation}) => {
   useEffect(() => {
     const handleUserStatus = async () => {
       let onboardingStatus = await AsyncStorage.getItem('userOnboarding');
-      console.log(`onboarding status: ${onboardingStatus});`);
       if (!onboardingStatus) {
         await AsyncStorage.setItem('userOnboarding', 'false');
       }
