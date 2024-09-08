@@ -12,9 +12,7 @@ import Fontisto from 'react-native-vector-icons/Fontisto';
 import Fonts from '../../Constants/Fonts';
 import {TouchableWithoutFeedback, Keyboard} from 'react-native';
 import {ScrollView} from 'react-native-gesture-handler';
-import {
-  getState,
-} from '../../redux/slices/order/orderServices';
+import {getState} from '../../redux/slices/order/orderServices';
 import {useDispatch, useSelector} from 'react-redux';
 import {DOWN_ARROW} from '../../Assets';
 import {StateResponse} from '../../redux/slices/order/types';
@@ -30,6 +28,12 @@ import {
   updateUserData,
 } from '../../redux/slices/auth/userServices';
 import CustomToast from '../../Components/Toast/CustomToast';
+import {
+  GuestData,
+  updateGuestData,
+} from '../../redux/slices/auth/guestServices';
+import DeviceInfo from 'react-native-device-info';
+import useUserType from '../../redux/manageUserType/userType';
 
 interface IProps {
   navigation: NavigationProp<ParamListBase>;
@@ -57,7 +61,7 @@ const AddAddress: FC<IProps> = ({navigation}) => {
   const modalizeRef = useRef<Modalize>(null);
   const [showMsg, setShowMsg] = useState(false);
   const [msg, setMsg] = useState('');
-
+  const userType = useUserType();
   const dispatch = useDispatch();
 
   const focusedInputRef = useRef<string | null>(null);
@@ -67,12 +71,6 @@ const AddAddress: FC<IProps> = ({navigation}) => {
       focusedInputRef.current = inputName;
     } else {
       focusedInputRef.current = null;
-    }
-  };
-
-  const handleTextChange = (newMobile: string) => {
-    if (/^\+234\d*$/.test(newMobile) && newMobile.length <= 14) {
-      setMobile(newMobile);
     }
   };
 
@@ -141,7 +139,11 @@ const AddAddress: FC<IProps> = ({navigation}) => {
     setLoading(true);
     setTimeout(() => {
       setLoading(false);
-      updateUserInformation();
+      if (userType === 'Registered User') {
+        updateUserInformation();
+      } else if (userType === 'Guest User') {
+        updateGuestInformation();
+      }
     }, 2000);
   };
 
@@ -201,6 +203,50 @@ const AddAddress: FC<IProps> = ({navigation}) => {
       });
   };
 
+  const updateGuestInformation = async () => {
+    const deviceId = await DeviceInfo.getUniqueId();
+    console.log('device id:', deviceId);
+    const payload: GuestData = {
+      address: {
+        address_type: 'customer_resident_address',
+        city: userState,
+        closest_landmark: '',
+        coordinate: {
+          latitude: 0,
+          longitude: 0,
+        },
+        default_delivery_address: true,
+        full_address: address,
+        lga: userLga,
+        state: userState,
+        verified: true,
+      },
+      default_delivery_address: true,
+      device_id: 'deviceId',
+      email: '',
+      first_name: firstName,
+      id: '',
+      last_name: lastName,
+      location: {
+        latitude: 0,
+        longitude: 0,
+      },
+      number: mobile,
+    };
+    dispatch(updateGuestData(payload))
+      .then(response => {
+        const result = response.payload as any;
+        if (response && result) {
+          console.log('guest data', result.data.message);
+        } else {
+          return null;
+        }
+      })
+      .catch(error => {
+        console.error('Error updating user data', error);
+      });
+  };
+
   const fetchUserAddress = async () => {
     try {
       const jsonValue = await AsyncStorage.getItem('userAddress');
@@ -210,7 +256,9 @@ const AddAddress: FC<IProps> = ({navigation}) => {
         setFirstName(retrievedUserInfoormation.first_name);
         setLastName(retrievedUserInfoormation.last_name);
         const lastIndex = retrievedUserInfoormation.addresses.length - 1;
-        setAddress(retrievedUserInfoormation.addresses[lastIndex]?.full_address);
+        setAddress(
+          retrievedUserInfoormation.addresses[lastIndex]?.full_address,
+        );
         setUserState(retrievedUserInfoormation.addresses[lastIndex]?.state);
         setUserLga(retrievedUserInfoormation.addresses[lastIndex]?.lga);
         setMobile(retrievedUserInfoormation?.phone.number);
@@ -222,6 +270,7 @@ const AddAddress: FC<IProps> = ({navigation}) => {
       console.error('Error retrieving data', error);
     }
   };
+
   useEffect(() => {
     fetchUserAddress();
   }, []);
@@ -254,6 +303,7 @@ const AddAddress: FC<IProps> = ({navigation}) => {
                 style={{color: colors.DGRAY, fontWeight: '500', fontSize: 17}}
                 onFocusStyle={{borderColor: colors.ORANGE}}
               />
+
               <StyledTextInput
                 placeholder="Phone Number"
                 name="mobile Number"
