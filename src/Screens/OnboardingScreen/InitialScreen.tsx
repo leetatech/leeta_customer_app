@@ -57,7 +57,6 @@ const InitialScreen: FC<IProps> = ({navigation}) => {
       .then(response => {
         const result = response.payload as any
         if (response && result && result.data) {
-         console.log('GUEST DATA',JSON.stringify(result.data,null,2))
         } else {
           return null;
         }
@@ -71,7 +70,7 @@ const InitialScreen: FC<IProps> = ({navigation}) => {
     try {
       const onboardingStatus = await AsyncStorage.getItem('userOnboarding');
       const routeName =
-        onboardingStatus === 'true' ? 'SignIn' : 'Slider';
+        onboardingStatus === 'true' ? 'BottomNavigator' : 'Slider';
       navigation.reset({
         index: 0,
         routes: [{name: routeName}],
