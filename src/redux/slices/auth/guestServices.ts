@@ -63,7 +63,6 @@ export const getGuestData = createAsyncThunk(
   'user/getGuestData',
   async (_, {rejectWithValue}) => {
     const deviceId = await DeviceInfo.getUniqueId();
-    console.log('device id:', deviceId);
     try {
       const url = `${apiUrl.guest}/${deviceId}`;
       const method = 'get';
@@ -80,7 +79,7 @@ export const getGuestData = createAsyncThunk(
       } else {
         return null;
       }
-      return response as any;
+      return response as GuestDataResponse;
     } catch (error) {
       if (axios.isAxiosError(error)) {
         return rejectWithValue(error.response?.data);

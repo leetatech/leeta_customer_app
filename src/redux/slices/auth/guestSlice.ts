@@ -23,7 +23,7 @@ const initialState: GuestState = {
     },
     extraReducers: builder => {
       builder
-      .addCase(updateGuestData.pending, (state, action) => {
+      .addCase(updateGuestData.pending, (state) => {
         state.loading = true;
         state.error = false;
       })

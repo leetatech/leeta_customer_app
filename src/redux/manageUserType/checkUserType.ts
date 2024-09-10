@@ -25,3 +25,9 @@ export const manageUserType = async (): Promise<UserType> => {
     return 'Unknown User Type';
   }
 };
+
+export const user = {
+  guest : 'Guest User',
+  registered : 'Registered User',
+  unknown : 'Unknown User Type'
+}

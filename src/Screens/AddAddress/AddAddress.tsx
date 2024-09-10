@@ -34,6 +34,7 @@ import {
 } from '../../redux/slices/auth/guestServices';
 import DeviceInfo from 'react-native-device-info';
 import useUserType from '../../redux/manageUserType/userType';
+import {user} from '../../redux/manageUserType/checkUserType';
 
 interface IProps {
   navigation: NavigationProp<ParamListBase>;
@@ -139,9 +140,9 @@ const AddAddress: FC<IProps> = ({navigation}) => {
     setLoading(true);
     setTimeout(() => {
       setLoading(false);
-      if (userType === 'Registered User') {
+      if (userType === user.registered) {
         updateUserInformation();
-      } else if (userType === 'Guest User') {
+      } else if (userType === user.guest) {
         updateGuestInformation();
       }
     }, 2000);
@@ -205,7 +206,6 @@ const AddAddress: FC<IProps> = ({navigation}) => {
 
   const updateGuestInformation = async () => {
     const deviceId = await DeviceInfo.getUniqueId();
-    console.log('device id:', deviceId);
     const payload: GuestData = {
       address: {
         address_type: 'customer_resident_address',
@@ -222,7 +222,7 @@ const AddAddress: FC<IProps> = ({navigation}) => {
         verified: true,
       },
       default_delivery_address: true,
-      device_id: 'deviceId',
+      device_id: deviceId,
       email: '',
       first_name: firstName,
       id: '',
@@ -237,7 +237,12 @@ const AddAddress: FC<IProps> = ({navigation}) => {
       .then(response => {
         const result = response.payload as any;
         if (response && result) {
-          console.log('guest data', result.data.message);
+          setMsg(result.data.message);
+          setShowMsg(true);
+          setTimeout(() => {
+            setShowMsg(false);
+            navigation.navigate('OrderConfirmation');
+          }, 2000);
         } else {
           return null;
         }
@@ -272,8 +277,10 @@ const AddAddress: FC<IProps> = ({navigation}) => {
   };
 
   useEffect(() => {
-    fetchUserAddress();
-  }, []);
+    if (userType === user.registered) {
+      fetchUserAddress();
+    }
+  }, [userType]);
 
   return (
     <>
@@ -290,7 +297,6 @@ const AddAddress: FC<IProps> = ({navigation}) => {
                 onChangeText={newFirstName => setFirstName(newFirstName)}
                 onBlur={() => handleScreenTitle('First Name', false)}
                 onFocus={() => handleScreenTitle('First Name', true)}
-                style={{color: colors.DGRAY, fontWeight: '500', fontSize: 17}}
                 onFocusStyle={{borderColor: colors.ORANGE}}
               />
               <StyledTextInput
@@ -300,7 +306,6 @@ const AddAddress: FC<IProps> = ({navigation}) => {
                 onChangeText={newLastName => setLastName(newLastName)}
                 onBlur={() => handleScreenTitle('Last Name', false)}
                 onFocus={() => handleScreenTitle('Last Name', true)}
-                style={{color: colors.DGRAY, fontWeight: '500', fontSize: 17}}
                 onFocusStyle={{borderColor: colors.ORANGE}}
               />
 
@@ -311,7 +316,6 @@ const AddAddress: FC<IProps> = ({navigation}) => {
                 onChangeText={newMobile => setMobile(newMobile)}
                 onBlur={handleBlur}
                 onFocus={handleFocus}
-                style={{color: colors.DGRAY, fontWeight: '500', fontSize: 17}}
                 onFocusStyle={{borderColor: colors.ORANGE}}
               />
               <StyledTextInput
@@ -321,30 +325,32 @@ const AddAddress: FC<IProps> = ({navigation}) => {
                 onChangeText={newAddress => setAddress(newAddress)}
                 onBlur={() => handleScreenTitle('Address', false)}
                 onFocus={() => handleScreenTitle('Address', true)}
-                style={{color: colors.DGRAY, fontWeight: '500', fontSize: 17}}
                 onFocusStyle={{borderColor: colors.ORANGE}}
               />
-              <StyledTextInput
-                placeholder="State"
-                name="State"
-                value={getFormattedState(userState)}
-                onChangeText={newState => setUserState(newState)}
-                onBlur={() => handleScreenTitle('State', false)}
-                onFocus={() => handleScreenTitle('State', true)}
-                style={{color: colors.DGRAY, fontWeight: '500', fontSize: 17}}
-                onFocusStyle={{borderColor: colors.ORANGE}}
-                image={DOWN_ARROW}
-                onPress={getAllState}
-              />
+            
+                  <StyledTextInput
+                    placeholder="State"
+                    name="State"
+                    editable={false}
+                    value={getFormattedState(userState)}
+                    onChangeText={newState => setUserState(newState)}
+                    onBlur={() => handleScreenTitle('State', false)}
+                    onFocus={() => handleScreenTitle('State', true)}
+                    onFocusStyle={{borderColor: colors.ORANGE}}
+                    image={DOWN_ARROW}
+                    onPress={getAllState}
+                  />
+              
+
               {userState && (
                 <StyledTextInput
                   placeholder="LGA"
                   name="lga"
+                  editable={false}
                   value={userLga}
                   onChangeText={newLga => setUserLga(newLga)}
                   onBlur={() => handleScreenTitle('More Information', false)}
                   onFocus={() => handleScreenTitle('More Information', true)}
-                  style={{color: colors.DGRAY, fontWeight: '500', fontSize: 17}}
                   onFocusStyle={{borderColor: colors.ORANGE}}
                   image={DOWN_ARROW}
                   onPress={getAllLgasForSelectedState}
@@ -358,7 +364,6 @@ const AddAddress: FC<IProps> = ({navigation}) => {
                 onChangeText={moreInfo => setMoreInfo(moreInfo)}
                 onBlur={() => handleScreenTitle('state', false)}
                 onFocus={() => handleScreenTitle('state', true)}
-                style={{color: colors.DGRAY, fontWeight: '500', fontSize: 17}}
                 onFocusStyle={{borderColor: colors.ORANGE}}
               />
             </View>

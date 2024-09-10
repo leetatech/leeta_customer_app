@@ -12,6 +12,7 @@ import Modal from 'react-native-modal';
 import CustomLoader from '../../Components/Loader/CustomLoader';
 import ShadowNavBar from '../../Components/NavBar/ShadowNavBar';
 import useUserType from '../../redux/manageUserType/userType';
+import { user } from '../../redux/manageUserType/checkUserType';
 
 interface IProps {
   navigation: NavigationProp<ParamListBase>;
@@ -68,15 +69,15 @@ const Settings: FC<IProps> = ({navigation}) => {
   };
 
   const handleUsers = () => {
-    if (userType === 'Registered User') {
+    if (userType === user.registered) {
       handleReisteredUser();
-    } else if (userType === 'Guest User') {
+    } else if (userType === user.guest) {
       handleGuestUser();
     }
   };
 
   useEffect(() => {
-    if (userType === 'Registered User') {
+    if (userType === user.registered) {
       checkUserStatus();
     }
   }, [userType]);
@@ -103,15 +104,15 @@ const Settings: FC<IProps> = ({navigation}) => {
             style={styles.logout_container}
             onPress={handleUsers}>
             <FontAwesome
-              name={userType === 'Guest User' ? 'sign-in' : 'sign-out'}
+              name={userType === user.guest ? 'sign-in' : 'sign-out'}
               size={24}
               color={
-                userType === 'Guest User' ? colors.ORANGE : colors.LIGHT_RED
+                userType === user.guest ? colors.ORANGE : colors.LIGHT_RED
               }
             />
             <Text
-              style={userType === 'Guest User' ? styles.login : styles.logout}>
-              {userType === 'Guest User' ? 'Login' : 'Logout'}
+              style={userType === user.guest ? styles.login : styles.logout}>
+              {userType === user.guest ? 'Login' : 'Logout'}
             </Text>
           </TouchableOpacity>
 
