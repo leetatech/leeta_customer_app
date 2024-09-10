@@ -81,9 +81,7 @@ const RenderDeliveryAddress: FC<IProps> = ({
     }
   };
   useEffect(() => {
-    // if(userType === user.guest) {
       fetcGuestAddress();
-    // }
   }, []);
   return (
     <View style={styles.card_style}>
