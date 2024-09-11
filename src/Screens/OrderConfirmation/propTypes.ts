@@ -8,6 +8,7 @@ export interface IProps {
   state?: string | null;
   address?: string | null;
   phone?: string | null;
+  isExistingGuest?: boolean | null;
 }
 export interface UserDataType {
   fullName?: string | null;

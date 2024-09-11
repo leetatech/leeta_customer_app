@@ -12,11 +12,18 @@ const createStyles = () =>
     checkbox_container: {
       flexDirection: 'row',
       gap: 8,
-      alignItems: 'center',
       paddingVertical: 10,
       width: 300,
     },
     payment_container: {
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      alignItems: 'center',
+      borderBottomWidth: 1,
+      borderBottomColor: colors.LGRAY,
+      paddingVertical: 10,
+    },
+    address_container :{
       flexDirection: 'row',
       justifyContent: 'space-between',
       alignItems: 'center',
