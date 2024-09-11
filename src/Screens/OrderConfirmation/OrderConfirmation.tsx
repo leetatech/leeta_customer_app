@@ -443,14 +443,6 @@ const OrderConfirmation: FC<IProps> = ({navigation}) => {
     navigation.navigate('BottomNavigator');
   };
 
-  const signInToContinue = () => {
-    setLoader(true);
-    setTimeout(() => {
-      setShowModal(false);
-      navigation.navigate('SignIn');
-    }, 2000);
-  };
-
   const selctedPaymentMethod = () => {
     setSelectPaymentMethod(!selectPaymentMethod);
   };
@@ -677,14 +669,6 @@ const OrderConfirmation: FC<IProps> = ({navigation}) => {
                 textStyle={{fontSize: 17}}
                 onPress={handleCheckout}
               />
-              {userType === user.guest &&  <Buttons
-                title="Sign In To Continue"
-                disabled={false}
-                buttonStyle={styles.view_receipt_btn}
-                textStyle={styles.view_receipt_text}
-                onPress={signInToContinue}
-              />}
-             
             </View>
           </FormMainContainer>
         )}
