@@ -50,7 +50,10 @@ import {triggerGetUserData} from '../../redux/slices/auth/userServices';
 import {capitalizeFirstLetter} from '../../utils';
 import {IProps, Order, Payment, UserDataType} from './propTypes';
 import {useFocusEffect} from '@react-navigation/native';
-import { UserDataResponse } from '../../redux/slices/auth/type';
+import {UserDataResponse} from '../../redux/slices/auth/type';
+import useUserType from '../../redux/manageUserType/userType';
+import {user} from '../../redux/manageUserType/checkUserType';
+import { getGuestData } from '../../redux/slices/auth/guestServices';
 
 const RenderDeliveryAddress: FC<IProps> = ({
   navigation,
@@ -60,22 +63,32 @@ const RenderDeliveryAddress: FC<IProps> = ({
   phone,
 }) => {
   const styles = useMemo(() => createStyles(), []);
-  const [userData, setUserData] = useState(null);
-  useEffect(() => {
-    const fetchUserData = async () => {
-      try {
-        const jsonValue = await AsyncStorage.getItem('userInformation');
-        setUserData(jsonValue != null ? JSON.parse(jsonValue) : null);
-      } catch (error) {
-        console.error('Error retrieving data', error);
+  const userType = useUserType();
+  const [isGuestAddress, setIsGuestAddrress] = useState(false);
+
+  const fetcGuestAddress = async () => {
+    try {
+      const jsonValue = await AsyncStorage.getItem('userInformation');
+      const retrievedUserInfoormation =
+        jsonValue != null ? JSON.parse(jsonValue) : null;
+      if (retrievedUserInfoormation.address.state) {
+        setIsGuestAddrress(true);
+      } else {
+        setIsGuestAddrress(false);
       }
-    };
-    fetchUserData();
+    } catch (error) {
+      console.error('Error retrieving data', error);
+    }
+  };
+  useEffect(() => {
+      fetcGuestAddress();
   }, []);
   return (
     <View style={styles.card_style}>
       <Fonts type="boldLightGray">Delivery Address</Fonts>
-      {userData ? (
+      {userType === user.registered ||
+      (userType === user.guest && isGuestAddress) ? (
+        <TouchableOpacity onPress={() => navigation.navigate('AddAddress')}>
         <View style={styles.payment_container}>
           <View style={styles.checkbox_container}>
             <LOCATION_ICON />
@@ -88,17 +101,19 @@ const RenderDeliveryAddress: FC<IProps> = ({
               <Fonts type="normalGrayText">{phone}</Fonts>
             </View>
           </View>
-          <TouchableOpacity onPress={() => navigation.navigate('AddAddress')}>
             <RIGHT_ICON />
-          </TouchableOpacity>
         </View>
+         </TouchableOpacity>
       ) : (
-        <View style={styles.checkbox_container}>
-          <TouchableOpacity onPress={() => navigation.navigate('AddAddress')}>
-            <Image source={ADD} />
-          </TouchableOpacity>
-          <Fonts type="boldBlack">Add address</Fonts>
-        </View>
+        userType === user.guest &&
+        !isGuestAddress && (
+          <View style={styles.checkbox_container}>
+            <TouchableOpacity onPress={() => navigation.navigate('AddAddress')}>
+              <Image source={ADD} />
+            </TouchableOpacity>
+            <Fonts type="boldBlack">Add address</Fonts>
+          </View>
+        )
       )}
     </View>
   );
@@ -195,14 +210,9 @@ const OrderConfirmation: FC<IProps> = ({navigation}) => {
   const [loader, setLoader] = useState(false);
   const [viewReceipt, setViewReceipt] = useState(false);
   const [orderSummary, setOrderSummary] = useState<number>(0);
-  const {
-    cartList,
-    userLga,
-    userState,
-    userDeliveryFee,
-    loading,
-    serviceFeePerOrder,
-  } = useSelector((state: RootState) => state.order);
+  const {cartList, userLga, userState, userDeliveryFee, loading} = useSelector(
+    (state: RootState) => state.order,
+  );
   const [errorMsg, setErrorMsg] = useState('');
   const [showErrorMsg, setShowErrorMsg] = useState(false);
   const [orderServiceFee, setOrderServiceFee] = useState(0);
@@ -216,9 +226,10 @@ const OrderConfirmation: FC<IProps> = ({navigation}) => {
     address: '',
     state: '',
     phone: '',
-    email:'',
+    email: '',
     lga: '',
   });
+  const userType = useUserType();
 
   const startRotation = () => {
     Animated.loop(
@@ -226,7 +237,6 @@ const OrderConfirmation: FC<IProps> = ({navigation}) => {
         toValue: 1,
         duration: 3000,
         easing: Easing.quad,
-
         useNativeDriver: true,
       }),
     ).start();
@@ -248,7 +258,6 @@ const OrderConfirmation: FC<IProps> = ({navigation}) => {
     const formattedTotalAmount = `₦${totalAmount?.toFixed(2)}`;
     return formattedTotalAmount;
   };
-
 
   const listCart = () => {
     const payload = {
@@ -441,6 +450,7 @@ const OrderConfirmation: FC<IProps> = ({navigation}) => {
       navigation.navigate('SignIn');
     }, 2000);
   };
+
   const selctedPaymentMethod = () => {
     setSelectPaymentMethod(!selectPaymentMethod);
   };
@@ -473,15 +483,49 @@ const OrderConfirmation: FC<IProps> = ({navigation}) => {
       });
   };
 
+  const fetchGuestAddress  = async () => {
+    dispatch(getGuestData())
+      .then(response => {
+        const result = response.payload as GuestDataResponse
+        if (response && result && result.data) {
+         const fullAddress = result.data.address.full_address;
+         const state = result.data.address.state;
+         const userEmail = result.data.email;
+         const fullName = `${result?.data.first_name} ${result?.data.last_name}`;
+         const getUserLga = result?.data.address.lga;
+         setRetrieveUserData({
+          fullName: fullName,
+          address: fullAddress,
+          state: state,
+          phone: result?.data.number,
+          email: userEmail,
+          lga: getUserLga,
+        });
+        } else {
+          return null;
+        }
+      })
+      .catch(error => {
+        console.error('Error fetching guest data:', error);
+      });
+  };
+
   useEffect(() => {
     startRotation();
   }, []);
+
   useFocusEffect(
     useCallback(() => {
-      getUserData();
+      if (userType && userType === user.registered) {
+        getUserData();
+      }
+      if (userType === user.guest) {
+        fetchGuestAddress();
+      }
       getServiceFee();
-    }, []),
+    }, [userType]),
   );
+
   useEffect(() => {
     getDeliveryFee();
   }, [retrieveUserData.lga]);
@@ -612,6 +656,8 @@ const OrderConfirmation: FC<IProps> = ({navigation}) => {
         )}
         {!viewReceipt && (
           <FormMainContainer>
+             {loader && <CustomLoader />}
+             {loading && <CustomLoader />}
             {showErrorMsg && <CustomToast>{errorMsg}</CustomToast>}
             <View style={styles.success_msg_container}>
               <View style={styles.iconContainer}>
@@ -625,21 +671,22 @@ const OrderConfirmation: FC<IProps> = ({navigation}) => {
             </View>
             <View style={styles.button_container}>
               <Buttons
-                title="Sign Out As Guest"
+                title={userType === user.registered ? "Sign Out " : "Sign Out As Guest" }
                 disabled={false}
                 buttonStyle={undefined}
                 textStyle={{fontSize: 17}}
                 onPress={handleCheckout}
               />
-              {loader && <CustomLoader />}
-              {loading && <CustomLoader />}
-              <Buttons
+              {/* {loader && <CustomLoader />}
+              {loading && <CustomLoader />} */}
+              {userType === user.guest &&  <Buttons
                 title="Sign In To Continue"
                 disabled={false}
                 buttonStyle={styles.view_receipt_btn}
                 textStyle={styles.view_receipt_text}
                 onPress={signInToContinue}
-              />
+              />}
+             
             </View>
           </FormMainContainer>
         )}

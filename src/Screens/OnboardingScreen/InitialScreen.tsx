@@ -7,6 +7,8 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import DeviceInfo from 'react-native-device-info';
 import {apiUrl} from '../../config';
 import {apiCall} from '../../utils';
+import { useDispatch } from 'react-redux';
+import { getGuestData } from '../../redux/slices/auth/guestServices';
 
 interface IProps {
   navigation: NavigationProp<ParamListBase>;
@@ -22,6 +24,9 @@ interface GuestSessionResponse {
   data: GuestSessionData;
 }
 const InitialScreen: FC<IProps> = ({navigation}) => {
+
+  const dispatch = useDispatch();
+
   const setGuestToken = async () => {
     try {
       const deviceId = await DeviceInfo.getUniqueId();
@@ -46,6 +51,19 @@ const InitialScreen: FC<IProps> = ({navigation}) => {
       console.error('Failed to refresh session:', error);
       throw error;
     }
+  };
+  const handleGetGuestData = async () => {
+    dispatch(getGuestData())
+      .then(response => {
+        const result = response.payload as any
+        if (response && result && result.data) {
+        } else {
+          return null;
+        }
+      })
+      .catch(error => {
+        console.error('Error getting guest data:', error);
+      });
   };
 
   const checkOnboardingStatus = async () => {
@@ -72,6 +90,7 @@ const InitialScreen: FC<IProps> = ({navigation}) => {
     };
     handleUserStatus();
     setGuestToken();
+    handleGetGuestData()
   }, []);
 
   const styles = useMemo(() => createStyles(), []);

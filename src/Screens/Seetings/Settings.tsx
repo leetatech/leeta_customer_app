@@ -11,6 +11,8 @@ import Fonts from '../../Constants/Fonts';
 import Modal from 'react-native-modal';
 import CustomLoader from '../../Components/Loader/CustomLoader';
 import ShadowNavBar from '../../Components/NavBar/ShadowNavBar';
+import useUserType from '../../redux/manageUserType/userType';
+import { user } from '../../redux/manageUserType/checkUserType';
 
 interface IProps {
   navigation: NavigationProp<ParamListBase>;
@@ -18,11 +20,11 @@ interface IProps {
 
 const Settings: FC<IProps> = ({navigation}) => {
   const styles = useMemo(() => createStyles(), []);
-  const [status, setStatus] = useState('');
   const [fullName, setFullName] = useState('');
   const [email, setEmail] = useState('');
   const [confirmLogout, setConfirmLogout] = useState(false);
   const [loader, setLoader] = useState(false);
+  const userType = useUserType();
 
   const checkUserStatus = async () => {
     try {
@@ -37,20 +39,16 @@ const Settings: FC<IProps> = ({navigation}) => {
         setFullName(getUserFirstName + ' ' + getUserLastName);
         const getEmail = checkDetails.body.email.address;
         setEmail(getEmail);
-        if (getUserFirstName !== null) {
-          setStatus('Log Out');
-        } else {
-          setStatus('Sign In');
-        }
       }
     } catch (error) {
       console.error('Error parsing JSON or retrieving data: ', error);
     }
   };
 
-  const handleLogoutAndLogin = async () => {
+  const handleLogout = async () => {
     try {
       await AsyncStorage.removeItem('userInformation');
+      await AsyncStorage.removeItem('userAddress');
       setLoader(true);
       setTimeout(() => {
         setLoader(false);
@@ -62,9 +60,27 @@ const Settings: FC<IProps> = ({navigation}) => {
     }
   };
 
+  const handleReisteredUser = () => {
+    setConfirmLogout(true);
+  };
+
+  const handleGuestUser = () => {
+    navigation.navigate('SignIn');
+  };
+
+  const handleUsers = () => {
+    if (userType === user.registered) {
+      handleReisteredUser();
+    } else if (userType === user.guest) {
+      handleGuestUser();
+    }
+  };
+
   useEffect(() => {
-    checkUserStatus();
-  }, []);
+    if (userType === user.registered) {
+      checkUserStatus();
+    }
+  }, [userType]);
   return (
     <React.Fragment>
       <ShadowNavBar
@@ -74,7 +90,6 @@ const Settings: FC<IProps> = ({navigation}) => {
         fill="#EAECF0"
         pathData="M14.5 21L11 17M11 17L14.5 13M11 17H24"
         imageSrc={NAVIGATOR}
-     
       />
       <View style={styles.container}>
         <TouchableOpacity>
@@ -87,14 +102,17 @@ const Settings: FC<IProps> = ({navigation}) => {
         <View style={styles.settings_options_container}>
           <TouchableOpacity
             style={styles.logout_container}
-            onPress={() => setConfirmLogout(true)}>
+            onPress={handleUsers}>
             <FontAwesome
-              name={status === 'Sign In' ? 'sign-in' : 'sign-out'}
+              name={userType === user.guest ? 'sign-in' : 'sign-out'}
               size={24}
-              color={status === 'Sign In' ? colors.ORANGE : colors.LIGHT_RED}
+              color={
+                userType === user.guest ? colors.ORANGE : colors.LIGHT_RED
+              }
             />
-            <Text style={status === 'Sign In' ? styles.login : styles.logout}>
-              {status}
+            <Text
+              style={userType === user.guest ? styles.login : styles.logout}>
+              {userType === user.guest ? 'Login' : 'Logout'}
             </Text>
           </TouchableOpacity>
 
@@ -127,7 +145,7 @@ const Settings: FC<IProps> = ({navigation}) => {
               disabled={false}
               buttonStyle={styles.btn}
               textStyle={styles.btn_text}
-              onPress={handleLogoutAndLogin}
+              onPress={handleLogout}
               title="Log out"
             />
           </View>
