@@ -671,14 +671,12 @@ const OrderConfirmation: FC<IProps> = ({navigation}) => {
             </View>
             <View style={styles.button_container}>
               <Buttons
-                title={userType === user.registered ? "Sign Out " : "Sign Out As Guest" }
+                title={userType === user.registered ? "Check Out " : "Check Out As Guest" }
                 disabled={false}
                 buttonStyle={undefined}
                 textStyle={{fontSize: 17}}
                 onPress={handleCheckout}
               />
-              {/* {loader && <CustomLoader />}
-              {loading && <CustomLoader />} */}
               {userType === user.guest &&  <Buttons
                 title="Sign In To Continue"
                 disabled={false}
