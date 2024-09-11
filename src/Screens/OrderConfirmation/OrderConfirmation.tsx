@@ -437,12 +437,10 @@ const OrderConfirmation: FC<IProps> = ({navigation}) => {
       }, 5000);
     }
   };
-
   const viewOrder = () => {
     setShowModal(false);
     navigation.navigate('BottomNavigator');
   };
-
   const selctedPaymentMethod = () => {
     setSelectPaymentMethod(!selectPaymentMethod);
   };
