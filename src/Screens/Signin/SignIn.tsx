@@ -24,6 +24,8 @@ import {
 } from '../../redux/slices/auth/userSlice';
 import {applicationErrorCode} from '../../errors';
 import Fonts from '../../Constants/Fonts';
+import { CommonActions } from '@react-navigation/native';
+
 
 interface IProps {
   navigation: NavigationProp<ParamListBase>;
@@ -94,7 +96,6 @@ const SignIn: FC<IProps> = ({navigation}) => {
 
   useEffect(() => {
     if (error && errorCode) {
-      console.log(errorCode);
       // TODO: handle more signin error edge cases
       switch (errorCode) {
         case applicationErrorCode.InvalidUserRoleError:
@@ -121,7 +122,6 @@ const SignIn: FC<IProps> = ({navigation}) => {
     } else if (!error && Object.keys(userData).length > 0) {
       formik.resetForm();
       const body = (userData as any).body;
-      console.log('Body', body);
       if (
         body &&
         typeof body.email === 'object' &&
@@ -138,12 +138,14 @@ const SignIn: FC<IProps> = ({navigation}) => {
         typeof body.email === 'object' &&
         body.email.verified === true
       ) {
-        navigation.navigate('BottomNavigator');
+        const resetAction = CommonActions.reset({
+          index: 0, 
+          routes: [{ name: 'BottomNavigator' }],
+        });
+        navigation.dispatch(resetAction);
       }
     }
   }, [userData, error, errorCode]);
-  console.log('ERROR', error);
-  console.log('ERRMSG', showErrorMsg);
 
   return (
     <>

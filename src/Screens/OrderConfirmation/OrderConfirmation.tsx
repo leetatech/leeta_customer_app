@@ -45,7 +45,6 @@ import {ADD} from '../../Assets';
 import CustomToast from '../../Components/Toast/CustomToast';
 import Fontisto from 'react-native-vector-icons/Fontisto';
 import LottieView from 'lottie-react-native';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import {triggerGetUserData} from '../../redux/slices/auth/userServices';
 import {capitalizeFirstLetter} from '../../utils';
 import {IProps, Order, Payment, UserDataType} from './propTypes';
@@ -61,35 +60,17 @@ const RenderDeliveryAddress: FC<IProps> = ({
   address,
   state,
   phone,
+  isExistingGuest
 }) => {
   const styles = useMemo(() => createStyles(), []);
   const userType = useUserType();
-  const [isGuestAddress, setIsGuestAddrress] = useState(false);
-
-  const fetcGuestAddress = async () => {
-    try {
-      const jsonValue = await AsyncStorage.getItem('userInformation');
-      const retrievedUserInfoormation =
-        jsonValue != null ? JSON.parse(jsonValue) : null;
-      if (retrievedUserInfoormation.address.state) {
-        setIsGuestAddrress(true);
-      } else {
-        setIsGuestAddrress(false);
-      }
-    } catch (error) {
-      console.error('Error retrieving data', error);
-    }
-  };
-  useEffect(() => {
-      fetcGuestAddress();
-  }, []);
   return (
     <View style={styles.card_style}>
       <Fonts type="boldLightGray">Delivery Address</Fonts>
       {userType === user.registered ||
-      (userType === user.guest && isGuestAddress) ? (
+      (userType === user.guest && isExistingGuest) ? (
         <TouchableOpacity onPress={() => navigation.navigate('AddAddress')}>
-        <View style={styles.payment_container}>
+        <View style={styles.address_container}>
           <View style={styles.checkbox_container}>
             <LOCATION_ICON />
             <View style={styles.address}>
@@ -106,13 +87,11 @@ const RenderDeliveryAddress: FC<IProps> = ({
          </TouchableOpacity>
       ) : (
         userType === user.guest &&
-        !isGuestAddress && (
-          <View style={styles.checkbox_container}>
-            <TouchableOpacity onPress={() => navigation.navigate('AddAddress')}>
+        !isExistingGuest && (
+          <TouchableOpacity style={styles.checkbox_container} onPress={() => navigation.navigate('AddAddress')}>
               <Image source={ADD} />
-            </TouchableOpacity>
             <Fonts type="boldBlack">Add address</Fonts>
-          </View>
+          </TouchableOpacity>
         )
       )}
     </View>
@@ -190,7 +169,7 @@ const RenderPaymentMethod: FC<Payment> = ({pyamentMethod, onPress}) => {
               name={pyamentMethod ? 'check' : 'checkbox-passive'}
               size={10}
               style={{
-                color: pyamentMethod ? colors.ORANGE : colors.BLACK,
+                color: pyamentMethod ? colors.ORANGE : colors.BLACK, paddingTop:5
               }}
             />
           </TouchableOpacity>
@@ -229,6 +208,7 @@ const OrderConfirmation: FC<IProps> = ({navigation}) => {
     email: '',
     lga: '',
   });
+  const[existingGuestuser,setExistingGuestuser] = useState(false);
   const userType = useUserType();
 
   const startRotation = () => {
@@ -389,7 +369,6 @@ const OrderConfirmation: FC<IProps> = ({navigation}) => {
       }, 2000);
     }
   };
-
   const handleCheckout = async () => {
     const cartId = cartList?.data?.id;
     const payload = {
@@ -438,19 +417,6 @@ const OrderConfirmation: FC<IProps> = ({navigation}) => {
     }
   };
 
-  const viewOrder = () => {
-    setShowModal(false);
-    navigation.navigate('BottomNavigator');
-  };
-
-  const signInToContinue = () => {
-    setLoader(true);
-    setTimeout(() => {
-      setShowModal(false);
-      navigation.navigate('SignIn');
-    }, 2000);
-  };
-
   const selctedPaymentMethod = () => {
     setSelectPaymentMethod(!selectPaymentMethod);
   };
@@ -490,6 +456,9 @@ const OrderConfirmation: FC<IProps> = ({navigation}) => {
         if (response && result && result.data) {
          const fullAddress = result.data.address.full_address;
          const state = result.data.address.state;
+         if(state){
+          setExistingGuestuser(true)
+         }
          const userEmail = result.data.email;
          const fullName = `${result?.data.first_name} ${result?.data.last_name}`;
          const getUserLga = result?.data.address.lga;
@@ -559,6 +528,7 @@ const OrderConfirmation: FC<IProps> = ({navigation}) => {
                 address={retrieveUserData.address}
                 state={retrieveUserData.state}
                 phone={retrieveUserData.phone}
+                isExistingGuest={existingGuestuser}
               />
               <Fonts type="boldLightGray" style={{paddingTop: 15}}>
                 Your Cart
@@ -637,13 +607,6 @@ const OrderConfirmation: FC<IProps> = ({navigation}) => {
               </View>
               <View style={styles.button_container}>
                 <Buttons
-                  title="View Order"
-                  disabled={false}
-                  buttonStyle={styles.view_receipt_btn}
-                  textStyle={styles.view_receipt_text}
-                  onPress={viewOrder}
-                />
-                <Buttons
                   title="Back to Homescreen"
                   disabled={false}
                   buttonStyle={undefined}
@@ -671,22 +634,12 @@ const OrderConfirmation: FC<IProps> = ({navigation}) => {
             </View>
             <View style={styles.button_container}>
               <Buttons
-                title={userType === user.registered ? "Sign Out " : "Sign Out As Guest" }
+                title={userType === user.registered ? "Check Out " : "Check Out As Guest" }
                 disabled={false}
                 buttonStyle={undefined}
                 textStyle={{fontSize: 17}}
                 onPress={handleCheckout}
               />
-              {/* {loader && <CustomLoader />}
-              {loading && <CustomLoader />} */}
-              {userType === user.guest &&  <Buttons
-                title="Sign In To Continue"
-                disabled={false}
-                buttonStyle={styles.view_receipt_btn}
-                textStyle={styles.view_receipt_text}
-                onPress={signInToContinue}
-              />}
-             
             </View>
           </FormMainContainer>
         )}
