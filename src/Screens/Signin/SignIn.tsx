@@ -9,7 +9,6 @@ import Icon from 'react-native-vector-icons/FontAwesome';
 import {NavigationProp, ParamListBase} from '@react-navigation/native';
 import * as Yup from 'yup';
 import {useFormik} from 'formik';
-import {colors} from '../../Constants/Colors';
 import {ScrollView} from 'react-native-gesture-handler';
 import {useDispatch, useSelector} from 'react-redux';
 import {login} from '../../redux/slices/auth/userServices';
@@ -24,8 +23,7 @@ import {
 } from '../../redux/slices/auth/userSlice';
 import {applicationErrorCode} from '../../errors';
 import Fonts from '../../Constants/Fonts';
-import { CommonActions } from '@react-navigation/native';
-
+import {CommonActions} from '@react-navigation/native';
 
 interface IProps {
   navigation: NavigationProp<ParamListBase>;
@@ -62,14 +60,15 @@ const SignIn: FC<IProps> = ({navigation}) => {
           'Must contain at least 8 characters with 1 Uppercase, Lowercase, Number and Special Character',
         ),
     }),
+    validateOnChange: true,
     enableReinitialize: false,
-    validateOnBlur: false,
+    validateOnBlur: true,
     onSubmit: () => {},
   });
   const handleSubmit = async () => {
     if (!Object.keys(formik.errors).length) {
       const payload = {
-        email: formik.values.email.trim(),
+        email: formik.values.email.trim().toLowerCase(),
         password: formik.values.password.trim(),
         user_type: formik.values.user_type,
       };
@@ -82,7 +81,7 @@ const SignIn: FC<IProps> = ({navigation}) => {
   const navigateToVerify = () => {
     dispatch(resetUserData());
     setShowErrorMsg(false);
-        navigation.navigate('OTPInput', {screenId: 'Signin'});
+    navigation.navigate('OTPInput', {screenId: 'Signin'});
   };
   const dismissErrorCodeMessageModal = () => {
     dispatch(resetUserState());
@@ -108,8 +107,7 @@ const SignIn: FC<IProps> = ({navigation}) => {
         case applicationErrorCode.CredentialsValidationError:
         case applicationErrorCode.UserNotFoundError:
           setErrorCodeMsg(
-            message ||
-              'An error has occurred while trying to sign in. Kindly try again shortly.',
+            'We couldn’t find a matching account or the credentials provided are incorrect. Please check your details and try again.',
           );
           break;
         default:
@@ -139,8 +137,8 @@ const SignIn: FC<IProps> = ({navigation}) => {
         body.email.verified === true
       ) {
         const resetAction = CommonActions.reset({
-          index: 0, 
-          routes: [{ name: 'BottomNavigator' }],
+          index: 0,
+          routes: [{name: 'BottomNavigator'}],
         });
         navigation.dispatch(resetAction);
       }
@@ -161,6 +159,7 @@ const SignIn: FC<IProps> = ({navigation}) => {
               <View>
                 <StyledTextInput
                   label="Email"
+                  placeholder="Enter Email"
                   onChangeText={formik.handleChange('email')}
                   value={formik.values.email}
                   name="email"
@@ -168,20 +167,15 @@ const SignIn: FC<IProps> = ({navigation}) => {
                   errors={formik.errors.email}
                   helperText={formik.errors.email}
                 />
-                {formik.errors.email && formik.touched.email && (
-                  <Fonts
-                    type="normalText"
-                    style={{color: colors.RED, paddingTop: 2}}>
-                    {formik.errors.email}
-                  </Fonts>
-                )}
               </View>
 
               <View>
                 <StyledTextInput
                   label="Password"
+                  placeholder="Enter Password"
                   name="password"
                   value={formik.values.password}
+                  errors={formik.errors.password}
                   onChangeText={formik.handleChange('password')}
                   onBlur={() => formik.handleBlur('password')}
                   secureTextEntry={!showPassword}
@@ -196,13 +190,6 @@ const SignIn: FC<IProps> = ({navigation}) => {
                   }
                   helperText={formik.errors.password}
                 />
-                {formik.errors.password && formik.touched.password && (
-                  <Fonts
-                    type="normalText"
-                    style={{color: colors.RED, paddingTop: 2}}>
-                    {formik.errors.password}
-                  </Fonts>
-                )}
                 <TouchableOpacity
                   onPress={() => navigation.navigate('ForgotPassword')}>
                   <Fonts type="normalText" style={styles.fp}>

@@ -7,7 +7,7 @@ const createStyles = () =>
       justifyContent: 'center',
       padding: 2,
     },
-    error: {
+    errorMsg: {
       color: colors.RED,
       paddingTop: 4,
     },
@@ -26,6 +26,17 @@ const createStyles = () =>
       paddingVertical:13,
       justifyContent: 'space-between',
     },
+    errorStyle:{
+      borderWidth: 1,
+      borderColor: colors.RED
+      
+    },
+    focusStyle:{
+      borderWidth: 1,
+      borderColor: colors.ORANGE
+      
+    },
+
     textInput: {
       flex: 1, 
       fontSize: 16,

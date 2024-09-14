@@ -68,8 +68,9 @@ export const userSlice = createSlice({
       .addCase(signup.rejected, (state, action: PayloadAction<any>) => {
         state.loading = false;
         state.error = true;
-        state.errorCode = action.payload?.data?.error_code || 1;
         state.message = action.payload.data.message;
+        state.errorCode = action.payload.data.data.error_code;
+
       })
 
       //verify otp slice
@@ -86,6 +87,8 @@ export const userSlice = createSlice({
         state.loading = false;
         state.error = true;
         state.message = action.payload.data.message;
+        state.errorCode = action.payload.data.data.error_code;
+
       })
 
       //login
@@ -101,8 +104,8 @@ export const userSlice = createSlice({
       .addCase(login.rejected, (state, action: PayloadAction<any>) => {
         state.loading = false;
         state.error = true;
-        state.message = action.payload.data.message;
-        state.errorCode = action.payload?.data?.error_code || 1;
+        state.message = action.payload.message;
+        state.errorCode = action.payload.data.data.error_code;
       })
 
       //forgot password

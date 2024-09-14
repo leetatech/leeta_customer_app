@@ -33,9 +33,10 @@ const OTPInput: FC<IOTPInputProps> = props => {
   const [errorMsg, setErrorMsg] = useState('');
   const [resendOtpMessage, setResendOtpMsg] = useState('');
   const [showResendOtpMsg, setShowResendOtpMsg] = useState(false);
+  
 
   const otpRef: any = useRef(null);
-  let {loading, message, userEmail, error} = useSelector(
+  let {loading, message, userEmail, error,errorCode} = useSelector(
     (state: RootState) => state.user,
   );
   const dispatch = useDispatch();
@@ -58,6 +59,7 @@ const OTPInput: FC<IOTPInputProps> = props => {
 
   const handleVerifyOTP = (actualOtp: string) => {
     if (validateOtp(actualOtp)) {
+      console.log("email",userEmail)
       const payload = {
         code: actualOtp,
         target: userEmail,
@@ -68,7 +70,7 @@ const OTPInput: FC<IOTPInputProps> = props => {
             string,
             Record<string, string>
           >;
-          if (response && result && result.data.success) {
+          if (result && result.data.success) {
             if (route.params && route.params.screenId) {
               switch (route.params.screenId) {
                 case 'Signup':
@@ -92,8 +94,7 @@ const OTPInput: FC<IOTPInputProps> = props => {
             }
             setOtp('');
           } else {
-            const errorCodeString: string = result.data.error_code;
-            const errorCode: number = parseInt(errorCodeString, 10);
+            console.log('error code',errorCode);
             switch (errorCode) {
               case applicationErrorCode.TokenValidationError:
                 setErrorMsg(
@@ -103,7 +104,7 @@ const OTPInput: FC<IOTPInputProps> = props => {
               default:
                 setErrorMsg(
                   message ||
-                    'Unknown error has occurred while trying to reset your email. Kindly try again shortly.',
+                    'Unknown error has occurred while trying to validaate OTP please try again.',
                 );
                 break;
             }
@@ -118,12 +119,15 @@ const OTPInput: FC<IOTPInputProps> = props => {
         });
     }
   };
+
+
   const toggleErrMsg = () => {
     dispatch(resetUserState());
   };
   const toggleResendOtpMsg = () => {
     setShowResendOtpMsg(false);
   };
+
 
   const handleResendOtp = () => {
     const payload = {
@@ -143,11 +147,10 @@ const OTPInput: FC<IOTPInputProps> = props => {
           const errorCode: number = parseInt(errorCodeString, 10);
           setShowResendOtpMsg(true);
           switch (errorCode) {
-            case applicationErrorCode.InternalError:
+            case applicationErrorCode.TokenValidationError:
               setResendOtpMsg(
                 message ||
-                  result.data.message ||
-                  'An error occurred while trying to reset a user password',
+                  'Token expired, please click the resend otp to generate a new token',
               );
               break;
             default:
@@ -199,7 +202,6 @@ const OTPInput: FC<IOTPInputProps> = props => {
           <View style={styles.mainContainer}>
             <Image source={OTPIMAGE} />
             {loading && <CustomLoader />}
-
             <Fonts type="boldBlack" style={styles.bigText}>
               Check your Email.
             </Fonts>
@@ -248,14 +250,14 @@ const OTPInput: FC<IOTPInputProps> = props => {
           onPress={() => handleVerifyOTP(otp)}
         />
       </View>
-      {error && (
+      {error &&  (
         <CustomToast onPress={toggleErrMsg}>
           <Fonts type="smallText">{errorMsg}.</Fonts>
         </CustomToast>
       )}
       {showResendOtpMsg && (
         <CustomToast onPress={toggleResendOtpMsg}>
-          <Fonts type="smallText">{resendOtpMessage}.</Fonts>
+          <Fonts type="smallText">{resendOtpMessage}</Fonts>
         </CustomToast>
       )}
 

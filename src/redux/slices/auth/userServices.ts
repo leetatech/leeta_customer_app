@@ -75,6 +75,8 @@ export const signup = createAsyncThunk(
       const url = apiUrl.signUp;
       const method = 'post';
       const response: any = await apiCall(url, method, userDetails);
+      // const response: any = await axios.post('https://leetabackend-e6d948d15ae2.herokuapp.com/api/session/signup', userDetails);
+
       if (response.data !== undefined) {
         await AsyncStorage.setItem('userToken', response.data.auth_token);
       } else {
@@ -83,9 +85,9 @@ export const signup = createAsyncThunk(
       return response as Record<string, Record<string, string> | string>;
     } catch (error) {
       if (axios.isAxiosError(error)) {
-        return rejectWithValue(error.response?.data);
+        return rejectWithValue({ ...error });
       } else if (error instanceof Error) {
-        return rejectWithValue(error.message);
+        return rejectWithValue({ ...error });
       } else {
         throw error;
       }
@@ -108,9 +110,9 @@ export const verifyOtp = createAsyncThunk(
       return response as Record<string, Record<string, string> | string>;
     } catch (error) {
       if (axios.isAxiosError(error)) {
-        return rejectWithValue(error.response?.data);
+        return rejectWithValue({ ...error });
       } else if (error instanceof Error) {
-        return rejectWithValue(error.message);
+        return rejectWithValue({ ...error });
       } else {
       }
     }
@@ -125,6 +127,7 @@ export const login = createAsyncThunk(
       const url = apiUrl.logIn;
       const method = 'post';
       const response: any = await apiCall(url, method, loginDetails);
+
       if (response.data !== undefined) {
         await AsyncStorage.setItem('userToken', response.data.auth_token);
         await AsyncStorage.setItem(
@@ -137,9 +140,9 @@ export const login = createAsyncThunk(
       return response as Record<string, Record<string, string> | string>;
     } catch (error) {
       if (axios.isAxiosError(error)) {
-        return rejectWithValue(error.response?.data);
+        return rejectWithValue({ ...error });
       } else if (error instanceof Error) {
-        return rejectWithValue(error.message);
+        return rejectWithValue({ ...error });
       } else {
         throw error;
       }
