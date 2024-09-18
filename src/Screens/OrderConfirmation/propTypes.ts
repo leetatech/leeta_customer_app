@@ -9,6 +9,7 @@ export interface IProps {
   address?: string | null;
   phone?: string | null;
   isExistingGuest?: boolean | null;
+  isUserData?: boolean | null;
 }
 export interface UserDataType {
   fullName?: string | null;

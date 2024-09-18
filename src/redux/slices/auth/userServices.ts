@@ -3,7 +3,7 @@ import axios from 'axios';
 import {apiUrl} from '../../../config';
 import {apiCall} from '../../../utils';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { UserDataResponse } from './type';
+import {UserDataResponse} from './type';
 
 export interface UserData {
   full_name: string;
@@ -31,7 +31,9 @@ export interface ResetPasswordData {
   password: string;
 }
 export interface ResendOtpData {
-  email: string;
+  topic: string;
+  target: string | null;
+  type: string;
 }
 export interface UpdateUserData {
   addresses: {
@@ -68,6 +70,15 @@ export interface UpdateUserData {
   status: string;
 }
 
+export interface ErrorPayload {
+  data: {
+    error_reference: string;
+    error_code: number;
+    error_type: string;
+    message: string;
+  };
+}
+
 export const signup = createAsyncThunk(
   'user/signup',
   async (userDetails: UserData, {rejectWithValue}) => {
@@ -75,7 +86,6 @@ export const signup = createAsyncThunk(
       const url = apiUrl.signUp;
       const method = 'post';
       const response: any = await apiCall(url, method, userDetails);
-      // const response: any = await axios.post('https://leetabackend-e6d948d15ae2.herokuapp.com/api/session/signup', userDetails);
 
       if (response.data !== undefined) {
         await AsyncStorage.setItem('userToken', response.data.auth_token);
@@ -85,9 +95,9 @@ export const signup = createAsyncThunk(
       return response as Record<string, Record<string, string> | string>;
     } catch (error) {
       if (axios.isAxiosError(error)) {
-        return rejectWithValue({ ...error });
+        return rejectWithValue({...error});
       } else if (error instanceof Error) {
-        return rejectWithValue({ ...error });
+        return rejectWithValue({...error});
       } else {
         throw error;
       }
@@ -108,13 +118,11 @@ export const verifyOtp = createAsyncThunk(
       };
       const response = await apiCall(url, method, verifyUser, headers);
       return response as Record<string, Record<string, string> | string>;
-    } catch (error) {
-      if (axios.isAxiosError(error)) {
-        return rejectWithValue({ ...error });
-      } else if (error instanceof Error) {
-        return rejectWithValue({ ...error });
-      } else {
-      }
+    } catch (error:any) {
+        const errorPayload: ErrorPayload = {
+          data: error.data?.data ?? { message: error.message, error_code: 0 },
+        };
+        return rejectWithValue(errorPayload.data);
     }
   },
 );
@@ -140,9 +148,9 @@ export const login = createAsyncThunk(
       return response as Record<string, Record<string, string> | string>;
     } catch (error) {
       if (axios.isAxiosError(error)) {
-        return rejectWithValue({ ...error });
+        return rejectWithValue({...error});
       } else if (error instanceof Error) {
-        return rejectWithValue({ ...error });
+        return rejectWithValue({...error});
       } else {
         throw error;
       }
@@ -233,7 +241,7 @@ export const triggerGetUserData = createAsyncThunk(
       } else {
         return null;
       }
-      return response as  UserDataResponse
+      return response as UserDataResponse;
     } catch (error) {
       if (axios.isAxiosError(error)) {
         return rejectWithValue(error.response?.data);
@@ -256,12 +264,7 @@ export const updateUserData = createAsyncThunk(
       const headers = {
         Authorization: `Bearer ${token}`,
       };
-      const response = await apiCall(
-        url,
-        method,
-        userDataDetails,
-        headers,
-      );
+      const response = await apiCall(url, method, userDataDetails, headers);
       return response as Record<string, Record<string, string> | string>;
     } catch (error) {
       if (axios.isAxiosError(error)) {

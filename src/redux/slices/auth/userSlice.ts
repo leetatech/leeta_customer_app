@@ -79,16 +79,17 @@ export const userSlice = createSlice({
         state.error = false;
       })
       .addCase(verifyOtp.fulfilled, (state, action) => {
+        console.log('fufilled')
         state.loading = false;
         state.error = false;
-        state.userData = action.payload!.data as Record<string, string>;
+        state.errorCode = initialState.errorCode
       })
       .addCase(verifyOtp.rejected, (state, action: PayloadAction<any>) => {
+        console.log('rejected') 
         state.loading = false;
         state.error = true;
-        state.message = action.payload.data.message;
-        state.errorCode = action.payload.data.data.error_code;
-
+        state.message = action.payload.message; 
+        state.errorCode = action.payload.error_code; 
       })
 
       //login
