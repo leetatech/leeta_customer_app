@@ -5,18 +5,18 @@ const createStyles = () =>
   StyleSheet.create({
     container: {
       backgroundColor: colors.LYELLOW,
-      paddingHorizontal: 15,
-      paddingVertical: 15,
+      paddingHorizontal: 25,
+      paddingVertical: 20,
       paddingTop: 20,
       position: 'absolute',
-      top: 55,
+      top: 50,
       left: 0,
       right: 0,
+      margin:0,
+      justifyContent:'center',
     },
     modal: {
-      flex: 1,
-      margin: 0,
-      justifyContent: 'flex-end',
+      right:10
     },
     message_container: {
       flexDirection: 'row',

@@ -3,7 +3,7 @@ import {Text, View} from 'react-native';
 import {NavigationProp, ParamListBase} from '@react-navigation/native';
 import Buttons from '../../Components/Buttons/Buttons';
 import createStyles from './style';
-import { SUCCESS } from '../../Assets/svgImages';
+import LottieView from 'lottie-react-native';
 
 interface IProps {
   navigation: NavigationProp<ParamListBase>;
@@ -13,7 +13,12 @@ const PasswordCreated: FC<IProps> = ({navigation}) => {
   return (
     <React.Fragment>
       <View style={styles.container}>
-        <SUCCESS />
+      <LottieView
+          source={require('../../Assets/success_animation.json')}
+          autoPlay
+          loop
+          style={{width: 150, height: 150}}
+        />
         <Text style={styles.title}>New Password Created</Text>
         <Text style={styles.description}>
           Your new password has been successfully created

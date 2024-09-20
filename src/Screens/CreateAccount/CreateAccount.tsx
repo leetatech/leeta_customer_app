@@ -1,7 +1,7 @@
-import React, {FC, useEffect, useMemo, useState} from 'react';
+import React, {FC, useCallback, useEffect, useMemo, useState} from 'react';
 import {Text, View, TouchableOpacity} from 'react-native';
 import createStyles from './styles';
-import {NavigationProp, ParamListBase} from '@react-navigation/native';
+import {NavigationProp, ParamListBase, useFocusEffect} from '@react-navigation/native';
 import FormTexts from '../../Components/FormTexts/FormTexts';
 import FormMainContainer from '../../Components/FormMainContainer/FormMainContainer';
 import Buttons from '../../Components/Buttons/Buttons';
@@ -91,37 +91,41 @@ const CreateAccount: FC<IProps> = ({navigation}) => {
   };
 
   const toggleErrorModal = () => {
+    setDisplayErrorMsg(false);
     dispatch(resetUserState());
     navigation.navigate('SignIn');
   };
 
-  useEffect(() => {
-    const storeToken = async () => {
-      if (error && errorCode) {
-        setDisplayErrorMsg(true);
-        switch (errorCode) {
-          case applicationErrorCode.DuplicateUserError:
-            setErrorMsg('User already exists. Kindly proceed to login');
-            break;
-          default:
-            setErrorMsg(
-              'Unknown error has occurred while trying to sign up. Kindly try again shortly.',
-            );
-            break;
+  //useFocus effect
+  useFocusEffect(
+    useCallback(() => {
+      const storeToken = async () => {
+        if (error && errorCode && Object.keys(userData).length === 0) {
+          setDisplayErrorMsg(true);
+          switch (errorCode) {
+            case applicationErrorCode.DuplicateUserError:
+              setErrorMsg('User already exists. Kindly proceed to login');
+              break;
+            default:
+              setErrorMsg(
+                'Unknown error has occurred while trying to sign up. Kindly try again shortly.',
+              );
+              break;
+          }
+          setIsAccountNotCreated(true);
+          setChecked(true);
+          dispatch(resetUserState());
+          formik.resetForm();
+        } else if (!error && Object.keys(userData).length > 0) {
+          setIsAccountCreated(true);
+          setChecked(true);
+          formik.resetForm();
+          dispatch(resetUserState());
         }
-        setIsAccountNotCreated(true);
-        setChecked(true);
-        dispatch(resetUserState());
-        formik.resetForm();
-      } else if (!error && Object.keys(userData).length > 0) {
-        setIsAccountCreated(true);
-        setChecked(true);
-        formik.resetForm();
-        dispatch(resetUserState());
-      }
-    };
-    storeToken();
-  }, [userData, error, errorCode]);
+      };
+      storeToken();
+    }, [userData, error, errorCode]),
+  );
 
   return (
     <>

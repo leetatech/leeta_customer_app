@@ -16,6 +16,12 @@ interface Location {
     coordinate: Coordinate;
     verified: boolean;
   }
+
+  interface Phone {
+    primary: boolean;
+    number: string;
+    verified: boolean;
+  }
   
   interface GuestDataResponse {
     data: {
@@ -24,7 +30,7 @@ interface Location {
       device_id: string;
       first_name: string;
       last_name: string;
-      number: string;
+      phone: Phone;
       email: string;
       address: Address;
     };

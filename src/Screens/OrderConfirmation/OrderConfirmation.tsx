@@ -77,7 +77,7 @@ const RenderDeliveryAddress: FC<IProps> = ({
               <Fonts type="boldBlack">{fullName}</Fonts>
               <Fonts type="normalGrayText">{address}</Fonts>
               <Fonts type="normalGrayText">
-                {capitalizeFirstLetter(state!)} Nigeria
+                {capitalizeFirstLetter(state!)} 
               </Fonts>
               <Fonts type="normalGrayText">{phone}</Fonts>
             </View>
@@ -462,11 +462,12 @@ const OrderConfirmation: FC<IProps> = ({navigation}) => {
          const userEmail = result.data.email;
          const fullName = `${result?.data.first_name} ${result?.data.last_name}`;
          const getUserLga = result?.data.address.lga;
+         console.log('phone',result?.data.phone?.number)
          setRetrieveUserData({
           fullName: fullName,
           address: fullAddress,
           state: state,
-          phone: result?.data.number,
+          phone: result?.data.phone?.number,
           email: userEmail,
           lga: getUserLga,
         });

@@ -19,7 +19,7 @@ const CustomToast: FC<CustomModalProps> = ({children, onPress, textStyle,  viewS
       <View style={styles.modal}>
         <View style={styles.message_container}>
           <INFO_CIRCLE />
-          <Text style={[{color: colors.BLACK}, textStyle]}>{children}</Text>
+          <Text style={[{color: colors.BLACK, paddingHorizontal:4}, textStyle]}>{children}</Text>
           <TouchableOpacity onPress={onPress}>
             <CLOSE_INFO />
           </TouchableOpacity>

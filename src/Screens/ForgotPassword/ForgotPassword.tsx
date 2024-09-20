@@ -1,5 +1,9 @@
-import React, {FC, useMemo, useState} from 'react';
-import {NavigationProp, ParamListBase} from '@react-navigation/native';
+import React, {FC, useCallback, useEffect, useMemo, useState} from 'react';
+import {
+  NavigationProp,
+  ParamListBase,
+  useFocusEffect,
+} from '@react-navigation/native';
 import createStyles from './styles';
 import FormTexts from '../../Components/FormTexts/FormTexts';
 import FormMainContainer from '../../Components/FormMainContainer/FormMainContainer';
@@ -8,7 +12,6 @@ import {NAVIGATION_ARROW} from '../../Assets';
 import {ScrollView} from 'react-native-gesture-handler';
 import StyledTextInput from '../../Components/InputFields/StyledTextInput';
 import Buttons from '../../Components/Buttons/Buttons';
-import {colors} from '../../Constants/Colors';
 import {useFormik} from 'formik';
 import * as Yup from 'yup';
 import {useDispatch, useSelector} from 'react-redux';
@@ -27,12 +30,10 @@ const ForgotPassword: FC<IProps> = ({navigation}) => {
   const styles = useMemo(() => createStyles(), []);
   const [showErrorMsg, setShowErrorMsg] = useState(false);
   const [errorMsg, setErrorMsg] = useState('');
-  let {loading, message} = useSelector((state: RootState) => state.user);
+  let {loading, message, error, errorCode, passwordRequest} = useSelector(
+    (state: RootState) => state.user,
+  );
   const dispatch = useDispatch();
-  const toggleErrMsg = () => {
-    setShowErrorMsg(false);
-  };
-
   const formik = useFormik({
     initialValues: {
       email: '',
@@ -53,37 +54,49 @@ const ForgotPassword: FC<IProps> = ({navigation}) => {
     };
     dispatch(setemail(formik.values.email.trim()));
     dispatch(forgotPassword(payload))
-      .then(response => {
-        const result = response.payload as unknown as Record<
-          string,
-          Record<string, string>
-        >;
-        if (response && result && result.data.success) {
-          navigation.navigate('OTPInput', {screenId: 'ForgotPassword'});
+      .then(response   => {
+        const result = response.payload;
+        console.log('result', result);
+        if (result && result?.data.success) {
+          setShowErrorMsg(true);
+          setErrorMsg(result.data.message || 'An unexpected error occurred. kindly ensure email is correct');
+          setTimeout(()=>{
+            setShowErrorMsg(false);
+            navigation.navigate('OTPInput', {screenId: 'ForgotPassword'});
+          },3000)
+          formik.resetForm();
         } else {
-          const errorCodeString: string = result.data.error_code;
-          const errorCode: number = parseInt(errorCodeString, 10);
           setShowErrorMsg(true);
           switch (errorCode) {
             case applicationErrorCode.UserNotFoundError:
               setErrorMsg(
-                message || result.data.message || 'This email does not exist',
+                'An error occurred because this is not a registered user',
               );
               break;
             default:
               setErrorMsg(
                 message ||
-                  result.data.message ||
-                  'Unknown error has occurred while trying to reset your email. Kindly try again shortly.',
+                  'Unknown error has occurred while trying to reset email',
               );
               break;
           }
+          const timer = setTimeout(() => {
+            setShowErrorMsg(false);
+          }, 2000);
+          return () => clearTimeout(timer);
         }
       })
-      .catch(error => {
-        console.error('Error:', error);
+      .catch(() => {
+        setShowErrorMsg(true);
+        setErrorMsg('An unexpected error occurred. kindly ensure email is correct');
+        const timer = setTimeout(() => {
+          setShowErrorMsg(false);
+        }, 2000);
+        return () => clearTimeout(timer);
       });
   };
+
+ 
 
   return (
     <FormMainContainer>
@@ -106,13 +119,8 @@ const ForgotPassword: FC<IProps> = ({navigation}) => {
                 name="email"
                 onBlur={() => formik.handleBlur('email')}
                 errors={formik.errors.email}
-                helperText={''}
+                helperText={formik.errors.email}
               />
-              {formik.touched.email && formik.errors.email && (
-                <Text style={{color: colors.RED, paddingTop: 2}}>
-                  {formik.errors.email}
-                </Text>
-              )}
             </View>
           </View>
         </View>
@@ -131,7 +139,7 @@ const ForgotPassword: FC<IProps> = ({navigation}) => {
         </View>
       </ScrollView>
       {showErrorMsg && (
-        <CustomToast onPress={toggleErrMsg}>
+        <CustomToast>
           <Text>{errorMsg}</Text>
         </CustomToast>
       )}

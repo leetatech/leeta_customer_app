@@ -20,7 +20,10 @@ interface UserState {
   userEmail?: string | null;
   userFullName?: string | null;
   updateUserInformation?: Record<string, string>;
-  retrieveUserInformation?: UserDataResponse
+  retrieveUserInformation?: UserDataResponse;
+  otpValidate?:Record<string, string>
+  passwordRequest?:Record<string, string>
+
 }
 
 const initialState: UserState = {
@@ -33,6 +36,8 @@ const initialState: UserState = {
   errorCode: 0,
   updateUserInformation: {},
   retrieveUserInformation: {},
+  otpValidate: {},
+passwordRequest: {},
 };
 export const userSlice = createSlice({
   name: 'user',
@@ -79,17 +84,18 @@ export const userSlice = createSlice({
         state.error = false;
       })
       .addCase(verifyOtp.fulfilled, (state, action) => {
-        console.log('fufilled')
         state.loading = false;
         state.error = false;
         state.errorCode = initialState.errorCode
+        state.otpValidate = action.payload.data as Record<string, string>;
       })
       .addCase(verifyOtp.rejected, (state, action: PayloadAction<any>) => {
-        console.log('rejected') 
         state.loading = false;
         state.error = true;
         state.message = action.payload.message; 
         state.errorCode = action.payload.error_code; 
+        state.otpValidate=action.payload
+
       })
 
       //login
@@ -117,13 +123,19 @@ export const userSlice = createSlice({
       .addCase(forgotPassword.fulfilled, (state, action) => {
         state.loading = false;
         state.error = false;
-        state.userData = action.payload!.data as Record<string, string>;
+        state.errorCode=initialState.errorCode
+        state.passwordRequest=action.payload.data as Record<string, string>;
+        console.log('successful',state.passwordRequest)
       })
+
       .addCase(forgotPassword.rejected, (state, action: PayloadAction<any>) => {
         state.loading = false;
         state.error = true;
-        state.message = action.payload.data.message;
-        state.errorCode = action.payload?.data?.error_code || 1;
+        state.message = action.payload?.message;
+        state.errorCode = action.payload?.error_code
+        state.passwordRequest=action.payload
+        console.log('fail',state.passwordRequest)
+
       })
 
       //reset password
@@ -134,7 +146,7 @@ export const userSlice = createSlice({
       .addCase(resetPassword.fulfilled, (state, action) => {
         state.loading = false;
         state.error = false;
-        state.userData = action.payload!.data as Record<string, string>;
+        state.userData = action.payload!.data as any;
       })
       .addCase(resetPassword.rejected, (state, action: PayloadAction<any>) => {
         state.loading = false;

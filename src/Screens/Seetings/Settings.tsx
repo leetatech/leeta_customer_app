@@ -24,13 +24,14 @@ const Settings: FC<IProps> = ({navigation}) => {
   const [email, setEmail] = useState('');
   const [confirmLogout, setConfirmLogout] = useState(false);
   const [loader, setLoader] = useState(false);
-  const userType = useUserType();
+  const [userInformation, setUserInformation] = useState<string | null>(null);  const userType = useUserType();
 
   const checkUserStatus = async () => {
     try {
       const checkTokenAvaibility = await AsyncStorage.getItem(
         'userInformation',
       );
+      setUserInformation(checkTokenAvaibility)
       const checkDetails =
         checkTokenAvaibility !== null ? JSON.parse(checkTokenAvaibility) : null;
       if (checkDetails) {
@@ -53,8 +54,8 @@ const Settings: FC<IProps> = ({navigation}) => {
       setTimeout(() => {
         setLoader(false);
         setConfirmLogout(false);
-        navigation.navigate('SignIn');
       }, 2000);
+      navigation.navigate('SignIn');
     } catch (error) {
       console.error('Error removing user information: ', error);
     }
@@ -71,7 +72,7 @@ const Settings: FC<IProps> = ({navigation}) => {
   const handleUsers = () => {
     if (userType === user.registered) {
       handleReisteredUser();
-    } else if (userType === user.guest) {
+    } else if (userType === user.guest || userInformation === null) {
       handleGuestUser();
     }
   };
@@ -80,7 +81,7 @@ const Settings: FC<IProps> = ({navigation}) => {
     if (userType === user.registered) {
       checkUserStatus();
     }
-  }, [userType]);
+  }, [userType, userInformation]);
   return (
     <React.Fragment>
       <ShadowNavBar
@@ -104,15 +105,15 @@ const Settings: FC<IProps> = ({navigation}) => {
             style={styles.logout_container}
             onPress={handleUsers}>
             <FontAwesome
-              name={userType === user.guest ? 'sign-in' : 'sign-out'}
+              name={userType === user.guest || userInformation === null ? 'sign-in' : 'sign-out'}
               size={24}
               color={
-                userType === user.guest ? colors.ORANGE : colors.LIGHT_RED
+                userType === user.guest || userInformation === null ? colors.ORANGE : colors.LIGHT_RED
               }
             />
             <Text
-              style={userType === user.guest ? styles.login : styles.logout}>
-              {userType === user.guest ? 'Login' : 'Logout'}
+              style={userType === user.guest || userInformation === null ? styles.login : styles.logout}>
+              {userType === user.guest || userInformation === null ? 'Login' : 'Logout'}
             </Text>
           </TouchableOpacity>
 

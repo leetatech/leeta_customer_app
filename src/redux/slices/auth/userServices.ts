@@ -146,14 +146,11 @@ export const login = createAsyncThunk(
         return null;
       }
       return response as Record<string, Record<string, string> | string>;
-    } catch (error) {
-      if (axios.isAxiosError(error)) {
-        return rejectWithValue({...error});
-      } else if (error instanceof Error) {
-        return rejectWithValue({...error});
-      } else {
-        throw error;
-      }
+    } catch (error:any) {
+      const errorPayload: ErrorPayload = {
+        data: error.data?.data ?? { message: error.message, error_code: 0 },
+      };
+      return rejectWithValue(errorPayload.data);
     }
   },
 );
@@ -167,14 +164,11 @@ export const forgotPassword = createAsyncThunk(
       const method = 'post';
       const response: any = await apiCall(url, method, forgotPasswordDetails);
       return response as Record<string, Record<string, string> | string>;
-    } catch (error) {
-      if (axios.isAxiosError(error)) {
-        return rejectWithValue(error.response?.data);
-      } else if (error instanceof Error) {
-        return rejectWithValue(error.message);
-      } else {
-        throw error;
-      }
+    } catch (error:any) {
+      const errorPayload: ErrorPayload = {
+        data: error.data?.data ?? { message: error.message, error_code: 0 },
+      };
+      return rejectWithValue(errorPayload.data);
     }
   },
 );
@@ -187,10 +181,13 @@ export const resetPassword = createAsyncThunk(
       const url = apiUrl.passwordReset;
       const method = 'post';
       const response: any = await apiCall(url, method, resetPasswordDetails);
-      return response as Record<string, Record<string, string> | string>;
+      // return response as Record<string, Record<string, string> | string>;
+      return response as any
+
     } catch (error) {
+      console.log('error', error);
       if (axios.isAxiosError(error)) {
-        return rejectWithValue(error.response?.data);
+        return rejectWithValue(error.response);
       } else if (error instanceof Error) {
         return rejectWithValue(error.message);
       } else {
