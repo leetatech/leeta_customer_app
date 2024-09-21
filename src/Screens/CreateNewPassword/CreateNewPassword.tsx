@@ -3,7 +3,7 @@ import {NavigationProp, ParamListBase} from '@react-navigation/native';
 import createStyles from './styles';
 import FormTexts from '../../Components/FormTexts/FormTexts';
 import FormMainContainer from '../../Components/FormMainContainer/FormMainContainer';
-import {View,TouchableOpacity} from 'react-native';
+import {View, TouchableOpacity} from 'react-native';
 import {NAVIGATION_ICON} from '../../Assets/svgImages';
 import {ScrollView} from 'react-native-gesture-handler';
 import Icon from 'react-native-vector-icons/FontAwesome';
@@ -29,7 +29,9 @@ const CreateNewPassword: FC<IProps> = ({navigation}) => {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [showErrorMsg, setShowErrorMsg] = useState(false);
   const [errorMsg, setErrorMsg] = useState('');
-  let {message, userEmail,loading} = useSelector((state: RootState) => state.user);
+  let {message, userEmail, loading} = useSelector(
+    (state: RootState) => state.user,
+  );
   const dispatch = useDispatch();
   const toggleErrMsg = () => {
     setShowErrorMsg(false);
@@ -97,8 +99,7 @@ const CreateNewPassword: FC<IProps> = ({navigation}) => {
             break;
           default:
             setErrorMsg(
-            
-                'An unknown error has occured while trying to reset password. Kindly try again',
+              'An unknown error has occured while trying to reset password. Kindly try again',
             );
             break;
         }
@@ -143,7 +144,6 @@ const CreateNewPassword: FC<IProps> = ({navigation}) => {
               />
             }
           />
-
         </View>
         <View style={styles.confirmPasswordContainer}>
           <StyledTextInput

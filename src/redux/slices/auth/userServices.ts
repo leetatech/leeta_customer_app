@@ -105,7 +105,6 @@ export const signup = createAsyncThunk(
   },
 );
 
-//verify otp
 export const verifyOtp = createAsyncThunk(
   'user/verification',
   async (verifyUser: UserVerification, {rejectWithValue}) => {
@@ -127,7 +126,6 @@ export const verifyOtp = createAsyncThunk(
   },
 );
 
-//user login
 export const login = createAsyncThunk(
   'user/login',
   async (loginDetails: loginUserData, {rejectWithValue}) => {
@@ -147,15 +145,17 @@ export const login = createAsyncThunk(
       }
       return response as Record<string, Record<string, string> | string>;
     } catch (error:any) {
-      const errorPayload: ErrorPayload = {
-        data: error.data?.data ?? { message: error.message, error_code: 0 },
-      };
-      return rejectWithValue(errorPayload.data);
+      if (axios.isAxiosError(error)) {
+        return rejectWithValue({...error});
+      } else if (error instanceof Error) {
+        return rejectWithValue({...error});
+      } else {
+        throw error;
+      }
     }
   },
 );
 
-//forgotPassword
 export const forgotPassword = createAsyncThunk(
   'user/forgotPassword',
   async (forgotPasswordDetails: ForgotPasswordData, {rejectWithValue}) => {
@@ -173,7 +173,6 @@ export const forgotPassword = createAsyncThunk(
   },
 );
 
-//Password Reset
 export const resetPassword = createAsyncThunk(
   'user/resetPassword',
   async (resetPasswordDetails: ResetPasswordData, {rejectWithValue}) => {
@@ -181,11 +180,8 @@ export const resetPassword = createAsyncThunk(
       const url = apiUrl.passwordReset;
       const method = 'post';
       const response: any = await apiCall(url, method, resetPasswordDetails);
-      // return response as Record<string, Record<string, string> | string>;
-      return response as any
-
+      return response as Record<string, Record<string, string> | string>;
     } catch (error) {
-      console.log('error', error);
       if (axios.isAxiosError(error)) {
         return rejectWithValue(error.response);
       } else if (error instanceof Error) {
@@ -197,7 +193,6 @@ export const resetPassword = createAsyncThunk(
   },
 );
 
-//Resend Otp
 export const resendOtp = createAsyncThunk(
   'user/resendOtp',
   async (resendOtpDetails: ResendOtpData, {rejectWithValue}) => {
@@ -218,7 +213,6 @@ export const resendOtp = createAsyncThunk(
   },
 );
 
-//Get user data
 export const triggerGetUserData = createAsyncThunk(
   'user/getUserData',
   async (_, {rejectWithValue}) => {
@@ -250,7 +244,6 @@ export const triggerGetUserData = createAsyncThunk(
     }
   },
 );
-//update user data
 export const updateUserData = createAsyncThunk(
   'user/updateUserData',
   async (userDataDetails: UpdateUserData, {rejectWithValue}) => {

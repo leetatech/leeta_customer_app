@@ -27,7 +27,10 @@ import {useDispatch, useSelector} from 'react-redux';
 import {resendOtp, verifyOtp} from '../../redux/slices/auth/userServices';
 import {maskEmail} from '../../utils';
 import {applicationErrorCode} from '../../errors';
-import {resetUserState} from '../../redux/slices/auth/userSlice';
+import {
+  resetUserState,
+  resetValidateOtp,
+} from '../../redux/slices/auth/userSlice';
 import Fonts from '../../Constants/Fonts';
 import {useFocusEffect} from '@react-navigation/native';
 
@@ -135,25 +138,23 @@ const OTPInput: FC<IOTPInputProps> = props => {
             break;
           default:
             setErrorMsg(
-              message ||
-                'Unknown error has occurred while trying to validate OTP. Please try again.',
+              'Unknown error has occurred while trying to validate OTP. Please try again.',
             );
             break;
         }
-        setOtp('');
+        otpRef.current.clear();
         setTimeout(() => {
           dispatch(resetUserState());
           setShowErrorCodeMsg(false);
         }, 3000);
-      } else if (!error  && otpValidate?.success) {
+      } else if (!error && otpValidate?.success) {
         if (route.params?.screenId) {
           switch (route.params.screenId) {
             case 'Signup':
-              otpRef.current.setValue('');
               navigation.navigate('EmailVerification');
               break;
             case 'ForgotPassword':
-              setErrorMsg('Otp validate successful');
+              setErrorMsg('Otp validation successful');
               setTimeout(() => {
                 setIsVerified(true);
                 setTimeout(() => {
@@ -169,19 +170,19 @@ const OTPInput: FC<IOTPInputProps> = props => {
                 setIsVerified(true);
                 setTimeout(() => {
                   setIsVerified(false);
-                  otpRef.current.setValue('');
                   navigation.navigate('SignIn');
-                }, 3000);
+                }, 2000);
               }, 2000);
               break;
             default:
               navigation.navigate('SignIn');
               break;
           }
+          otpRef.current.clear();
+          dispatch(resetValidateOtp());
         } else {
-          console.log('screen id invalidate');
+          otpRef.current.clear();
         }
-        setOtp('');
       }
     }, [errorCode, message, error, loading]),
   );

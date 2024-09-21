@@ -1,4 +1,4 @@
-import React, {useMemo, useState, FC, useCallback} from 'react';
+import React, {useMemo, useState, FC, useCallback, useEffect} from 'react';
 import {View, TouchableOpacity} from 'react-native';
 import createStyles from './styles';
 import FormTexts from '../../Components/FormTexts/FormTexts';
@@ -113,13 +113,11 @@ const SignIn: FC<IProps> = ({navigation}) => {
 
   useFocusEffect(
     useCallback(() => {
-      checkUserStatus();
-      console.log('Entering');
       try {
         if (error && errorCode) {
           // TODO: handle more signin error edge cases
           setShowErrorCodeMsg(true);
-  
+
           switch (errorCode) {
             case applicationErrorCode.InvalidUserRoleError:
             case applicationErrorCode.UserCategoryError:
@@ -130,6 +128,7 @@ const SignIn: FC<IProps> = ({navigation}) => {
               break;
             case applicationErrorCode.CredentialsValidationError:
             case applicationErrorCode.UserNotFoundError:
+            case applicationErrorCode.NoUserIdentity:
               setErrorCodeMsg(
                 'We couldn’t find a matching account or the credentials provided are incorrect. Please check your details and try again.',
               );
@@ -143,18 +142,15 @@ const SignIn: FC<IProps> = ({navigation}) => {
         } else if (
           !error &&
           !errorCode &&
-          Object.keys(userData).length > 0 
-          && userInformation !== null
+          Object.keys(userData).length > 0 &&
+          userInformation !== null
         ) {
-          console.log('userdata', Object.keys(userData).length);
-          console.log('****', errorCode, error);
           formik.resetForm();
           const body = (userData as any).body;
           if (
             body &&
             typeof body.email === 'object' &&
             body.email.verified === false
-           
           ) {
             setShowErrorMsg(true);
             setErrorMsg(
@@ -165,7 +161,7 @@ const SignIn: FC<IProps> = ({navigation}) => {
           } else if (
             body &&
             typeof body.email === 'object' &&
-            body.email.verified === true 
+            body.email.verified === true
           ) {
             const resetAction = CommonActions.reset({
               index: 0,
@@ -175,16 +171,17 @@ const SignIn: FC<IProps> = ({navigation}) => {
           }
         }
       } catch (error) {
-        console.log('error',error);
         setShowErrorCodeMsg(true);
         setErrorMsg(
-            'An unknown error has occured while trying to log in please try again',
+          'An unknown error has occured while trying to log in please try again',
         );
-       
       }
-    
-    }, [userData, error, errorCode]),
+    }, [userData, error, errorCode, userInformation]),
   );
+
+  useEffect(() => {
+    checkUserStatus();
+  }, [userData, error, errorCode]);
 
   return (
     <>

@@ -1,9 +1,5 @@
-import React, {FC, useCallback, useEffect, useMemo, useState} from 'react';
-import {
-  NavigationProp,
-  ParamListBase,
-  useFocusEffect,
-} from '@react-navigation/native';
+import React, {FC, useMemo, useState} from 'react';
+import {NavigationProp, ParamListBase} from '@react-navigation/native';
 import createStyles from './styles';
 import FormTexts from '../../Components/FormTexts/FormTexts';
 import FormMainContainer from '../../Components/FormMainContainer/FormMainContainer';
@@ -30,7 +26,7 @@ const ForgotPassword: FC<IProps> = ({navigation}) => {
   const styles = useMemo(() => createStyles(), []);
   const [showErrorMsg, setShowErrorMsg] = useState(false);
   const [errorMsg, setErrorMsg] = useState('');
-  let {loading, message, error, errorCode, passwordRequest} = useSelector(
+  let {loading, message, errorCode} = useSelector(
     (state: RootState) => state.user,
   );
   const dispatch = useDispatch();
@@ -50,20 +46,25 @@ const ForgotPassword: FC<IProps> = ({navigation}) => {
 
   const handleForgotPassword = async () => {
     const payload = {
-      email: formik.values.email.trim(),
+      email: formik.values.email.trim().toLowerCase(),
     };
     dispatch(setemail(formik.values.email.trim()));
     dispatch(forgotPassword(payload))
-      .then(response   => {
-        const result = response.payload;
-        console.log('result', result);
+      .then(response => {
+        const result = response.payload as unknown as Record<
+          string,
+          Record<string, string>
+        >;
         if (result && result?.data.success) {
           setShowErrorMsg(true);
-          setErrorMsg(result.data.message || 'An unexpected error occurred. kindly ensure email is correct');
-          setTimeout(()=>{
+          setErrorMsg(
+            result.data.message ||
+              'An unexpected error occurred. kindly ensure email is correct',
+          );
+          setTimeout(() => {
             setShowErrorMsg(false);
             navigation.navigate('OTPInput', {screenId: 'ForgotPassword'});
-          },3000)
+          }, 3000);
           formik.resetForm();
         } else {
           setShowErrorMsg(true);
@@ -88,15 +89,15 @@ const ForgotPassword: FC<IProps> = ({navigation}) => {
       })
       .catch(() => {
         setShowErrorMsg(true);
-        setErrorMsg('An unexpected error occurred. kindly ensure email is correct');
+        setErrorMsg(
+          'An unexpected error occurred. kindly ensure email is correct',
+        );
         const timer = setTimeout(() => {
           setShowErrorMsg(false);
         }, 2000);
         return () => clearTimeout(timer);
       });
   };
-
- 
 
   return (
     <FormMainContainer>
