@@ -12,7 +12,7 @@ import Modal from 'react-native-modal';
 import CustomLoader from '../../Components/Loader/CustomLoader';
 import ShadowNavBar from '../../Components/NavBar/ShadowNavBar';
 import useUserType from '../../redux/manageUserType/userType';
-import { user } from '../../redux/manageUserType/checkUserType';
+import {user} from '../../redux/manageUserType/checkUserType';
 
 interface IProps {
   navigation: NavigationProp<ParamListBase>;
@@ -24,14 +24,15 @@ const Settings: FC<IProps> = ({navigation}) => {
   const [email, setEmail] = useState('');
   const [confirmLogout, setConfirmLogout] = useState(false);
   const [loader, setLoader] = useState(false);
-  const [userInformation, setUserInformation] = useState<string | null>(null);  const userType = useUserType();
+  const [userInformation, setUserInformation] = useState<string | null>(null);
+  const userType = useUserType();
 
   const checkUserStatus = async () => {
     try {
       const checkTokenAvaibility = await AsyncStorage.getItem(
         'userInformation',
       );
-      setUserInformation(checkTokenAvaibility)
+      setUserInformation(checkTokenAvaibility);
       const checkDetails =
         checkTokenAvaibility !== null ? JSON.parse(checkTokenAvaibility) : null;
       if (checkDetails) {
@@ -50,12 +51,13 @@ const Settings: FC<IProps> = ({navigation}) => {
     try {
       await AsyncStorage.removeItem('userInformation');
       await AsyncStorage.removeItem('userAddress');
+      await AsyncStorage.removeItem('userToken');
       setLoader(true);
       setTimeout(() => {
         setLoader(false);
         setConfirmLogout(false);
+        navigation.navigate('SignIn');
       }, 2000);
-      navigation.navigate('SignIn');
     } catch (error) {
       console.error('Error removing user information: ', error);
     }
@@ -105,15 +107,27 @@ const Settings: FC<IProps> = ({navigation}) => {
             style={styles.logout_container}
             onPress={handleUsers}>
             <FontAwesome
-              name={userType === user.guest || userInformation === null ? 'sign-in' : 'sign-out'}
+              name={
+                userType === user.guest || userInformation === null
+                  ? 'sign-in'
+                  : 'sign-out'
+              }
               size={24}
               color={
-                userType === user.guest || userInformation === null ? colors.ORANGE : colors.LIGHT_RED
+                userType === user.guest || userInformation === null
+                  ? colors.ORANGE
+                  : colors.LIGHT_RED
               }
             />
             <Text
-              style={userType === user.guest || userInformation === null ? styles.login : styles.logout}>
-              {userType === user.guest || userInformation === null ? 'Login' : 'Logout'}
+              style={
+                userType === user.guest || userInformation === null
+                  ? styles.login
+                  : styles.logout
+              }>
+              {userType === user.guest || userInformation === null
+                ? 'Login'
+                : 'Logout'}
             </Text>
           </TouchableOpacity>
 

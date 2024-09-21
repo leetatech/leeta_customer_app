@@ -7,23 +7,13 @@ const createStyles = () =>
      flex: 1,
      justifyContent: 'center',
      alignItems: 'center',
-     paddingHorizontal:15,
+     paddingHorizontal:25,
      backgroundColor:colors.WHITE
     },
-
     buttonStyle:{
      width: '100%',
     },
-   title: {
-     fontSize: 20,
-     fontWeight: 'bold',
-     color: colors.BLACK,
-     paddingTop: 20,
-   },
    description: {
-     fontSize: 15,
-     fontWeight: '400',
-     color: colors.GRAY,
      textAlign: 'center',
      paddingTop: 10,
    },
