@@ -1,4 +1,11 @@
-import React, {FC, useMemo, useState, useEffect, useRef} from 'react';
+import React, {
+  FC,
+  useMemo,
+  useState,
+  useEffect,
+  useRef,
+  useCallback,
+} from 'react';
 import {
   View,
   Image,
@@ -20,8 +27,12 @@ import {useDispatch, useSelector} from 'react-redux';
 import {resendOtp, verifyOtp} from '../../redux/slices/auth/userServices';
 import {maskEmail} from '../../utils';
 import {applicationErrorCode} from '../../errors';
-import {resetUserState} from '../../redux/slices/auth/userSlice';
+import {
+  resetUserState,
+  resetValidateOtp,
+} from '../../redux/slices/auth/userSlice';
 import Fonts from '../../Constants/Fonts';
+import {useFocusEffect} from '@react-navigation/native';
 
 const OTPInput: FC<IOTPInputProps> = props => {
   const {navigation, route} = props;
@@ -33,13 +44,13 @@ const OTPInput: FC<IOTPInputProps> = props => {
   const [errorMsg, setErrorMsg] = useState('');
   const [resendOtpMessage, setResendOtpMsg] = useState('');
   const [showResendOtpMsg, setShowResendOtpMsg] = useState(false);
-
+  const [isVerified, setIsVerified] = useState(false);
+  const [showErrorCodeMsg, setShowErrorCodeMsg] = useState(false);
   const otpRef: any = useRef(null);
-  let {loading, message, userEmail, error} = useSelector(
-    (state: RootState) => state.user,
-  );
+  let {loading, message, userEmail, error, errorCode, otpValidate} =
+    useSelector((state: RootState) => state.user);
   const dispatch = useDispatch();
-  const maskedEmail = maskEmail(userEmail as string);
+  const maskedEmail = userEmail ? maskEmail(userEmail) : 'Email not available';
 
   const validateOtp = (otp: string): boolean => {
     if (otp.length !== 6) {
@@ -62,73 +73,23 @@ const OTPInput: FC<IOTPInputProps> = props => {
         code: actualOtp,
         target: userEmail,
       };
-      dispatch(verifyOtp(payload))
-        .then(response => {
-          const result = response.payload as unknown as Record<
-            string,
-            Record<string, string>
-          >;
-          if (response && result && result.data.success) {
-            if (route.params && route.params.screenId) {
-              switch (route.params.screenId) {
-                case 'Signup':
-                  otpRef.current.setValue('');
-                  navigation.navigate('EmailVerification');
-                  break;
-                case 'ForgotPassword':
-                  otpRef.current.setValue('');
-                  navigation.navigate('CreateNewPassword');
-                  break;
-                case 'Signin':
-                  otpRef.current.setValue('');
-                  navigation.navigate('SignIn');
-                  break;
-                default:
-                  navigation.navigate('SignIn');
-                  break;
-              }
-            } else {
-              console.log('screen id invalidate');
-            }
-            setOtp('');
-          } else {
-            const errorCodeString: string = result.data.error_code;
-            const errorCode: number = parseInt(errorCodeString, 10);
-            switch (errorCode) {
-              case applicationErrorCode.TokenValidationError:
-                setErrorMsg(
-                  message || 'This is not a valid OTP. OTP may have expired.',
-                );
-                break;
-              default:
-                setErrorMsg(
-                  message ||
-                    'Unknown error has occurred while trying to reset your email. Kindly try again shortly.',
-                );
-                break;
-            }
-            setOtp('');
-            setTimeout(() => {
-              dispatch(resetUserState());
-            }, 5000);
-          }
-        })
-        .catch(error => {
-          console.error('Error verifying OTP:', error);
-        });
+      dispatch(verifyOtp(payload));
     }
   };
+
   const toggleErrMsg = () => {
     dispatch(resetUserState());
   };
   const toggleResendOtpMsg = () => {
     setShowResendOtpMsg(false);
   };
-
   const handleResendOtp = () => {
     const payload = {
-      email: userEmail!,
+      topic: 'Test',
+      target: userEmail!,
+      type: 'EMAIL',
     };
+
     dispatch(resendOtp(payload))
       .then(response => {
         const result = response.payload as unknown as Record<
@@ -143,11 +104,10 @@ const OTPInput: FC<IOTPInputProps> = props => {
           const errorCode: number = parseInt(errorCodeString, 10);
           setShowResendOtpMsg(true);
           switch (errorCode) {
-            case applicationErrorCode.InternalError:
+            case applicationErrorCode.TokenValidationError:
               setResendOtpMsg(
                 message ||
-                  result.data.message ||
-                  'An error occurred while trying to reset a user password',
+                  'Token expired, please click the resend otp to generate a new token',
               );
               break;
             default:
@@ -164,8 +124,68 @@ const OTPInput: FC<IOTPInputProps> = props => {
       .catch(error => {
         console.error('Error sending OTP:', error);
       });
-
   };
+
+  useFocusEffect(
+    useCallback(() => {
+      if (error && errorCode) {
+        setShowErrorCodeMsg(true);
+        switch (errorCode) {
+          case applicationErrorCode.TokenValidationError:
+            setErrorMsg(
+              message || 'This is not a valid OTP. OTP may have expired.',
+            );
+            break;
+          default:
+            setErrorMsg(
+              'Unknown error has occurred while trying to validate OTP. Please try again.',
+            );
+            break;
+        }
+        otpRef.current.clear();
+        setTimeout(() => {
+          dispatch(resetUserState());
+          setShowErrorCodeMsg(false);
+        }, 3000);
+      } else if (!error && otpValidate?.success) {
+        if (route.params?.screenId) {
+          switch (route.params.screenId) {
+            case 'Signup':
+              navigation.navigate('EmailVerification');
+              break;
+            case 'ForgotPassword':
+              setErrorMsg('Otp validation successful');
+              setTimeout(() => {
+                setIsVerified(true);
+                setTimeout(() => {
+                  setIsVerified(false);
+                  otpRef.current.setValue('');
+                  navigation.navigate('CreateNewPassword');
+                }, 3000);
+              }, 2000);
+              break;
+            case 'Signin':
+              setErrorMsg('otp validate successful');
+              setTimeout(() => {
+                setIsVerified(true);
+                setTimeout(() => {
+                  setIsVerified(false);
+                  navigation.navigate('SignIn');
+                }, 2000);
+              }, 2000);
+              break;
+            default:
+              navigation.navigate('SignIn');
+              break;
+          }
+          otpRef.current.clear();
+          dispatch(resetValidateOtp());
+        } else {
+          otpRef.current.clear();
+        }
+      }
+    }, [errorCode, message, error, loading]),
+  );
 
   useEffect(() => {
     if (isTimerRunning) {
@@ -199,7 +219,6 @@ const OTPInput: FC<IOTPInputProps> = props => {
           <View style={styles.mainContainer}>
             <Image source={OTPIMAGE} />
             {loading && <CustomLoader />}
-
             <Fonts type="boldBlack" style={styles.bigText}>
               Check your Email.
             </Fonts>
@@ -213,7 +232,6 @@ const OTPInput: FC<IOTPInputProps> = props => {
                 focusColor={colors.BLACK}
                 focusStickBlinkingDuration={200}
                 onTextChange={handleOtpCodeChange}
-
                 theme={{
                   pinCodeContainerStyle: styles.input,
                   pinCodeTextStyle: styles.inputText,
@@ -230,7 +248,6 @@ const OTPInput: FC<IOTPInputProps> = props => {
                 </TouchableOpacity>
               ) : (
                 <Fonts type="smallText">
-
                   Time Remaining {minutes < 10 ? `0${minutes}` : minutes}:
                   {seconds < 10 ? `0${seconds}` : seconds}
                 </Fonts>
@@ -248,17 +265,21 @@ const OTPInput: FC<IOTPInputProps> = props => {
           onPress={() => handleVerifyOTP(otp)}
         />
       </View>
-      {error && (
+      {showErrorCodeMsg && (
+        <CustomToast onPress={toggleErrMsg}>
+          <Fonts type="smallText">{errorMsg}.</Fonts>
+        </CustomToast>
+      )}
+      {isVerified && (
         <CustomToast onPress={toggleErrMsg}>
           <Fonts type="smallText">{errorMsg}.</Fonts>
         </CustomToast>
       )}
       {showResendOtpMsg && (
         <CustomToast onPress={toggleResendOtpMsg}>
-          <Fonts type="smallText">{resendOtpMessage}.</Fonts>
+          <Fonts type="smallText">{resendOtpMessage}</Fonts>
         </CustomToast>
       )}
-
     </FormMainContainer>
   );
 };

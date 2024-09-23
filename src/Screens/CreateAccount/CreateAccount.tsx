@@ -1,7 +1,7 @@
-import React, {FC, useEffect, useMemo, useState} from 'react';
+import React, {FC, useCallback, useEffect, useMemo, useState} from 'react';
 import {Text, View, TouchableOpacity} from 'react-native';
 import createStyles from './styles';
-import {NavigationProp, ParamListBase} from '@react-navigation/native';
+import {NavigationProp, ParamListBase, useFocusEffect} from '@react-navigation/native';
 import FormTexts from '../../Components/FormTexts/FormTexts';
 import FormMainContainer from '../../Components/FormMainContainer/FormMainContainer';
 import Buttons from '../../Components/Buttons/Buttons';
@@ -12,13 +12,17 @@ import {useFormik} from 'formik';
 import * as Yup from 'yup';
 import {colors} from '../../Constants/Colors';
 import CustomModal from '../../Components/Modal/CustomModal';
-import {SUCCESS} from '../../Assets/svgImages';
 import {ScrollView} from 'react-native-gesture-handler';
 import {RootState} from '../../redux/rootReducer';
 import {useDispatch, useSelector} from 'react-redux';
 import {signup} from '../../redux/slices/auth/userServices';
 import CustomLoader from '../../Components/Loader/CustomLoader';
-import {resetUserData, resetUserState, setFullName, setemail} from '../../redux/slices/auth/userSlice';
+import {
+  resetUserData,
+  resetUserState,
+  setFullName,
+  setemail,
+} from '../../redux/slices/auth/userSlice';
 import {appUserType} from '../../config';
 import {applicationErrorCode} from '../../errors';
 
@@ -60,7 +64,9 @@ const CreateAccount: FC<IProps> = ({navigation}) => {
           'Must contain at least 8 characters with 1 Uppercase, Lowercase, Number and Special Character',
         ),
     }),
+    validateOnChange: true,
     enableReinitialize: false,
+    validateOnBlur: true,
     onSubmit: () => {},
   });
 
@@ -68,12 +74,12 @@ const CreateAccount: FC<IProps> = ({navigation}) => {
     if (!Object.keys(formik.errors).length) {
       const payload = {
         full_name: formik.values.full_name.trim(),
-        email: formik.values.email.trim(),
+        email: formik.values.email.trim().toLowerCase(),
         password: formik.values.password.trim(),
         user_type: formik.values.user_type,
       };
       dispatch(setemail(formik.values.email.trim()));
-      dispatch(setFullName(formik.values.full_name.trim()))
+      dispatch(setFullName(formik.values.full_name.trim()));
       dispatch(signup(payload));
     }
   };
@@ -82,77 +88,45 @@ const CreateAccount: FC<IProps> = ({navigation}) => {
     setIsAccountCreated(false);
     dispatch(resetUserData());
     navigation.navigate('OTPInput', {screenId: 'Signup'});
-
   };
 
   const toggleErrorModal = () => {
+    setDisplayErrorMsg(false);
     dispatch(resetUserState());
     navigation.navigate('SignIn');
   };
 
-  useEffect(() => {
-    const storeToken = async () => {
-      if (error && errorCode) {
-        setDisplayErrorMsg(true);
-        switch (errorCode) {
-          case applicationErrorCode.DuplicateUserError:
-            setErrorMsg('User already exists. Kindly proceed to login');
-            break;
-          default:
-            setErrorMsg(
-              'Unknown error has occurred while trying to sign up. Kindly try again shortly.',
-            );
-            break;
+  //useFocus effect
+  useFocusEffect(
+    useCallback(() => {
+      const storeToken = async () => {
+        if (error && errorCode && Object.keys(userData).length === 0) {
+          setDisplayErrorMsg(true);
+          switch (errorCode) {
+            case applicationErrorCode.DuplicateUserError:
+              setErrorMsg('User already exists. Kindly proceed to login');
+              break;
+            default:
+              setErrorMsg(
+                'Unknown error has occurred while trying to sign up. Kindly try again shortly.',
+              );
+              break;
+          }
+          setIsAccountNotCreated(true);
+          setChecked(true);
+          dispatch(resetUserState());
+          formik.resetForm();
+        } else if (!error && Object.keys(userData).length > 0) {
+          setIsAccountCreated(true);
+          setChecked(true);
+          formik.resetForm();
+          dispatch(resetUserState());
         }
-        setIsAccountNotCreated(true);
-        setChecked(true);
-        dispatch(resetUserState());
-        formik.resetForm();
-      } else if (!error && Object.keys(userData).length > 0) {
-        setIsAccountCreated(true);
-        setChecked(true);
-        formik.resetForm();
-        dispatch(resetUserState());
+      };
+      storeToken();
+    }, [userData, error, errorCode]),
+  );
 
-      }
-    };
-    storeToken();
-  }, [userData, error, errorCode]);
-
-  interface ModalProps {
-    visible: boolean;
-    title: string;
-    description: string;
-    buttonText: string;
-    onButtonPress: () => void;
-  }
-
-  const Modal: React.FC<ModalProps> = ({
-    visible,
-    title,
-    description,
-    buttonText,
-    onButtonPress,
-  }) => {
-    return (
-      <CustomModal visible={visible}>
-        <View style={styles.modal_description_container}>
-          {!visible && <SUCCESS />}
-          <Text style={styles.modal_content_title}>{title}</Text>
-          <Text style={styles.modal_content_description}>{description}</Text>
-        </View>
-        <View style={styles.modal_btn_container}>
-          <Buttons
-            title={buttonText}
-            disabled={false}
-            buttonStyle={undefined}
-            textStyle={undefined}
-            onPress={onButtonPress}
-          />
-        </View>
-      </CustomModal>
-    );
-  };
   return (
     <>
       <FormMainContainer>
@@ -167,41 +141,36 @@ const CreateAccount: FC<IProps> = ({navigation}) => {
               <View>
                 <StyledTextInput
                   label="Full name"
+                  placeholder='Enter Full Name'
                   onChangeText={formik.handleChange('full_name')}
                   value={formik.values.full_name}
                   name="full_name"
                   onBlur={() => formik.handleBlur('full_name')}
                   errors={formik.errors.full_name}
-                  helperText={''}
+                  helperText={formik.errors.full_name}
                 />
-                {formik.touched.full_name && formik.errors.full_name && (
-                  <Text style={{color: colors.RED, paddingTop: 2}}>
-                    {formik.errors.full_name}
-                  </Text>
-                )}
               </View>
               <View>
                 <StyledTextInput
                   label="Email"
+                  placeholder='Enter Email'
                   onChangeText={formik.handleChange('email')}
                   value={formik.values.email}
                   name="email"
                   onBlur={() => formik.handleBlur('email')}
                   errors={formik.errors.email}
-                  helperText={''}
+                  helperText={formik.errors.email}
                 />
-                {formik.touched.email && formik.errors.email && (
-                  <Text style={{color: colors.RED, paddingTop: 2}}>
-                    {formik.errors.email}
-                  </Text>
-                )}
               </View>
               <View>
                 <StyledTextInput
                   label="Password"
+                  placeholder='Enter Password'
                   name="password"
                   value={formik.values.password}
                   onChangeText={formik.handleChange('password')}
+                  helperText={formik.errors.password}
+                  errors={formik.errors.password}
                   onBlur={() => formik.handleBlur('password')}
                   secureTextEntry={!showPassword}
                   isPassword={true}
@@ -213,13 +182,7 @@ const CreateAccount: FC<IProps> = ({navigation}) => {
                       style={styles.passwordIcon}
                     />
                   }
-                  helperText={''}
                 />
-                {formik.touched.password && formik.errors.password && (
-                  <Text style={{color: colors.RED, paddingTop: 2}}>
-                    {formik.errors.password}
-                  </Text>
-                )}
                 <View style={styles.checkboxContainer}>
                   <TouchableOpacity>
                     <Fontisto

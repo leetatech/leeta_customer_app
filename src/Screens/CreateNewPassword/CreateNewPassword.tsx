@@ -3,13 +3,12 @@ import {NavigationProp, ParamListBase} from '@react-navigation/native';
 import createStyles from './styles';
 import FormTexts from '../../Components/FormTexts/FormTexts';
 import FormMainContainer from '../../Components/FormMainContainer/FormMainContainer';
-import {View,TouchableOpacity} from 'react-native';
+import {View, TouchableOpacity} from 'react-native';
 import {NAVIGATION_ICON} from '../../Assets/svgImages';
 import {ScrollView} from 'react-native-gesture-handler';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import StyledTextInput from '../../Components/InputFields/StyledTextInput';
 import Buttons from '../../Components/Buttons/Buttons';
-import {colors} from '../../Constants/Colors';
 import {useFormik} from 'formik';
 import * as Yup from 'yup';
 import {useDispatch, useSelector} from 'react-redux';
@@ -30,7 +29,9 @@ const CreateNewPassword: FC<IProps> = ({navigation}) => {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [showErrorMsg, setShowErrorMsg] = useState(false);
   const [errorMsg, setErrorMsg] = useState('');
-  let {message, userEmail,loading} = useSelector((state: RootState) => state.user);
+  let {message, userEmail, loading} = useSelector(
+    (state: RootState) => state.user,
+  );
   const dispatch = useDispatch();
   const toggleErrMsg = () => {
     setShowErrorMsg(false);
@@ -75,7 +76,7 @@ const CreateNewPassword: FC<IProps> = ({navigation}) => {
         result &&
         result.data.body
       ) {
-        navigation.navigate('SignIn');
+        navigation.navigate('PasswordCreated');
         formik.resetForm();
       } else {
         const errorCodeString: string = result.data.error_code;
@@ -98,8 +99,7 @@ const CreateNewPassword: FC<IProps> = ({navigation}) => {
             break;
           default:
             setErrorMsg(
-            
-                'An unknown error has occured while trying to reset password. Kindly try again',
+              'An unknown error has occured while trying to reset password. Kindly try again',
             );
             break;
         }
@@ -128,11 +128,13 @@ const CreateNewPassword: FC<IProps> = ({navigation}) => {
           <StyledTextInput
             label="Password"
             name="password"
+            errors={formik.errors.password}
             value={formik.values.password}
             onChangeText={formik.handleChange('password')}
             onBlur={() => formik.setFieldTouched('password')}
             secureTextEntry={!showPassword}
             isPassword={true}
+            helperText={formik.errors.password}
             icon={
               <Icon
                 name={showPassword ? 'eye' : 'eye-slash'}
@@ -141,21 +143,17 @@ const CreateNewPassword: FC<IProps> = ({navigation}) => {
                 style={styles.passwordIcon}
               />
             }
-            helperText={''}
           />
-          {formik.touched.password && formik.errors.password && (
-            <Fonts type="smallText" style={{color: colors.RED, paddingTop: 2}}>
-              {formik.errors.password}
-            </Fonts>
-          )}
         </View>
         <View style={styles.confirmPasswordContainer}>
           <StyledTextInput
             label="Confirm Password"
             name="confirm_password"
+            errors={formik.errors.confirm_password}
             value={formik.values.confirm_password}
             onChangeText={formik.handleChange('confirm_password')}
             onBlur={() => formik.setFieldTouched('confirm_password')}
+            helperText={formik.errors.confirm_password}
             secureTextEntry={!showConfirmPassword}
             isPassword={true}
             icon={
@@ -166,20 +164,7 @@ const CreateNewPassword: FC<IProps> = ({navigation}) => {
                 style={styles.passwordIcon}
               />
             }
-            helperText={
-              formik.touched.confirm_password && formik.errors.confirm_password
-                ? formik.errors.confirm_password.toString()
-                : undefined
-            }
           />
-          {formik.touched.confirm_password &&
-            formik.errors.confirm_password && (
-              <Fonts
-                type="smallText"
-                style={{color: colors.RED, paddingTop: 2}}>
-                {formik.errors.confirm_password}
-              </Fonts>
-            )}
         </View>
         <View style={styles.buttonContainer}>
           <Buttons

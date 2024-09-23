@@ -1,4 +1,4 @@
-import React, {useMemo, useState, FC, useEffect} from 'react';
+import React, {useMemo, useState, FC, useCallback, useEffect} from 'react';
 import {View, TouchableOpacity} from 'react-native';
 import createStyles from './styles';
 import FormTexts from '../../Components/FormTexts/FormTexts';
@@ -6,10 +6,13 @@ import FormMainContainer from '../../Components/FormMainContainer/FormMainContai
 import Buttons from '../../Components/Buttons/Buttons';
 import StyledTextInput from '../../Components/InputFields/StyledTextInput';
 import Icon from 'react-native-vector-icons/FontAwesome';
-import {NavigationProp, ParamListBase} from '@react-navigation/native';
+import {
+  NavigationProp,
+  ParamListBase,
+  useFocusEffect,
+} from '@react-navigation/native';
 import * as Yup from 'yup';
 import {useFormik} from 'formik';
-import {colors} from '../../Constants/Colors';
 import {ScrollView} from 'react-native-gesture-handler';
 import {useDispatch, useSelector} from 'react-redux';
 import {login} from '../../redux/slices/auth/userServices';
@@ -24,8 +27,8 @@ import {
 } from '../../redux/slices/auth/userSlice';
 import {applicationErrorCode} from '../../errors';
 import Fonts from '../../Constants/Fonts';
-import { CommonActions } from '@react-navigation/native';
-
+import {CommonActions} from '@react-navigation/native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 interface IProps {
   navigation: NavigationProp<ParamListBase>;
@@ -38,6 +41,8 @@ const SignIn: FC<IProps> = ({navigation}) => {
   const [errorMsg, setErrorMsg] = useState('');
   const [errorCodeMsg, setErrorCodeMsg] = useState('');
   const [showErrorCodeMsg, setShowErrorCodeMsg] = useState(false);
+  const [userInformation, setUserInformation] = useState<string | null>(null);
+
   let {loading, errorCode, error, userData, message} = useSelector(
     (state: RootState) => state.user,
   );
@@ -62,14 +67,15 @@ const SignIn: FC<IProps> = ({navigation}) => {
           'Must contain at least 8 characters with 1 Uppercase, Lowercase, Number and Special Character',
         ),
     }),
+    validateOnChange: true,
     enableReinitialize: false,
-    validateOnBlur: false,
+    validateOnBlur: true,
     onSubmit: () => {},
   });
   const handleSubmit = async () => {
     if (!Object.keys(formik.errors).length) {
       const payload = {
-        email: formik.values.email.trim(),
+        email: formik.values.email.trim().toLowerCase(),
         password: formik.values.password.trim(),
         user_type: formik.values.user_type,
       };
@@ -82,7 +88,7 @@ const SignIn: FC<IProps> = ({navigation}) => {
   const navigateToVerify = () => {
     dispatch(resetUserData());
     setShowErrorMsg(false);
-        navigation.navigate('OTPInput', {screenId: 'Signin'});
+    navigation.navigate('OTPInput', {screenId: 'Signin'});
   };
   const dismissErrorCodeMessageModal = () => {
     dispatch(resetUserState());
@@ -94,57 +100,87 @@ const SignIn: FC<IProps> = ({navigation}) => {
     navigation.navigate('CreateAccount');
   };
 
-  useEffect(() => {
-    if (error && errorCode) {
-      // TODO: handle more signin error edge cases
-      switch (errorCode) {
-        case applicationErrorCode.InvalidUserRoleError:
-        case applicationErrorCode.UserCategoryError:
-          setErrorCodeMsg(
-            message ||
-              'You are trying to log into the wrong LEETA app. kindly sign in with the LEETA Vendor app',
-          );
-          break;
-        case applicationErrorCode.CredentialsValidationError:
-        case applicationErrorCode.UserNotFoundError:
-          setErrorCodeMsg(
-            message ||
-              'An error has occurred while trying to sign in. Kindly try again shortly.',
-          );
-          break;
-        default:
-          setErrorCodeMsg(
-            'An error has occurred while trying to sign in. Kindly try again shortly.',
-          );
-          break;
+  const checkUserStatus = async () => {
+    try {
+      const checkUserAvaibility = await AsyncStorage.getItem('userInformation');
+      if (checkUserAvaibility) {
+        setUserInformation(checkUserAvaibility);
       }
-      setShowErrorCodeMsg(true);
-    } else if (!error && Object.keys(userData).length > 0) {
-      formik.resetForm();
-      const body = (userData as any).body;
-      if (
-        body &&
-        typeof body.email === 'object' &&
-        body.email.verified === false
-      ) {
-        setShowErrorMsg(true);
-        setErrorMsg(
-          message ||
-            'Your email is not verified. Kindly check email for OTP for email verification',
-        );
-        dispatch(resetUserState());
-      } else if (
-        body &&
-        typeof body.email === 'object' &&
-        body.email.verified === true
-      ) {
-        const resetAction = CommonActions.reset({
-          index: 0, 
-          routes: [{ name: 'BottomNavigator' }],
-        });
-        navigation.dispatch(resetAction);
-      }
+    } catch (error) {
+      console.error('Error parsing JSON or retrieving data: ', error);
     }
+  };
+
+  useFocusEffect(
+    useCallback(() => {
+      try {
+        if (error && errorCode) {
+          // TODO: handle more signin error edge cases
+          setShowErrorCodeMsg(true);
+
+          switch (errorCode) {
+            case applicationErrorCode.InvalidUserRoleError:
+            case applicationErrorCode.UserCategoryError:
+              setErrorCodeMsg(
+                message ||
+                  'You are trying to log into the wrong LEETA app. kindly sign in with the LEETA Vendor app',
+              );
+              break;
+            case applicationErrorCode.CredentialsValidationError:
+            case applicationErrorCode.UserNotFoundError:
+            case applicationErrorCode.NoUserIdentity:
+              setErrorCodeMsg(
+                'We couldn’t find a matching account or the credentials provided are incorrect. Please check your details and try again.',
+              );
+              break;
+            default:
+              setErrorCodeMsg(
+                'An error has occurred while trying to sign in. Kindly try again shortly.',
+              );
+              break;
+          }
+        } else if (
+          !error &&
+          !errorCode &&
+          Object.keys(userData).length > 0 &&
+          userInformation !== null
+        ) {
+          formik.resetForm();
+          const body = (userData as any).body;
+          if (
+            body &&
+            typeof body.email === 'object' &&
+            body.email.verified === false
+          ) {
+            setShowErrorMsg(true);
+            setErrorMsg(
+              message ||
+                'Your email is not verified. Kindly check email for OTP for email verification',
+            );
+            dispatch(resetUserState());
+          } else if (
+            body &&
+            typeof body.email === 'object' &&
+            body.email.verified === true
+          ) {
+            const resetAction = CommonActions.reset({
+              index: 0,
+              routes: [{name: 'BottomNavigator'}],
+            });
+            navigation.dispatch(resetAction);
+          }
+        }
+      } catch (error) {
+        setShowErrorCodeMsg(true);
+        setErrorMsg(
+          'An unknown error has occured while trying to log in please try again',
+        );
+      }
+    }, [userData, error, errorCode, userInformation]),
+  );
+
+  useEffect(() => {
+    checkUserStatus();
   }, [userData, error, errorCode]);
 
   return (
@@ -161,6 +197,7 @@ const SignIn: FC<IProps> = ({navigation}) => {
               <View>
                 <StyledTextInput
                   label="Email"
+                  placeholder="Enter Email"
                   onChangeText={formik.handleChange('email')}
                   value={formik.values.email}
                   name="email"
@@ -168,20 +205,15 @@ const SignIn: FC<IProps> = ({navigation}) => {
                   errors={formik.errors.email}
                   helperText={formik.errors.email}
                 />
-                {formik.errors.email && formik.touched.email && (
-                  <Fonts
-                    type="normalText"
-                    style={{color: colors.RED, paddingTop: 2}}>
-                    {formik.errors.email}
-                  </Fonts>
-                )}
               </View>
 
               <View>
                 <StyledTextInput
                   label="Password"
+                  placeholder="Enter Password"
                   name="password"
                   value={formik.values.password}
+                  errors={formik.errors.password}
                   onChangeText={formik.handleChange('password')}
                   onBlur={() => formik.handleBlur('password')}
                   secureTextEntry={!showPassword}
@@ -196,13 +228,6 @@ const SignIn: FC<IProps> = ({navigation}) => {
                   }
                   helperText={formik.errors.password}
                 />
-                {formik.errors.password && formik.touched.password && (
-                  <Fonts
-                    type="normalText"
-                    style={{color: colors.RED, paddingTop: 2}}>
-                    {formik.errors.password}
-                  </Fonts>
-                )}
                 <TouchableOpacity
                   onPress={() => navigation.navigate('ForgotPassword')}>
                   <Fonts type="normalText" style={styles.fp}>
@@ -232,7 +257,7 @@ const SignIn: FC<IProps> = ({navigation}) => {
         </View>
       </FormMainContainer>
 
-      {error && (
+      {showErrorCodeMsg ? (
         <CustomModal visible={showErrorCodeMsg}>
           <View style={styles.modal_description_container}>
             <Fonts type="normalText" style={styles.modal_content_title}>
@@ -252,6 +277,8 @@ const SignIn: FC<IProps> = ({navigation}) => {
             />
           </View>
         </CustomModal>
+      ) : (
+        <></>
       )}
       {showErrorMsg && (
         <CustomModal visible={showErrorMsg}>

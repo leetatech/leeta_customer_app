@@ -30,7 +30,11 @@ export interface GuestData {
     latitude: number;
     longitude: number;
   };
-  number: string;
+  phone : {
+    primary: boolean;
+    number: string;
+    verified: boolean;
+  }
 }
 
 export const updateGuestData = createAsyncThunk(

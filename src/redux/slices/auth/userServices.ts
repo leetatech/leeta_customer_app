@@ -3,7 +3,7 @@ import axios from 'axios';
 import {apiUrl} from '../../../config';
 import {apiCall} from '../../../utils';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { UserDataResponse } from './type';
+import {UserDataResponse} from './type';
 
 export interface UserData {
   full_name: string;
@@ -31,7 +31,9 @@ export interface ResetPasswordData {
   password: string;
 }
 export interface ResendOtpData {
-  email: string;
+  topic: string;
+  target: string | null;
+  type: string;
 }
 export interface UpdateUserData {
   addresses: {
@@ -68,6 +70,15 @@ export interface UpdateUserData {
   status: string;
 }
 
+export interface ErrorPayload {
+  data: {
+    error_reference: string;
+    error_code: number;
+    error_type: string;
+    message: string;
+  };
+}
+
 export const signup = createAsyncThunk(
   'user/signup',
   async (userDetails: UserData, {rejectWithValue}) => {
@@ -75,6 +86,7 @@ export const signup = createAsyncThunk(
       const url = apiUrl.signUp;
       const method = 'post';
       const response: any = await apiCall(url, method, userDetails);
+
       if (response.data !== undefined) {
         await AsyncStorage.setItem('userToken', response.data.auth_token);
       } else {
@@ -83,9 +95,9 @@ export const signup = createAsyncThunk(
       return response as Record<string, Record<string, string> | string>;
     } catch (error) {
       if (axios.isAxiosError(error)) {
-        return rejectWithValue(error.response?.data);
+        return rejectWithValue({...error});
       } else if (error instanceof Error) {
-        return rejectWithValue(error.message);
+        return rejectWithValue({...error});
       } else {
         throw error;
       }
@@ -93,7 +105,6 @@ export const signup = createAsyncThunk(
   },
 );
 
-//verify otp
 export const verifyOtp = createAsyncThunk(
   'user/verification',
   async (verifyUser: UserVerification, {rejectWithValue}) => {
@@ -106,18 +117,15 @@ export const verifyOtp = createAsyncThunk(
       };
       const response = await apiCall(url, method, verifyUser, headers);
       return response as Record<string, Record<string, string> | string>;
-    } catch (error) {
-      if (axios.isAxiosError(error)) {
-        return rejectWithValue(error.response?.data);
-      } else if (error instanceof Error) {
-        return rejectWithValue(error.message);
-      } else {
-      }
+    } catch (error:any) {
+        const errorPayload: ErrorPayload = {
+          data: error.data?.data ?? { message: error.message, error_code: 0 },
+        };
+        return rejectWithValue(errorPayload.data);
     }
   },
 );
 
-//user login
 export const login = createAsyncThunk(
   'user/login',
   async (loginDetails: loginUserData, {rejectWithValue}) => {
@@ -125,6 +133,7 @@ export const login = createAsyncThunk(
       const url = apiUrl.logIn;
       const method = 'post';
       const response: any = await apiCall(url, method, loginDetails);
+
       if (response.data !== undefined) {
         await AsyncStorage.setItem('userToken', response.data.auth_token);
         await AsyncStorage.setItem(
@@ -135,11 +144,11 @@ export const login = createAsyncThunk(
         return null;
       }
       return response as Record<string, Record<string, string> | string>;
-    } catch (error) {
+    } catch (error:any) {
       if (axios.isAxiosError(error)) {
-        return rejectWithValue(error.response?.data);
+        return rejectWithValue({...error});
       } else if (error instanceof Error) {
-        return rejectWithValue(error.message);
+        return rejectWithValue({...error});
       } else {
         throw error;
       }
@@ -147,7 +156,6 @@ export const login = createAsyncThunk(
   },
 );
 
-//forgotPassword
 export const forgotPassword = createAsyncThunk(
   'user/forgotPassword',
   async (forgotPasswordDetails: ForgotPasswordData, {rejectWithValue}) => {
@@ -156,19 +164,15 @@ export const forgotPassword = createAsyncThunk(
       const method = 'post';
       const response: any = await apiCall(url, method, forgotPasswordDetails);
       return response as Record<string, Record<string, string> | string>;
-    } catch (error) {
-      if (axios.isAxiosError(error)) {
-        return rejectWithValue(error.response?.data);
-      } else if (error instanceof Error) {
-        return rejectWithValue(error.message);
-      } else {
-        throw error;
-      }
+    } catch (error:any) {
+      const errorPayload: ErrorPayload = {
+        data: error.data?.data ?? { message: error.message, error_code: 0 },
+      };
+      return rejectWithValue(errorPayload.data);
     }
   },
 );
 
-//Password Reset
 export const resetPassword = createAsyncThunk(
   'user/resetPassword',
   async (resetPasswordDetails: ResetPasswordData, {rejectWithValue}) => {
@@ -179,7 +183,7 @@ export const resetPassword = createAsyncThunk(
       return response as Record<string, Record<string, string> | string>;
     } catch (error) {
       if (axios.isAxiosError(error)) {
-        return rejectWithValue(error.response?.data);
+        return rejectWithValue(error.response);
       } else if (error instanceof Error) {
         return rejectWithValue(error.message);
       } else {
@@ -189,7 +193,6 @@ export const resetPassword = createAsyncThunk(
   },
 );
 
-//Resend Otp
 export const resendOtp = createAsyncThunk(
   'user/resendOtp',
   async (resendOtpDetails: ResendOtpData, {rejectWithValue}) => {
@@ -210,7 +213,6 @@ export const resendOtp = createAsyncThunk(
   },
 );
 
-//Get user data
 export const triggerGetUserData = createAsyncThunk(
   'user/getUserData',
   async (_, {rejectWithValue}) => {
@@ -230,7 +232,7 @@ export const triggerGetUserData = createAsyncThunk(
       } else {
         return null;
       }
-      return response as  UserDataResponse
+      return response as UserDataResponse;
     } catch (error) {
       if (axios.isAxiosError(error)) {
         return rejectWithValue(error.response?.data);
@@ -242,7 +244,6 @@ export const triggerGetUserData = createAsyncThunk(
     }
   },
 );
-//update user data
 export const updateUserData = createAsyncThunk(
   'user/updateUserData',
   async (userDataDetails: UpdateUserData, {rejectWithValue}) => {
@@ -253,12 +254,7 @@ export const updateUserData = createAsyncThunk(
       const headers = {
         Authorization: `Bearer ${token}`,
       };
-      const response = await apiCall(
-        url,
-        method,
-        userDataDetails,
-        headers,
-      );
+      const response = await apiCall(url, method, userDataDetails, headers);
       return response as Record<string, Record<string, string> | string>;
     } catch (error) {
       if (axios.isAxiosError(error)) {
