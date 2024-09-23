@@ -168,6 +168,7 @@ const SignIn: FC<IProps> = ({navigation}) => {
               routes: [{name: 'BottomNavigator'}],
             });
             navigation.dispatch(resetAction);
+            dispatch(resetUserState());
           }
         }
       } catch (error) {
@@ -180,6 +181,8 @@ const SignIn: FC<IProps> = ({navigation}) => {
   );
 
   useEffect(() => {
+    dispatch(resetUserState());
+
     checkUserStatus();
   }, [userData, error, errorCode]);
 
