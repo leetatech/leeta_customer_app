@@ -71,7 +71,7 @@ const OTPInput: FC<IOTPInputProps> = props => {
     if (validateOtp(actualOtp)) {
       const payload = {
         code: actualOtp,
-        target: userEmail,
+        target: userEmail?.toLowerCase(),
       };
       dispatch(verifyOtp(payload));
     }
