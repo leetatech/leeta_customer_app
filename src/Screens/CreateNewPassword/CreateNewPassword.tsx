@@ -39,7 +39,7 @@ const CreateNewPassword: FC<IProps> = ({navigation}) => {
 
   const formik = useFormik({
     initialValues: {
-      email: userEmail!,
+      email: userEmail!.toLowerCase(),
       password: '',
       confirm_password: '',
     },
@@ -192,3 +192,4 @@ const CreateNewPassword: FC<IProps> = ({navigation}) => {
 };
 
 export default CreateNewPassword;
+
