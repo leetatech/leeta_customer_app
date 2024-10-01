@@ -13,4 +13,5 @@ export {default as Cart} from './Cart/Cart';
 export {default as OrderConfirmation} from './OrderConfirmation/OrderConfirmation';
 export {default as AddAddress} from './AddAddress/AddAddress';
 export {default as Settings} from './Seetings/Settings';
+export {default as Orders} from './Orders/Orders';
 
