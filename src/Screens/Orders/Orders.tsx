@@ -5,7 +5,6 @@ import ShadowNavBar from '../../Components/NavBar/ShadowNavBar';
 import createStyles from './styles';
 import {ScrollView, Text, View} from 'react-native';
 import Tabs from '../../Components/Tabs/Tabs';
-import {colors} from '../../Constants/Colors';
 import {ComponentType} from './types';
 interface IProps {
   navigation: NavigationProp<ParamListBase>;
