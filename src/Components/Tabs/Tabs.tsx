@@ -1,6 +1,6 @@
-import React, {FC, useState, useMemo} from 'react';
-import {Text, View, TouchableOpacity, ViewStyle, StyleProp} from 'react-native';
-import createStyles from './styles';
+import React, {FC} from 'react';
+import {View, TouchableOpacity, ViewStyle, StyleProp} from 'react-native';
+import Fonts from '../../Constants/Fonts';
 interface IProps {
   onPress: () => void;
   text: string;
@@ -8,24 +8,17 @@ interface IProps {
 }
 
 const Tabs: FC<IProps> = ({onPress, text, viewStyle}) => {
-  const styles = useMemo(() => createStyles(), []);
-  const [isActive, setIsActive] = useState(false);
-  const toggleView = () => {
-    setIsActive(!isActive);
-  };
   return (
-      <View >
-        <TouchableOpacity
-          onPress={onPress}
-          activeOpacity={0.8}
-          style={[viewStyle]}>
-          <View>
-            <Text style={styles.order_title}>{text} </Text>
-          </View>
-        </TouchableOpacity>
-       
-      </View>
-
+    <View>
+      <TouchableOpacity
+        onPress={onPress}
+        activeOpacity={0.8}
+        style={[viewStyle]}>
+        <View>
+          <Fonts type="boldBlack">{text} </Fonts>
+        </View>
+      </TouchableOpacity>
+    </View>
   );
 };
 export default Tabs;

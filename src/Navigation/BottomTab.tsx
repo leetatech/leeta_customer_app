@@ -1,7 +1,7 @@
 import React from 'react';
 import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
-import {Home, Settings} from '../Screens';
+import {Home, Orders, Settings} from '../Screens';
 import {colors} from '../Constants/Colors';
 import {SvgIcon} from '../Components/icons';
 
@@ -44,6 +44,23 @@ const BottomNavigator = () => {
           ),
         }}
       />
+       <Tab.Screen
+        name="Orders"
+        component={Orders}
+        options={{
+          tabBarIcon: ({focused}) => (
+            <SvgIcon
+              size={24}
+              fill={focused ? colors.ORANGE : colors.LGRAY}
+              pathData="M1.56784 14.4724V4.1005L0 0.683417L1.44724 0L3.33668 4.0603H12.6633L14.5528 0L16 0.683417L14.4322 4.1005V14.4724H1.56784ZM6.39196 8.84422H9.60804C9.83584 8.84422 10.0269 8.76703 10.1813 8.61266C10.3357 8.45829 10.4126 8.26747 10.4121 8.0402C10.4115 7.81293 10.3343 7.62211 10.1805 7.46774C10.0267 7.31337 9.83584 7.23618 9.60804 7.23618H6.39196C6.16415 7.23618 5.97333 7.31337 5.8195 7.46774C5.66566 7.62211 5.58848 7.81293 5.58794 8.0402C5.5874 8.26747 5.66459 8.45856 5.8195 8.61347C5.9744 8.76837 6.16523 8.84529 6.39196 8.84422ZM3.17588 12.8643H12.8241V5.66834H3.17588V12.8643Z"
+              style={{
+                marginTop: 3
+              }}
+            />
+          ),
+        }}
+      />
+     
       <Tab.Screen
         name="Settings"
         component={Settings}
