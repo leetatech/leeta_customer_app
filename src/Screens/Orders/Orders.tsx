@@ -6,6 +6,7 @@ import createStyles from './styles';
 import {ScrollView, Text, View} from 'react-native';
 import Tabs from '../../Components/Tabs/Tabs';
 import {ComponentType} from './types';
+import Buttons from '../../Components/Buttons/Buttons';
 interface IProps {
   navigation: NavigationProp<ParamListBase>;
 }
@@ -59,7 +60,7 @@ const Orders: FC<IProps> = ({navigation}) => {
                 onPress={() => showCurrentComponent('deliveredOrders')}
                 text="Delivered Orders"
                 viewStyle={
-                 showComponent.deliveredOrders
+                  showComponent.deliveredOrders
                     ? styles.activeContainer
                     : styles.inactiveContainer
                 }
@@ -80,9 +81,17 @@ const Orders: FC<IProps> = ({navigation}) => {
             showsVerticalScrollIndicator={false}
             style={styles.order_container}>
             {showComponent.openOrders && (
-              <View>
-                <Text>New Order</Text>
-              </View>
+              <>
+                <View>
+                  <Text>New Order</Text>
+                </View>
+                <Buttons
+                  title="Go to details"
+                  textStyle={undefined}
+                  buttonStyle={undefined}
+                  onPress={() => navigation.navigate('Summary')}
+                />
+              </>
             )}
             {showComponent.deliveredOrders && (
               <View>

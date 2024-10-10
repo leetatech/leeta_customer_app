@@ -5,7 +5,9 @@ export default function AppNavigator () {
      const isUserLoggedIn = true
   return (
     <>
-     <RootNavigation defaultRoute={isUserLoggedIn ? 'DashboardLayout' : 'InitialScreen'} />
+      <RootNavigation
+        defaultRoute={isUserLoggedIn ? 'DashboardLayout' : 'InitialScreen'}
+      />
     </>
-  )
+  );
 }
