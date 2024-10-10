@@ -22,7 +22,7 @@ const createStyles = () =>
       ...Platform.select({
         ios: {
           shadowColor: colors.LGRAY,
-          shadowOpacity: 0.2,
+          // shadowOpacity: 0.2,
           shadowRadius: 4,
           zIndex: 3,
         },
