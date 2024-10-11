@@ -7,6 +7,10 @@ import {ScrollView, Text, View} from 'react-native';
 import Tabs from '../../Components/Tabs/Tabs';
 import {ComponentType} from './types';
 import Buttons from '../../Components/Buttons/Buttons';
+import {CYLINDER} from '../../Assets/svgImages';
+import Fonts from '../../Constants/Fonts';
+import {colors} from '../../Constants/Colors';
+import Card from '../../Components/Card/Card';
 interface IProps {
   navigation: NavigationProp<ParamListBase>;
 }
@@ -41,7 +45,7 @@ const Orders: FC<IProps> = ({navigation}) => {
       />
 
       <View style={styles.main_container}>
-        <View style={styles.container}>
+        <View>
           <ScrollView
             scrollEnabled={true}
             horizontal={true}
@@ -49,7 +53,7 @@ const Orders: FC<IProps> = ({navigation}) => {
             <View style={styles.order_description_container}>
               <Tabs
                 onPress={() => showCurrentComponent('openOrders')}
-                text="Open Orders"
+                text="All Orders"
                 viewStyle={
                   showComponent.openOrders
                     ? styles.activeContainer
@@ -76,10 +80,8 @@ const Orders: FC<IProps> = ({navigation}) => {
               />
             </View>
           </ScrollView>
-          <ScrollView
-            scrollEnabled={true}
-            showsVerticalScrollIndicator={false}
-            style={styles.order_container}>
+
+          <ScrollView scrollEnabled={true} showsVerticalScrollIndicator={false}>
             {showComponent.openOrders && (
               <>
                 <View>
@@ -101,6 +103,24 @@ const Orders: FC<IProps> = ({navigation}) => {
             {showComponent.cancelledOrders && (
               <View>
                 <Text>Canceled Order</Text>
+              <View style={styles.scrollContainer}>
+                <Card>
+                  <View style={styles.order_container}>
+                    <CYLINDER />
+                    <View style={styles.order_desc_container}>
+                      <Fonts type="smallText">10Kg Gas Refill</Fonts>
+                      <Fonts type="smallText">Order #12345678</Fonts>
+                      <View style={styles.order_status_container}>
+                        <Fonts
+                          type="normalBoldText"
+                          style={{color: colors.WHITE}}>
+                          DELIVERED
+                        </Fonts>
+                      </View>
+                      <Fonts type="normalBoldText">On Friday, 10 - 02</Fonts>
+                    </View>
+                  </View>
+                </Card>
               </View>
             )}
           </ScrollView>
