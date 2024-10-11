@@ -61,6 +61,7 @@ const createStyles = () =>
     },
     bold_txt: {
       fontWeight: '800',
+      color: colors.GRAY,
     },
     gray_txt: {color: colors.GRAY, lineHeight: 20},
     amount_container: {
@@ -82,6 +83,52 @@ const createStyles = () =>
       lineHeight: 34,
       fontSize: 16,
     },
+    safet_area: {
+      backgroundColor: colors.WHITE,
+      flex: 1,
+    },
+    btns_content: {
+      flexDirection: 'column',
+      gap: 19,
+    },
+    scroll_safe: {
+      paddingBottom: 40,
+    },
+    btns_size: {
+      fontSize: 17,
+    },
+    btn_style: {borderColor: colors.ORANGE, borderWidth: 1},
+    payments: {
+      color: colors.GRAY,
+      fontSize: 14,
+      fontWeight: 'bold',
+      lineHeight: 34,
+      marginTop: 19,
+    },
+    payments_mtd: {
+      color: colors.GRAY,
+      fontSize: 16,
+      fontWeight: 'bold',
+      lineHeight: 34,
+    },
+    delivery: {
+      fontSize: 14,
+      fontWeight: 'bold',
+      lineHeight: 34,
+      marginTop: 25,
+    },
+    payon: {borderBottomWidth: 0.5, borderColor: colors.LGRAY},
+    sect: {
+      borderBottomWidth: 1,
+      borderColor: colors.ORANGE,
+      marginTop: 25,
+    },
+    sect2: {
+      borderBottomWidth: 0.5,
+      borderColor: colors.ORANGE,
+      marginTop: 10,
+    },
+    list: {flexDirection: 'row', justifyContent: 'space-between'},
   });
 
 export default createStyles;
