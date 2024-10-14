@@ -28,9 +28,14 @@ const createStyles = () =>
       flexDirection: 'row',
       gap: 20,
     },
-    order_status_container: {
+    all_orders_status_container: {
       backgroundColor: colors.LEMON,
-      padding:2    },
+      padding: 2,
+    },
+    cancelled_orders_status_container: {
+      backgroundColor: colors.RED,
+      padding: 2,
+    },
     order_desc_container: {gap: 3},
     scrollContainer: {
       paddingBottom: 60,
