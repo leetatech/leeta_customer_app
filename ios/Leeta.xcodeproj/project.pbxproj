@@ -7,14 +7,14 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		00E356F31AD99517003FC87E /* vendorTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 00E356F21AD99517003FC87E /* vendorTests.m */; };
+		00E356F31AD99517003FC87E /* LeetaTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 00E356F21AD99517003FC87E /* LeetaTests.m */; };
 		13B07FBC1A68108700A75B9A /* AppDelegate.mm in Sources */ = {isa = PBXBuildFile; fileRef = 13B07FB01A68108700A75B9A /* AppDelegate.mm */; };
 		13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 13B07FB51A68108700A75B9A /* Images.xcassets */; };
 		13B07FC11A68108700A75B9A /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 13B07FB71A68108700A75B9A /* main.m */; };
+		14D8BF7FE9C4BF8668EA76F8 /* libPods-Leeta-LeetaTests.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 09A8EF13E690C39670B29C6D /* libPods-Leeta-LeetaTests.a */; };
 		189827502A6E9B6B001D7A17 /* Fonts in Resources */ = {isa = PBXBuildFile; fileRef = 1898274F2A6E9B6A001D7A17 /* Fonts */; };
-		22B70B047446675BDBE6C552 /* libPods-vendor-vendorTests.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 84A250B7932909EA5E5CD681 /* libPods-vendor-vendorTests.a */; };
-		7E035DCDE9754052D66553AD /* libPods-vendor.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 104BB346EABD8A7ADFE4E809 /* libPods-vendor.a */; };
 		81AB9BB82411601600AC10FF /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */; };
+		F99C51585A3D8E11D53FE1E1 /* libPods-Leeta.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 9C04CA90E3D033BD5EE8C0CE /* libPods-Leeta.a */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -23,29 +23,29 @@
 			containerPortal = 83CBB9F71A601CBA00E9B192 /* Project object */;
 			proxyType = 1;
 			remoteGlobalIDString = 13B07F861A680F5B00A75B9A;
-			remoteInfo = vendor;
+			remoteInfo = Leeta;
 		};
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
-		00E356EE1AD99517003FC87E /* vendorTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = vendorTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		00E356EE1AD99517003FC87E /* LeetaTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = LeetaTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		00E356F11AD99517003FC87E /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		00E356F21AD99517003FC87E /* vendorTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = vendorTests.m; sourceTree = "<group>"; };
-		104BB346EABD8A7ADFE4E809 /* libPods-vendor.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-vendor.a"; sourceTree = BUILT_PRODUCTS_DIR; };
-		13B07F961A680F5B00A75B9A /* vendor.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = vendor.app; sourceTree = BUILT_PRODUCTS_DIR; };
-		13B07FAF1A68108700A75B9A /* AppDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = AppDelegate.h; path = vendor/AppDelegate.h; sourceTree = "<group>"; };
-		13B07FB01A68108700A75B9A /* AppDelegate.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = AppDelegate.mm; path = vendor/AppDelegate.mm; sourceTree = "<group>"; };
-		13B07FB51A68108700A75B9A /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; name = Images.xcassets; path = vendor/Images.xcassets; sourceTree = "<group>"; };
-		13B07FB61A68108700A75B9A /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = Info.plist; path = vendor/Info.plist; sourceTree = "<group>"; };
-		13B07FB71A68108700A75B9A /* main.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = main.m; path = vendor/main.m; sourceTree = "<group>"; };
+		00E356F21AD99517003FC87E /* LeetaTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = LeetaTests.m; sourceTree = "<group>"; };
+		09A8EF13E690C39670B29C6D /* libPods-Leeta-LeetaTests.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-Leeta-LeetaTests.a"; sourceTree = BUILT_PRODUCTS_DIR; };
+		13B07F961A680F5B00A75B9A /* Leeta.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Leeta.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		13B07FAF1A68108700A75B9A /* AppDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = AppDelegate.h; path = Leeta/AppDelegate.h; sourceTree = "<group>"; };
+		13B07FB01A68108700A75B9A /* AppDelegate.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = AppDelegate.mm; path = Leeta/AppDelegate.mm; sourceTree = "<group>"; };
+		13B07FB51A68108700A75B9A /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; name = Images.xcassets; path = Leeta/Images.xcassets; sourceTree = "<group>"; };
+		13B07FB61A68108700A75B9A /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = Info.plist; path = Leeta/Info.plist; sourceTree = "<group>"; };
+		13B07FB71A68108700A75B9A /* main.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = main.m; path = Leeta/main.m; sourceTree = "<group>"; };
 		1898274F2A6E9B6A001D7A17 /* Fonts */ = {isa = PBXFileReference; lastKnownFileType = folder; name = Fonts; path = "../node_modules/react-native-vector-icons/Fonts"; sourceTree = "<group>"; };
-		2F7DC3F40711D1D0DB6276EA /* Pods-vendor-vendorTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-vendor-vendorTests.debug.xcconfig"; path = "Target Support Files/Pods-vendor-vendorTests/Pods-vendor-vendorTests.debug.xcconfig"; sourceTree = "<group>"; };
-		42736813107965DDEAC899EF /* Pods-vendor.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-vendor.debug.xcconfig"; path = "Target Support Files/Pods-vendor/Pods-vendor.debug.xcconfig"; sourceTree = "<group>"; };
-		4FC1A8EF3D9D0E05C950C7BB /* Pods-vendor-vendorTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-vendor-vendorTests.release.xcconfig"; path = "Target Support Files/Pods-vendor-vendorTests/Pods-vendor-vendorTests.release.xcconfig"; sourceTree = "<group>"; };
-		719A899977289FF0CB934203 /* Pods-vendor.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-vendor.release.xcconfig"; path = "Target Support Files/Pods-vendor/Pods-vendor.release.xcconfig"; sourceTree = "<group>"; };
-		81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; name = LaunchScreen.storyboard; path = vendor/LaunchScreen.storyboard; sourceTree = "<group>"; };
-		84A250B7932909EA5E5CD681 /* libPods-vendor-vendorTests.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-vendor-vendorTests.a"; sourceTree = BUILT_PRODUCTS_DIR; };
+		81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; name = LaunchScreen.storyboard; path = Leeta/LaunchScreen.storyboard; sourceTree = "<group>"; };
+		9C04CA90E3D033BD5EE8C0CE /* libPods-Leeta.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-Leeta.a"; sourceTree = BUILT_PRODUCTS_DIR; };
+		AA8797EAA785AACD815AD103 /* Pods-Leeta-LeetaTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Leeta-LeetaTests.debug.xcconfig"; path = "Target Support Files/Pods-Leeta-LeetaTests/Pods-Leeta-LeetaTests.debug.xcconfig"; sourceTree = "<group>"; };
+		BDDFA6C93E42DC0A8A4862E9 /* Pods-Leeta-LeetaTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Leeta-LeetaTests.release.xcconfig"; path = "Target Support Files/Pods-Leeta-LeetaTests/Pods-Leeta-LeetaTests.release.xcconfig"; sourceTree = "<group>"; };
+		EB160EEBA34C50FE04A1D705 /* Pods-Leeta.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Leeta.release.xcconfig"; path = "Target Support Files/Pods-Leeta/Pods-Leeta.release.xcconfig"; sourceTree = "<group>"; };
 		ED297162215061F000B7C4FE /* JavaScriptCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = JavaScriptCore.framework; path = System/Library/Frameworks/JavaScriptCore.framework; sourceTree = SDKROOT; };
+		F5191663570A8E96C7AB3CB5 /* Pods-Leeta.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Leeta.debug.xcconfig"; path = "Target Support Files/Pods-Leeta/Pods-Leeta.debug.xcconfig"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -53,7 +53,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				22B70B047446675BDBE6C552 /* libPods-vendor-vendorTests.a in Frameworks */,
+				14D8BF7FE9C4BF8668EA76F8 /* libPods-Leeta-LeetaTests.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -61,20 +61,20 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				7E035DCDE9754052D66553AD /* libPods-vendor.a in Frameworks */,
+				F99C51585A3D8E11D53FE1E1 /* libPods-Leeta.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
-		00E356EF1AD99517003FC87E /* vendorTests */ = {
+		00E356EF1AD99517003FC87E /* LeetaTests */ = {
 			isa = PBXGroup;
 			children = (
-				00E356F21AD99517003FC87E /* vendorTests.m */,
+				00E356F21AD99517003FC87E /* LeetaTests.m */,
 				00E356F01AD99517003FC87E /* Supporting Files */,
 			);
-			path = vendorTests;
+			path = LeetaTests;
 			sourceTree = "<group>";
 		};
 		00E356F01AD99517003FC87E /* Supporting Files */ = {
@@ -85,7 +85,7 @@
 			name = "Supporting Files";
 			sourceTree = "<group>";
 		};
-		13B07FAE1A68108700A75B9A /* vendor */ = {
+		13B07FAE1A68108700A75B9A /* Leeta */ = {
 			isa = PBXGroup;
 			children = (
 				13B07FAF1A68108700A75B9A /* AppDelegate.h */,
@@ -95,15 +95,16 @@
 				81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */,
 				13B07FB71A68108700A75B9A /* main.m */,
 			);
-			name = vendor;
+			name = Leeta;
 			sourceTree = "<group>";
+			usesTabs = 0;
 		};
 		2D16E6871FA4F8E400B85C8A /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
 				ED297162215061F000B7C4FE /* JavaScriptCore.framework */,
-				104BB346EABD8A7ADFE4E809 /* libPods-vendor.a */,
-				84A250B7932909EA5E5CD681 /* libPods-vendor-vendorTests.a */,
+				9C04CA90E3D033BD5EE8C0CE /* libPods-Leeta.a */,
+				09A8EF13E690C39670B29C6D /* libPods-Leeta-LeetaTests.a */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -119,9 +120,9 @@
 			isa = PBXGroup;
 			children = (
 				1898274F2A6E9B6A001D7A17 /* Fonts */,
-				13B07FAE1A68108700A75B9A /* vendor */,
+				13B07FAE1A68108700A75B9A /* Leeta */,
 				832341AE1AAA6A7D00B99B32 /* Libraries */,
-				00E356EF1AD99517003FC87E /* vendorTests */,
+				00E356EF1AD99517003FC87E /* LeetaTests */,
 				83CBBA001A601CBA00E9B192 /* Products */,
 				2D16E6871FA4F8E400B85C8A /* Frameworks */,
 				BBD78D7AC51CEA395F1C20DB /* Pods */,
@@ -134,8 +135,8 @@
 		83CBBA001A601CBA00E9B192 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				13B07F961A680F5B00A75B9A /* vendor.app */,
-				00E356EE1AD99517003FC87E /* vendorTests.xctest */,
+				13B07F961A680F5B00A75B9A /* Leeta.app */,
+				00E356EE1AD99517003FC87E /* LeetaTests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -143,10 +144,10 @@
 		BBD78D7AC51CEA395F1C20DB /* Pods */ = {
 			isa = PBXGroup;
 			children = (
-				42736813107965DDEAC899EF /* Pods-vendor.debug.xcconfig */,
-				719A899977289FF0CB934203 /* Pods-vendor.release.xcconfig */,
-				2F7DC3F40711D1D0DB6276EA /* Pods-vendor-vendorTests.debug.xcconfig */,
-				4FC1A8EF3D9D0E05C950C7BB /* Pods-vendor-vendorTests.release.xcconfig */,
+				F5191663570A8E96C7AB3CB5 /* Pods-Leeta.debug.xcconfig */,
+				EB160EEBA34C50FE04A1D705 /* Pods-Leeta.release.xcconfig */,
+				AA8797EAA785AACD815AD103 /* Pods-Leeta-LeetaTests.debug.xcconfig */,
+				BDDFA6C93E42DC0A8A4862E9 /* Pods-Leeta-LeetaTests.release.xcconfig */,
 			);
 			path = Pods;
 			sourceTree = "<group>";
@@ -154,9 +155,9 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		00E356ED1AD99517003FC87E /* vendorTests */ = {
+		00E356ED1AD99517003FC87E /* LeetaTests */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 00E357021AD99517003FC87E /* Build configuration list for PBXNativeTarget "vendorTests" */;
+			buildConfigurationList = 00E357021AD99517003FC87E /* Build configuration list for PBXNativeTarget "LeetaTests" */;
 			buildPhases = (
 				874B8B3427458260CD8A3FF9 /* [CP] Check Pods Manifest.lock */,
 				00E356EA1AD99517003FC87E /* Sources */,
@@ -170,14 +171,14 @@
 			dependencies = (
 				00E356F51AD99517003FC87E /* PBXTargetDependency */,
 			);
-			name = vendorTests;
-			productName = vendorTests;
-			productReference = 00E356EE1AD99517003FC87E /* vendorTests.xctest */;
+			name = LeetaTests;
+			productName = LeetaTests;
+			productReference = 00E356EE1AD99517003FC87E /* LeetaTests.xctest */;
 			productType = "com.apple.product-type.bundle.unit-test";
 		};
-		13B07F861A680F5B00A75B9A /* vendor */ = {
+		13B07F861A680F5B00A75B9A /* Leeta */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 13B07F931A680F5B00A75B9A /* Build configuration list for PBXNativeTarget "vendor" */;
+			buildConfigurationList = 13B07F931A680F5B00A75B9A /* Build configuration list for PBXNativeTarget "Leeta" */;
 			buildPhases = (
 				61D9A0886198AAFD57DB9518 /* [CP] Check Pods Manifest.lock */,
 				FD10A7F022414F080027D42C /* Start Packager */,
@@ -192,9 +193,9 @@
 			);
 			dependencies = (
 			);
-			name = vendor;
-			productName = vendor;
-			productReference = 13B07F961A680F5B00A75B9A /* vendor.app */;
+			name = Leeta;
+			productName = Leeta;
+			productReference = 13B07F961A680F5B00A75B9A /* Leeta.app */;
 			productType = "com.apple.product-type.application";
 		};
 /* End PBXNativeTarget section */
@@ -214,7 +215,7 @@
 					};
 				};
 			};
-			buildConfigurationList = 83CBB9FA1A601CBA00E9B192 /* Build configuration list for PBXProject "vendor" */;
+			buildConfigurationList = 83CBB9FA1A601CBA00E9B192 /* Build configuration list for PBXProject "Leeta" */;
 			compatibilityVersion = "Xcode 12.0";
 			developmentRegion = en;
 			hasScannedForEncodings = 0;
@@ -227,8 +228,8 @@
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				13B07F861A680F5B00A75B9A /* vendor */,
-				00E356ED1AD99517003FC87E /* vendorTests */,
+				13B07F861A680F5B00A75B9A /* Leeta */,
+				00E356ED1AD99517003FC87E /* LeetaTests */,
 			);
 		};
 /* End PBXProject section */
@@ -276,15 +277,15 @@
 			files = (
 			);
 			inputFileListPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-vendor-vendorTests/Pods-vendor-vendorTests-resources-${CONFIGURATION}-input-files.xcfilelist",
+				"${PODS_ROOT}/Target Support Files/Pods-Leeta-LeetaTests/Pods-Leeta-LeetaTests-resources-${CONFIGURATION}-input-files.xcfilelist",
 			);
 			name = "[CP] Copy Pods Resources";
 			outputFileListPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-vendor-vendorTests/Pods-vendor-vendorTests-resources-${CONFIGURATION}-output-files.xcfilelist",
+				"${PODS_ROOT}/Target Support Files/Pods-Leeta-LeetaTests/Pods-Leeta-LeetaTests-resources-${CONFIGURATION}-output-files.xcfilelist",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-vendor-vendorTests/Pods-vendor-vendorTests-resources.sh\"\n";
+			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-Leeta-LeetaTests/Pods-Leeta-LeetaTests-resources.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
 		61D9A0886198AAFD57DB9518 /* [CP] Check Pods Manifest.lock */ = {
@@ -302,7 +303,7 @@
 			outputFileListPaths = (
 			);
 			outputPaths = (
-				"$(DERIVED_FILE_DIR)/Pods-vendor-checkManifestLockResult.txt",
+				"$(DERIVED_FILE_DIR)/Pods-Leeta-checkManifestLockResult.txt",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
@@ -324,7 +325,7 @@
 			outputFileListPaths = (
 			);
 			outputPaths = (
-				"$(DERIVED_FILE_DIR)/Pods-vendor-vendorTests-checkManifestLockResult.txt",
+				"$(DERIVED_FILE_DIR)/Pods-Leeta-LeetaTests-checkManifestLockResult.txt",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
@@ -337,15 +338,15 @@
 			files = (
 			);
 			inputFileListPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-vendor/Pods-vendor-frameworks-${CONFIGURATION}-input-files.xcfilelist",
+				"${PODS_ROOT}/Target Support Files/Pods-Leeta/Pods-Leeta-frameworks-${CONFIGURATION}-input-files.xcfilelist",
 			);
 			name = "[CP] Embed Pods Frameworks";
 			outputFileListPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-vendor/Pods-vendor-frameworks-${CONFIGURATION}-output-files.xcfilelist",
+				"${PODS_ROOT}/Target Support Files/Pods-Leeta/Pods-Leeta-frameworks-${CONFIGURATION}-output-files.xcfilelist",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-vendor/Pods-vendor-frameworks.sh\"\n";
+			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-Leeta/Pods-Leeta-frameworks.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
 		E6A0CA0D54FC43354FDD02C0 /* [CP] Embed Pods Frameworks */ = {
@@ -354,15 +355,15 @@
 			files = (
 			);
 			inputFileListPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-vendor-vendorTests/Pods-vendor-vendorTests-frameworks-${CONFIGURATION}-input-files.xcfilelist",
+				"${PODS_ROOT}/Target Support Files/Pods-Leeta-LeetaTests/Pods-Leeta-LeetaTests-frameworks-${CONFIGURATION}-input-files.xcfilelist",
 			);
 			name = "[CP] Embed Pods Frameworks";
 			outputFileListPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-vendor-vendorTests/Pods-vendor-vendorTests-frameworks-${CONFIGURATION}-output-files.xcfilelist",
+				"${PODS_ROOT}/Target Support Files/Pods-Leeta-LeetaTests/Pods-Leeta-LeetaTests-frameworks-${CONFIGURATION}-output-files.xcfilelist",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-vendor-vendorTests/Pods-vendor-vendorTests-frameworks.sh\"\n";
+			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-Leeta-LeetaTests/Pods-Leeta-LeetaTests-frameworks.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
 		F78D992DAE3BE8B79C553FBC /* [CP] Copy Pods Resources */ = {
@@ -371,15 +372,15 @@
 			files = (
 			);
 			inputFileListPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-vendor/Pods-vendor-resources-${CONFIGURATION}-input-files.xcfilelist",
+				"${PODS_ROOT}/Target Support Files/Pods-Leeta/Pods-Leeta-resources-${CONFIGURATION}-input-files.xcfilelist",
 			);
 			name = "[CP] Copy Pods Resources";
 			outputFileListPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-vendor/Pods-vendor-resources-${CONFIGURATION}-output-files.xcfilelist",
+				"${PODS_ROOT}/Target Support Files/Pods-Leeta/Pods-Leeta-resources-${CONFIGURATION}-output-files.xcfilelist",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-vendor/Pods-vendor-resources.sh\"\n";
+			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-Leeta/Pods-Leeta-resources.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
 		FD10A7F022414F080027D42C /* Start Packager */ = {
@@ -408,7 +409,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				00E356F31AD99517003FC87E /* vendorTests.m in Sources */,
+				00E356F31AD99517003FC87E /* LeetaTests.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -426,7 +427,7 @@
 /* Begin PBXTargetDependency section */
 		00E356F51AD99517003FC87E /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
-			target = 13B07F861A680F5B00A75B9A /* vendor */;
+			target = 13B07F861A680F5B00A75B9A /* Leeta */;
 			targetProxy = 00E356F41AD99517003FC87E /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
@@ -434,7 +435,7 @@
 /* Begin XCBuildConfiguration section */
 		00E356F61AD99517003FC87E /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 2F7DC3F40711D1D0DB6276EA /* Pods-vendor-vendorTests.debug.xcconfig */;
+			baseConfigurationReference = AA8797EAA785AACD815AD103 /* Pods-Leeta-LeetaTests.debug.xcconfig */;
 			buildSettings = {
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				CODE_SIGN_IDENTITY = "Apple Development";
@@ -444,7 +445,7 @@
 					"DEBUG=1",
 					"$(inherited)",
 				);
-				INFOPLIST_FILE = vendorTests/Info.plist;
+				INFOPLIST_FILE = LeetaTests/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 12.4;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -459,20 +460,20 @@
 				PRODUCT_BUNDLE_IDENTIFIER = com.leeta.customer;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
-				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/vendor.app/vendor";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Leeta.app/Leeta";
 			};
 			name = Debug;
 		};
 		00E356F71AD99517003FC87E /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 4FC1A8EF3D9D0E05C950C7BB /* Pods-vendor-vendorTests.release.xcconfig */;
+			baseConfigurationReference = BDDFA6C93E42DC0A8A4862E9 /* Pods-Leeta-LeetaTests.release.xcconfig */;
 			buildSettings = {
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				COPY_PHASE_STRIP = NO;
 				DEVELOPMENT_TEAM = 3QMD85QTB9;
-				INFOPLIST_FILE = vendorTests/Info.plist;
+				INFOPLIST_FILE = LeetaTests/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 12.4;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -487,13 +488,13 @@
 				PRODUCT_BUNDLE_IDENTIFIER = com.leeta.customer;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
-				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/vendor.app/vendor";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Leeta.app/Leeta";
 			};
 			name = Release;
 		};
 		13B07F941A680F5B00A75B9A /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 42736813107965DDEAC899EF /* Pods-vendor.debug.xcconfig */;
+			baseConfigurationReference = F5191663570A8E96C7AB3CB5 /* Pods-Leeta.debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
@@ -502,20 +503,21 @@
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = 3QMD85QTB9;
 				ENABLE_BITCODE = NO;
-				INFOPLIST_FILE = vendor/Info.plist;
+				INFOPLIST_FILE = Leeta/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = Leeta;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.0.1;
+				NEW_SETTING = "";
 				OTHER_LDFLAGS = (
 					"$(inherited)",
 					"-ObjC",
 					"-lc++",
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.leeta.customer;
-				PRODUCT_NAME = vendor;
+				PRODUCT_NAME = Leeta;
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_VERSION = 5.0;
@@ -525,7 +527,7 @@
 		};
 		13B07F951A680F5B00A75B9A /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 719A899977289FF0CB934203 /* Pods-vendor.release.xcconfig */;
+			baseConfigurationReference = EB160EEBA34C50FE04A1D705 /* Pods-Leeta.release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
@@ -533,20 +535,21 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = 3QMD85QTB9;
-				INFOPLIST_FILE = vendor/Info.plist;
+				INFOPLIST_FILE = Leeta/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = Leeta;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.0.1;
+				NEW_SETTING = "";
 				OTHER_LDFLAGS = (
 					"$(inherited)",
 					"-ObjC",
 					"-lc++",
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.leeta.customer;
-				PRODUCT_NAME = vendor;
+				PRODUCT_NAME = Leeta;
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_VERSION = 5.0;
 				VERSIONING_SYSTEM = "apple-generic";
@@ -693,7 +696,7 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		00E357021AD99517003FC87E /* Build configuration list for PBXNativeTarget "vendorTests" */ = {
+		00E357021AD99517003FC87E /* Build configuration list for PBXNativeTarget "LeetaTests" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				00E356F61AD99517003FC87E /* Debug */,
@@ -702,7 +705,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		13B07F931A680F5B00A75B9A /* Build configuration list for PBXNativeTarget "vendor" */ = {
+		13B07F931A680F5B00A75B9A /* Build configuration list for PBXNativeTarget "Leeta" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				13B07F941A680F5B00A75B9A /* Debug */,
@@ -711,7 +714,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		83CBB9FA1A601CBA00E9B192 /* Build configuration list for PBXProject "vendor" */ = {
+		83CBB9FA1A601CBA00E9B192 /* Build configuration list for PBXProject "Leeta" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				83CBBA201A601CBA00E9B192 /* Debug */,

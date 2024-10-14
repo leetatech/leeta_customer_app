@@ -103,24 +103,25 @@ const Orders: FC<IProps> = ({navigation}) => {
             {showComponent.cancelledOrders && (
               <View>
                 <Text>Canceled Order</Text>
-              <View style={styles.scrollContainer}>
-                <Card>
-                  <View style={styles.order_container}>
-                    <CYLINDER />
-                    <View style={styles.order_desc_container}>
-                      <Fonts type="smallText">10Kg Gas Refill</Fonts>
-                      <Fonts type="smallText">Order #12345678</Fonts>
-                      <View style={styles.order_status_container}>
-                        <Fonts
-                          type="normalBoldText"
-                          style={{color: colors.WHITE}}>
-                          DELIVERED
-                        </Fonts>
+                <View style={styles.scrollContainer}>
+                  <Card>
+                    <View style={styles.order_container}>
+                      <CYLINDER />
+                      <View style={styles.order_desc_container}>
+                        <Fonts type="smallText">10Kg Gas Refill</Fonts>
+                        <Fonts type="smallText">Order #12345678</Fonts>
+                        <View style={styles.order_status_container}>
+                          <Fonts
+                            type="normalBoldText"
+                            style={{color: colors.WHITE}}>
+                            DELIVERED
+                          </Fonts>
+                        </View>
+                        <Fonts type="normalBoldText">On Friday, 10 - 02</Fonts>
                       </View>
-                      <Fonts type="normalBoldText">On Friday, 10 - 02</Fonts>
                     </View>
-                  </View>
-                </Card>
+                  </Card>
+                </View>
               </View>
             )}
           </ScrollView>
