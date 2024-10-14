@@ -6,6 +6,7 @@ import createStyles from './styles';
 import {ScrollView, Text, View} from 'react-native';
 import Tabs from '../../Components/Tabs/Tabs';
 import {ComponentType} from './types';
+import Buttons from '../../Components/Buttons/Buttons';
 import {CYLINDER} from '../../Assets/svgImages';
 import Fonts from '../../Constants/Fonts';
 import {colors} from '../../Constants/Colors';
@@ -81,28 +82,33 @@ const Orders: FC<IProps> = ({navigation}) => {
           </ScrollView>
 
           <ScrollView scrollEnabled={true} showsVerticalScrollIndicator={false}>
-            {showComponent.openOrders && (
-              <View style={styles.scrollContainer}>
-                <Card>
-                  <View style={styles.order_container}>
-                    <CYLINDER />
-                    <View style={styles.order_desc_container}>
-                      <Fonts type="smallText">10Kg Gas Refill</Fonts>
-                      <Fonts type="smallText">Order #12345678</Fonts>
-                      <View style={styles.all_orders_status_container}>
-                        <Fonts
-                          type="normalBoldText"
-                          style={{color: colors.WHITE}}>
-                          DELIVERED
-                        </Fonts>
-                      </View>
-                      <Fonts type="normalBoldText">On Friday, 10 - 02</Fonts>
+  {showComponent.openOrders && (
+            <View style={styles.scrollContainer}>
+              <Card>
+                <View style={styles.order_container}>
+                  <CYLINDER />
+                  <View style={styles.order_desc_container}>
+                    <Fonts type="smallText">10Kg Gas Refill</Fonts>
+                    <Fonts type="smallText">Order #12345678</Fonts>
+                    <View style={styles.all_orders_status_container}>
+                      <Fonts
+                        type="normalBoldText"
+                        style={{color: colors.WHITE}}>
+                        DELIVERED
+                      </Fonts>
                     </View>
+                    <Fonts type="normalBoldText">On Friday, 10 - 02</Fonts>
                   </View>
-                </Card>
-              </View>
-            )}
-          </ScrollView>
+                </View>
+              </Card>
+  <Buttons
+                  title="Go to details"
+                  textStyle={undefined}
+                  buttonStyle={undefined}
+                  onPress={() => navigation.navigate('Summary')}
+                />
+            </View>
+          )}
           {showComponent.deliveredOrders && (
             <View style={styles.scrollContainer}>
               <Card>
@@ -124,7 +130,7 @@ const Orders: FC<IProps> = ({navigation}) => {
               </Card>
             </View>
           )}
-          {showComponent.cancelledOrders && (
+                     {showComponent.cancelledOrders && (
             <View style={styles.scrollContainer}>
               <Card>
                 <View style={styles.order_container}>
@@ -145,6 +151,8 @@ const Orders: FC<IProps> = ({navigation}) => {
               </Card>
             </View>
           )}
+
+          </ScrollView>
         </View>
       </View>
     </>

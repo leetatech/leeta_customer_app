@@ -4,19 +4,20 @@ import {
   StackNavigationOptions,
 } from '@react-navigation/stack';
 import Slider from '../Screens/OnboardingScreen/Slider/Slider';
-import { 
+import {
   InitialScreen,
-  CreateAccount, 
-  OTPInput, 
-  ForgotPassword, 
-  EmailVerification, 
-  SignIn, 
+  CreateAccount,
+  OTPInput,
+  ForgotPassword,
+  EmailVerification,
+  SignIn,
   CreateNewPassword,
   PasswordCreated,
   MarketPlace,
   Cart,
   OrderConfirmation,
   AddAddress,
+  Summary,
 } from '../Screens';
 import BottomNavigator from './BottomTab';
 
@@ -53,12 +54,12 @@ export default function RootNavigation({defaultRoute}: IProps) {
               component={CreateAccount}
               options={screenDefaultOptions}
             />
-             <RootStack.Screen
+            <RootStack.Screen
               name="OTPInput"
               component={OTPInput}
               options={screenDefaultOptions}
             />
-             <RootStack.Screen
+            <RootStack.Screen
               name="EmailVerification"
               component={EmailVerification}
               options={screenDefaultOptions}
@@ -78,29 +79,34 @@ export default function RootNavigation({defaultRoute}: IProps) {
               component={PasswordCreated}
               options={screenDefaultOptions}
             />
-              <RootStack.Screen
+            <RootStack.Screen
               name="SignIn"
               component={SignIn}
               options={screenDefaultOptions}
             />
-             <RootStack.Screen
+            <RootStack.Screen
               name="MarketPlace"
               component={MarketPlace}
               options={screenDefaultOptions}
             />
-             <RootStack.Screen
+            <RootStack.Screen
               name="Cart"
               component={Cart}
               options={screenDefaultOptions}
             />
-             <RootStack.Screen
+            <RootStack.Screen
               name="OrderConfirmation"
               component={OrderConfirmation}
               options={screenDefaultOptions}
             />
-              <RootStack.Screen
+            <RootStack.Screen
               name="AddAddress"
               component={AddAddress}
+              options={screenDefaultOptions}
+            />
+            <RootStack.Screen
+              name="Summary"
+              component={Summary}
               options={screenDefaultOptions}
             />
           </RootStack.Group>

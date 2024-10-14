@@ -9,7 +9,7 @@
 {
  [GMSServices provideAPIKey:@"AIzaSyCskfZWwL9KnJEGcW5-AKFTTy7HTnZtzi8"]; 
 
-  self.moduleName = @"vendor";
+  self.moduleName = @"Leeta";
 
   // You can add your custom initial props in the dictionary below.
   // They will be passed down to the ViewController used by React Native.
