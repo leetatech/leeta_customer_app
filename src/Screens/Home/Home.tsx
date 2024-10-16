@@ -1,5 +1,5 @@
-import React, {FC, useEffect, useMemo, useRef, useState} from 'react';
-import {NavigationProp, ParamListBase} from '@react-navigation/native';
+import React, {FC, useCallback, useEffect, useMemo, useRef, useState} from 'react';
+import {NavigationProp, ParamListBase, useFocusEffect} from '@react-navigation/native';
 import GoogleMap from '../GoogleMap/GoogleMap';
 import {View, Text, TextInput} from 'react-native';
 import createStyles from './style';
@@ -7,7 +7,7 @@ import Buttons from '../../Components/Buttons/Buttons';
 import CustomModal from '../../Components/Modal/CustomModal';
 import {SvgIcon} from '../../Components/icons';
 import {TouchableOpacity} from 'react-native-gesture-handler';
-import {CANCEL_ICON} from '../../Assets/svgImages';
+import {CANCEL_ICON, CART} from '../../Assets/svgImages';
 import {colors} from '../../Constants/Colors';
 import KeyboardAvoidingContainer from '../../Components/KeyboardAvoidingContainer';
 import {useDispatch, useSelector} from 'react-redux';
@@ -15,6 +15,7 @@ import {
   addTocart,
   productFee,
   productList,
+  triggerCartList,
 } from '../../redux/slices/order/orderServices';
 import {
   setCartItemId,
@@ -26,6 +27,8 @@ import {
   CartItemResponsePayload,
   FeesResponse,
 } from '../../redux/slices/order/types';
+import Fonts from '../../Constants/Fonts';
+import Cart from '../Cart/Cart';
 
 interface IProps {
   navigation: NavigationProp<ParamListBase>;
@@ -40,6 +43,8 @@ const Home: FC<IProps> = ({navigation}) => {
   const inputRef = useRef<TextInput>(null);
   const dispatch = useDispatch();
   const [weightInput, setWeightInput] = useState<number>(weightOptions[0]);
+  const [cartItemCount, setCartItemCount] = useState(0); 
+
   const {productWeight, fee, productQuantity, productId} = useSelector(
     (state: RootState) => state.order,
   );
@@ -61,7 +66,6 @@ const Home: FC<IProps> = ({navigation}) => {
     setInputWeight(false);
   };
 
- 
   const handleChange = (e: string) => {
     setWeightInput(Number(e));
   };
@@ -81,11 +85,17 @@ const Home: FC<IProps> = ({navigation}) => {
       quantity: productQuantity!,
       weight: weight,
     };
-    console.log('payload', payload);
     dispatch(addTocart(payload))
       .then(response => {
         const result = response.payload as CartItemResponsePayload;
-        if (response && result && payload.cost && payload.product_id && payload.quantity && payload.weight) {
+        if (
+          response &&
+          result &&
+          payload.cost &&
+          payload.product_id &&
+          payload.quantity &&
+          payload.weight
+        ) {
           const cartItemIds = result?.data?.cart_items;
           if (cartItemIds) {
             cartItemIds.forEach(item => {
@@ -100,7 +110,7 @@ const Home: FC<IProps> = ({navigation}) => {
         console.error('Error adding items to cart:', error);
       });
   };
-  
+
   const handleInputWeight = (index: number) => {
     if (index === weightOptions.length - 1) {
       setInputWeight(true);
@@ -109,7 +119,7 @@ const Home: FC<IProps> = ({navigation}) => {
       updateCartAndNavigate(selectedWeight);
     }
   };
-  
+
   const handleNavigation = () => {
     updateCartAndNavigate(weightInput);
   };
@@ -122,8 +132,7 @@ const Home: FC<IProps> = ({navigation}) => {
       },
     };
     dispatch(productList(payload))
-      .then(response => {
-      })
+      .then(response => {})
       .catch(error => {
         console.error('Error getting Product Id:', error);
       });
@@ -157,8 +166,7 @@ const Home: FC<IProps> = ({navigation}) => {
           );
           if (productFee) {
             const costPerType = productFee.cost.cost_per_type;
-            return costPerType
-           
+            return costPerType;
           } else {
             return null;
           }
@@ -168,16 +176,52 @@ const Home: FC<IProps> = ({navigation}) => {
         console.error('Error getting fees:', error);
       });
   };
+  const listCart = () => {
+    const payload = {
+      paging: {
+        index: 0,
+        size: 10,
+      },
+    };
+    dispatch(triggerCartList(payload))
+      .then(response => {
+        const result = response.payload as any;
+        if (response && result && result.data && result.data.data.cart_items) {
+          const itemCount = result.data.data.cart_items.length; 
+          setCartItemCount(itemCount);
+        } else {
+          setCartItemCount(0);
+        }
+      })
+      .catch(error => {
+        console.error('Error getting Cart list:', error);
+      });
+  };
 
   useEffect(() => {
     getProductListing();
     getProductFee();
   }, []);
-
+  useFocusEffect(
+    useCallback(() => {
+      listCart();
+    }, []),
+  );
   return (
     <KeyboardAvoidingContainer>
       <View style={styles.mainContainer}>
         <GoogleMap />
+        <View style={styles.cart_icon}>
+          <TouchableOpacity onPress={() => navigation.navigate('Cart')}>
+            <Fonts
+            type="smallText"
+            style={styles.item_counter}>
+            {cartItemCount}
+          </Fonts>
+            <CART />
+          </TouchableOpacity>
+        </View>
+
         <View style={styles.button_container}>
           <Buttons
             title="Gas refill"
