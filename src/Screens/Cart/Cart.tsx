@@ -17,14 +17,17 @@ import Modal from 'react-native-modal';
 import CustomToast from '../../Components/Toast/CustomToast';
 import {useDispatch, useSelector} from 'react-redux';
 import {RootState} from '../../redux/rootReducer';
-import {setServiceFee, updateCart} from '../../redux/slices/order/orderSlice';
+import {setServiceFee, updateCart} from '../../redux/slices/cart/cartSlice';
 import {
   serviceFee,
   triggerCartList,
   triggerDeleteCartItem,
   updateCartItemQuantity,
-} from '../../redux/slices/order/orderServices';
-import {CartItemResponsePayload, FeesResponse} from '../../redux/slices/order/types';
+} from '../../redux/slices/cart/cartServices';
+import {
+  CartItemResponsePayload,
+  FeesResponse,
+} from '../../redux/slices/cart/types';
 import CustomLoader from '../../Components/Loader/CustomLoader';
 
 interface IProps {
@@ -33,7 +36,7 @@ interface IProps {
 
 const Cart: FC<IProps> = ({navigation}) => {
   const styles = useMemo(() => createStyles(), []);
-  let {fee,loading,cartList} = useSelector((state: RootState) => state.order);
+  let {fee, loading, cartList} = useSelector((state: RootState) => state.cart);
   const [showModal, setShowModal] = useState(false);
   const [showToastMsg, setshowToastMsg] = useState(false);
   const [selectedItem, setSelectedItem] = useState<string>('');
@@ -141,7 +144,6 @@ const Cart: FC<IProps> = ({navigation}) => {
     return formattedTotalAmount;
   };
 
-
   const getServiceFee = () => {
     const payload = {
       filter: {
@@ -202,7 +204,7 @@ const Cart: FC<IProps> = ({navigation}) => {
 
   useEffect(() => {
     getServiceFee();
-    listCart()
+    listCart();
   }, []);
 
   return (

@@ -31,7 +31,6 @@ const initialState: GuestState = {
         state.loading = false;
         state.error = false;
         state.guestData = action.payload!.data as Record<string, string>;
-        console.log("Guest data",state.guestData)
       })
       .addCase(updateGuestData.rejected, (state, action: PayloadAction<any>) => {
         state.loading = false;

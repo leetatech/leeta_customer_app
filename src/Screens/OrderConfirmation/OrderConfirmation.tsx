@@ -27,20 +27,20 @@ import {RootState} from '../../redux/rootReducer';
 import {
   CartItemResponsePayload,
   FeesResponse,
-} from '../../redux/slices/order/types';
+} from '../../redux/slices/cart/types';
 import {
   DeliveryFeeData,
   deliveryFee,
   serviceFee,
   triggerCartList,
   triggerCheckout,
-} from '../../redux/slices/order/orderServices';
+} from '../../redux/slices/cart/cartServices';
 import CustomLoader from '../../Components/Loader/CustomLoader';
 import {
   setServiceFee,
   setUserCartId,
   updateUserDeliveryFee,
-} from '../../redux/slices/order/orderSlice';
+} from '../../redux/slices/cart/cartSlice';
 import {ADD} from '../../Assets';
 import CustomToast from '../../Components/Toast/CustomToast';
 import Fontisto from 'react-native-vector-icons/Fontisto';
@@ -52,7 +52,7 @@ import {useFocusEffect} from '@react-navigation/native';
 import {UserDataResponse} from '../../redux/slices/auth/type';
 import useUserType from '../../redux/manageUserType/userType';
 import {user} from '../../redux/manageUserType/checkUserType';
-import { getGuestData } from '../../redux/slices/auth/guestServices';
+import {getGuestData} from '../../redux/slices/auth/guestServices';
 
 const RenderDeliveryAddress: FC<IProps> = ({
   navigation,
@@ -60,7 +60,7 @@ const RenderDeliveryAddress: FC<IProps> = ({
   address,
   state,
   phone,
-  isExistingGuest
+  isExistingGuest,
 }) => {
   const styles = useMemo(() => createStyles(), []);
   const userType = useUserType();
@@ -70,26 +70,28 @@ const RenderDeliveryAddress: FC<IProps> = ({
       {userType === user.registered ||
       (userType === user.guest && isExistingGuest) ? (
         <TouchableOpacity onPress={() => navigation.navigate('AddAddress')}>
-        <View style={styles.address_container}>
-          <View style={styles.checkbox_container}>
-            <LOCATION_ICON />
-            <View style={styles.address}>
-              <Fonts type="boldBlack">{fullName}</Fonts>
-              <Fonts type="normalGrayText">{address}</Fonts>
-              <Fonts type="normalGrayText">
-                {capitalizeFirstLetter(state!)} 
-              </Fonts>
-              <Fonts type="normalGrayText">{phone}</Fonts>
+          <View style={styles.address_container}>
+            <View style={styles.checkbox_container}>
+              <LOCATION_ICON />
+              <View style={styles.address}>
+                <Fonts type="boldBlack">{fullName}</Fonts>
+                <Fonts type="normalGrayText">{address}</Fonts>
+                <Fonts type="normalGrayText">
+                  {capitalizeFirstLetter(state!)}
+                </Fonts>
+                <Fonts type="normalGrayText">{phone}</Fonts>
+              </View>
             </View>
-          </View>
             <RIGHT_ICON />
-        </View>
-         </TouchableOpacity>
+          </View>
+        </TouchableOpacity>
       ) : (
         userType === user.guest &&
         !isExistingGuest && (
-          <TouchableOpacity style={styles.checkbox_container} onPress={() => navigation.navigate('AddAddress')}>
-              <Image source={ADD} />
+          <TouchableOpacity
+            style={styles.checkbox_container}
+            onPress={() => navigation.navigate('AddAddress')}>
+            <Image source={ADD} />
             <Fonts type="boldBlack">Add address</Fonts>
           </TouchableOpacity>
         )
@@ -169,7 +171,8 @@ const RenderPaymentMethod: FC<Payment> = ({pyamentMethod, onPress}) => {
               name={pyamentMethod ? 'check' : 'checkbox-passive'}
               size={10}
               style={{
-                color: pyamentMethod ? colors.ORANGE : colors.BLACK, paddingTop:5
+                color: pyamentMethod ? colors.ORANGE : colors.BLACK,
+                paddingTop: 5,
               }}
             />
           </TouchableOpacity>
@@ -190,7 +193,7 @@ const OrderConfirmation: FC<IProps> = ({navigation}) => {
   const [viewReceipt, setViewReceipt] = useState(false);
   const [orderSummary, setOrderSummary] = useState<number>(0);
   const {cartList, userLga, userState, userDeliveryFee, loading} = useSelector(
-    (state: RootState) => state.order,
+    (state: RootState) => state.cart,
   );
   const [errorMsg, setErrorMsg] = useState('');
   const [showErrorMsg, setShowErrorMsg] = useState(false);
@@ -208,7 +211,7 @@ const OrderConfirmation: FC<IProps> = ({navigation}) => {
     email: '',
     lga: '',
   });
-  const[existingGuestuser,setExistingGuestuser] = useState(false);
+  const [existingGuestuser, setExistingGuestuser] = useState(false);
   const userType = useUserType();
 
   const startRotation = () => {
@@ -449,28 +452,28 @@ const OrderConfirmation: FC<IProps> = ({navigation}) => {
       });
   };
 
-  const fetchGuestAddress  = async () => {
+  const fetchGuestAddress = async () => {
     dispatch(getGuestData())
       .then(response => {
-        const result = response.payload as GuestDataResponse
+        const result = response.payload as GuestDataResponse;
         if (response && result && result.data) {
-         const fullAddress = result.data.address.full_address;
-         const state = result.data.address.state;
-         if(state){
-          setExistingGuestuser(true)
-         }
-         const userEmail = result.data.email;
-         const fullName = `${result?.data.first_name} ${result?.data.last_name}`;
-         const getUserLga = result?.data.address.lga;
-         console.log('phone',result?.data.phone?.number)
-         setRetrieveUserData({
-          fullName: fullName,
-          address: fullAddress,
-          state: state,
-          phone: result?.data.phone?.number,
-          email: userEmail,
-          lga: getUserLga,
-        });
+          const fullAddress = result.data.address.full_address;
+          const state = result.data.address.state;
+          if (state) {
+            setExistingGuestuser(true);
+          }
+          const userEmail = result.data.email;
+          const fullName = `${result?.data.first_name} ${result?.data.last_name}`;
+          const getUserLga = result?.data.address.lga;
+          console.log('phone', result?.data.phone?.number);
+          setRetrieveUserData({
+            fullName: fullName,
+            address: fullAddress,
+            state: state,
+            phone: result?.data.phone?.number,
+            email: userEmail,
+            lga: getUserLga,
+          });
         } else {
           return null;
         }
@@ -620,8 +623,8 @@ const OrderConfirmation: FC<IProps> = ({navigation}) => {
         )}
         {!viewReceipt && (
           <FormMainContainer>
-             {loader && <CustomLoader />}
-             {loading && <CustomLoader />}
+            {loader && <CustomLoader />}
+            {loading && <CustomLoader />}
             {showErrorMsg && <CustomToast>{errorMsg}</CustomToast>}
             <View style={styles.success_msg_container}>
               <View style={styles.iconContainer}>
@@ -635,7 +638,11 @@ const OrderConfirmation: FC<IProps> = ({navigation}) => {
             </View>
             <View style={styles.button_container}>
               <Buttons
-                title={userType === user.registered ? "Check Out " : "Check Out As Guest" }
+                title={
+                  userType === user.registered
+                    ? 'Check Out '
+                    : 'Check Out As Guest'
+                }
                 disabled={false}
                 buttonStyle={undefined}
                 textStyle={{fontSize: 17}}

@@ -15,17 +15,17 @@ import {
   addTocart,
   productFee,
   productList,
-} from '../../redux/slices/order/orderServices';
+} from '../../redux/slices/cart/cartServices';
 import {
   setCartItemId,
   setProductWeight,
   setUserCart,
-} from '../../redux/slices/order/orderSlice';
+} from '../../redux/slices/cart/cartSlice';
 import {RootState} from '../../redux/rootReducer';
 import {
   CartItemResponsePayload,
   FeesResponse,
-} from '../../redux/slices/order/types';
+} from '../../redux/slices/cart/types';
 
 interface IProps {
   navigation: NavigationProp<ParamListBase>;
@@ -41,7 +41,7 @@ const Home: FC<IProps> = ({navigation}) => {
   const dispatch = useDispatch();
   const [weightInput, setWeightInput] = useState<number>(weightOptions[0]);
   const {productWeight, fee, productQuantity, productId} = useSelector(
-    (state: RootState) => state.order,
+    (state: RootState) => state.cart,
   );
 
   const focusInput = () => {
@@ -61,7 +61,6 @@ const Home: FC<IProps> = ({navigation}) => {
     setInputWeight(false);
   };
 
- 
   const handleChange = (e: string) => {
     setWeightInput(Number(e));
   };
@@ -85,7 +84,14 @@ const Home: FC<IProps> = ({navigation}) => {
     dispatch(addTocart(payload))
       .then(response => {
         const result = response.payload as CartItemResponsePayload;
-        if (response && result && payload.cost && payload.product_id && payload.quantity && payload.weight) {
+        if (
+          response &&
+          result &&
+          payload.cost &&
+          payload.product_id &&
+          payload.quantity &&
+          payload.weight
+        ) {
           const cartItemIds = result?.data?.cart_items;
           if (cartItemIds) {
             cartItemIds.forEach(item => {
@@ -100,7 +106,7 @@ const Home: FC<IProps> = ({navigation}) => {
         console.error('Error adding items to cart:', error);
       });
   };
-  
+
   const handleInputWeight = (index: number) => {
     if (index === weightOptions.length - 1) {
       setInputWeight(true);
@@ -109,7 +115,7 @@ const Home: FC<IProps> = ({navigation}) => {
       updateCartAndNavigate(selectedWeight);
     }
   };
-  
+
   const handleNavigation = () => {
     updateCartAndNavigate(weightInput);
   };
@@ -122,8 +128,7 @@ const Home: FC<IProps> = ({navigation}) => {
       },
     };
     dispatch(productList(payload))
-      .then(response => {
-      })
+      .then(response => {})
       .catch(error => {
         console.error('Error getting Product Id:', error);
       });
@@ -157,8 +162,7 @@ const Home: FC<IProps> = ({navigation}) => {
           );
           if (productFee) {
             const costPerType = productFee.cost.cost_per_type;
-            return costPerType
-           
+            return costPerType;
           } else {
             return null;
           }

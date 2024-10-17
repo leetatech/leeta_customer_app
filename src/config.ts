@@ -2,20 +2,20 @@ interface ApiUrls {
   signUp: string;
   otpVerification: string;
   logIn: string;
-  forgotPassword:string;
-  passwordReset:string
-  resendOtp : string;
-  productList:string;
-  feesType:string;
-  cartAdd:string;
-  cartItemQuantity:string;
-  listCart:string;
+  forgotPassword: string;
+  passwordReset: string;
+  resendOtp: string;
+  productList: string;
+  feesType: string;
+  cartAdd: string;
+  cartItemQuantity: string;
+  listCart: string;
   getStates: string;
-  deleteCartItem:string;
-  checkout:string;
-  user:string
-  guest:string;
-
+  deleteCartItem: string;
+  checkout: string;
+  user: string;
+  guest: string;
+  getOrders: string;
 }
 
 const BASE_URL = 'https://leetabackend-e6d948d15ae2.herokuapp.com/api/';
@@ -27,16 +27,19 @@ export const apiUrl: ApiUrls = {
   forgotPassword: `${BASE_URL}session/password/forgot`, // POST
   passwordReset: `${BASE_URL}session/password/create`, // POST
   resendOtp: `${BASE_URL}session/otp/request`, //POST
-  productList:`${BASE_URL}product`, // PUT
-  feesType:`${BASE_URL}fees`, // PUT
-  cartAdd:`${BASE_URL}cart/add`, //POST
-  cartItemQuantity:`${BASE_URL}cart/item/quantity`, // PUT
-  listCart:`${BASE_URL}cart`, // PUT
-  getStates:`${BASE_URL}state`, // GET
-  deleteCartItem :`${BASE_URL}cart/item`, //DELETE
+  productList: `${BASE_URL}product`, // PUT
+  feesType: `${BASE_URL}fees`, // PUT
+  cartAdd: `${BASE_URL}cart/add`, //POST
+  cartItemQuantity: `${BASE_URL}cart/item/quantity`, // PUT
+  listCart: `${BASE_URL}cart`, // PUT
+  getStates: `${BASE_URL}state`, // GET
+  deleteCartItem: `${BASE_URL}cart/item`, //DELETE
   checkout: `${BASE_URL}cart/checkout`, //POST
-  user:`${BASE_URL}user`, // GET
-  guest:`${BASE_URL}session/guest`
+  user: `${BASE_URL}user`, // GET
+  guest: `${BASE_URL}session/guest`,
+
+  // Orders
+  getOrders: `${BASE_URL}order`,
 };
 
-export const appUserType = "customer"
+export const appUserType = 'customer';
