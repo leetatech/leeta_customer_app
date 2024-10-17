@@ -12,15 +12,15 @@ import Fontisto from 'react-native-vector-icons/Fontisto';
 import Fonts from '../../Constants/Fonts';
 import {TouchableWithoutFeedback, Keyboard} from 'react-native';
 import {ScrollView} from 'react-native-gesture-handler';
-import {getState} from '../../redux/slices/order/orderServices';
+import {getState} from '../../redux/slices/cart/cartServices';
 import {useDispatch, useSelector} from 'react-redux';
 import {DOWN_ARROW} from '../../Assets';
-import {StateResponse} from '../../redux/slices/order/types';
+import {StateResponse} from '../../redux/slices/cart/types';
 import {RootState} from '../../redux/rootReducer';
 import {
   updateUserLga,
   updateUserState,
-} from '../../redux/slices/order/orderSlice';
+} from '../../redux/slices/cart/cartSlice';
 import CustomLoader from '../../Components/Loader/CustomLoader';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {
@@ -42,7 +42,7 @@ interface IProps {
 
 const AddAddress: FC<IProps> = ({navigation}) => {
   const styles = useMemo(() => createStyles(), []);
-  const {states} = useSelector((state: RootState) => state.order);
+  const {states} = useSelector((state: RootState) => state.cart);
   const [checked, setChecked] = useState(true);
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
@@ -232,11 +232,11 @@ const AddAddress: FC<IProps> = ({navigation}) => {
         latitude: 0,
         longitude: 0,
       },
-      phone : {
+      phone: {
         primary: true,
         number: mobile,
         verified: false,
-      }
+      },
     };
     dispatch(updateGuestData(payload))
       .then(response => {
@@ -332,20 +332,19 @@ const AddAddress: FC<IProps> = ({navigation}) => {
                 onFocus={() => handleScreenTitle('Address', true)}
                 onFocusStyle={{borderColor: colors.ORANGE}}
               />
-            
-                  <StyledTextInput
-                    placeholder="State"
-                    name="State"
-                    editable={false}
-                    value={getFormattedState(userState)}
-                    onChangeText={newState => setUserState(newState)}
-                    onBlur={() => handleScreenTitle('State', false)}
-                    onFocus={() => handleScreenTitle('State', true)}
-                    onFocusStyle={{borderColor: colors.ORANGE}}
-                    image={DOWN_ARROW}
-                    onPress={getAllState}
-                  />
-              
+
+              <StyledTextInput
+                placeholder="State"
+                name="State"
+                editable={false}
+                value={getFormattedState(userState)}
+                onChangeText={newState => setUserState(newState)}
+                onBlur={() => handleScreenTitle('State', false)}
+                onFocus={() => handleScreenTitle('State', true)}
+                onFocusStyle={{borderColor: colors.ORANGE}}
+                image={DOWN_ARROW}
+                onPress={getAllState}
+              />
 
               {userState && (
                 <StyledTextInput
