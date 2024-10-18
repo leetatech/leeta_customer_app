@@ -31,7 +31,7 @@ const Buttons: FC<IProps> = ({
   textStyle,
   text,
   text2,
-  onPress2
+  onPress2,
 }) => {
   const styles = useMemo(() => createStyles(), []);
   return (
@@ -39,18 +39,54 @@ const Buttons: FC<IProps> = ({
       <TouchableOpacity
         style={[
           styles.button,
-          {backgroundColor: disabled ? colors.LGRAY : colors.ORANGE},
+          {
+            backgroundColor: disabled ? colors.LGRAY : colors.ORANGE,
+          },
           buttonStyle,
         ]}
         onPress={onPress}
-        disabled={disabled}
-        >
+        disabled={disabled}>
+        <Text style={[styles.text, textStyle]}>{title}</Text>
+      </TouchableOpacity>
+
+      {text && (
+        <Text style={styles.textStyle}>
+          {text}
+          {text2 && (
+            <Text style={styles.coloredText} onPress={onPress2}>
+              {text2}
+            </Text>
+          )}
+        </Text>
+      )}
+    </View>
+  );
+};
+
+export default Buttons;
+
+export const OrderButtons: FC<IProps> = ({
+  title,
+  onPress,
+  disabled,
+  buttonStyle,
+  textStyle,
+  text,
+  text2,
+}) => {
+  const styles = useMemo(() => createStyles(), []);
+
+  return (
+    <View>
+      <TouchableOpacity
+        style={[styles.order_button, buttonStyle]}
+        onPress={onPress}>
         <Text style={[styles.text, textStyle]}>{title}</Text>
       </TouchableOpacity>
 
       <Text style={styles.textStyle}>
         {text}
-        <Text style={styles.coloredText} onPress={onPress2}>
+        <Text style={styles.coloredText} onPress={onPress}>
           {text2}
         </Text>
       </Text>
@@ -58,31 +94,25 @@ const Buttons: FC<IProps> = ({
   );
 };
 
-export default Buttons;
-
-export const OrderButtons: FC<IProps> = ({title,
+export const ButtonsOutline: FC<IProps> = ({
+  title,
   onPress,
   disabled,
   buttonStyle,
   textStyle,
   text,
-  text2}) => {
-    const styles = useMemo(() => createStyles(), []);
-
-  return(
+  text2,
+  onPress2,
+}) => {
+  const styles = useMemo(() => createStyles(), []);
+  return (
     <View>
-    <TouchableOpacity
-      style={[
-        styles.order_button,
-        buttonStyle,
-      ]}
-      onPress={onPress}>
-      <Text style={[styles.text, textStyle]}>{title}</Text>
-    </TouchableOpacity>
-
-
-    <Text style={styles.textStyle}>{text}<Text style={styles.coloredText} onPress={onPress}>{text2}</Text></Text>
+      <TouchableOpacity
+        style={[styles.button, buttonStyle]}
+        onPress={onPress}
+        disabled={disabled}>
+        <Text style={[styles.text, textStyle]}>{title}</Text>
+      </TouchableOpacity>
     </View>
-  )
-}
-
+  );
+};

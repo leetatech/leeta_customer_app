@@ -14,4 +14,4 @@ export {default as OrderConfirmation} from './OrderConfirmation/OrderConfirmatio
 export {default as AddAddress} from './AddAddress/AddAddress';
 export {default as Settings} from './Seetings/Settings';
 export {default as Orders} from './Orders/Orders';
-
+export {default as Summary} from './Summary/Summary';

@@ -17,11 +17,12 @@ import {
   productList,
   triggerCartList,
 } from '../../redux/slices/order/orderServices';
+} from '../../redux/slices/cart/cartServices';
 import {
   setCartItemId,
   setProductWeight,
   setUserCart,
-} from '../../redux/slices/order/orderSlice';
+} from '../../redux/slices/cart/cartSlice';
 import {RootState} from '../../redux/rootReducer';
 import {
   CartItemResponsePayload,
@@ -29,6 +30,7 @@ import {
 } from '../../redux/slices/order/types';
 import Fonts from '../../Constants/Fonts';
 import Cart from '../Cart/Cart';
+} from '../../redux/slices/cart/types';
 
 interface IProps {
   navigation: NavigationProp<ParamListBase>;
@@ -46,7 +48,7 @@ const Home: FC<IProps> = ({navigation}) => {
   const [cartItemCount, setCartItemCount] = useState(0); 
 
   const {productWeight, fee, productQuantity, productId} = useSelector(
-    (state: RootState) => state.order,
+    (state: RootState) => state.cart,
   );
 
   const focusInput = () => {
