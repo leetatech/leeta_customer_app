@@ -1,4 +1,4 @@
-import {CartItemResponsePayload} from '../../redux/slices/order/types';
+import {CartItemResponsePayload} from '../../redux/slices/cart/types';
 import {NavigationProp, ParamListBase} from '@react-navigation/native';
 
 export interface IProps {
