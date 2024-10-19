@@ -309,6 +309,8 @@ const Cart: FC<IProps> = ({navigation}) => {
       <Modal isVisible={showModal} propagateSwipe={true} style={{margin: 0}}>
         <View style={styles.modal_container}>
           <View style={styles.action}>
+          {loading && <CustomLoader />}
+
             <Text style={styles.modal_title}>Remove from cart</Text>
             <TouchableOpacity onPress={() => setShowModal(false)}>
               <CANCEL_ICON />
@@ -335,6 +337,7 @@ const Cart: FC<IProps> = ({navigation}) => {
             textStyle={{color: colors.ORANGE, fontSize: 17}}
             onPress={() => handleDeleteItem()}
           />
+
         </View>
       </Modal>
       {showToastMsg && (

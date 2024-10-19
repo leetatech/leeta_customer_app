@@ -234,10 +234,10 @@ const OrderConfirmation: FC<IProps> = ({navigation}) => {
     transform: [{rotate: spin}],
   };
 
-  const sumAllOrders = () => {
-    const totalAmount = cartList?.data?.cart_items.reduce((total, item) => {
+  const sumAllOrders = () => {    
+    const totalAmount = cartList?.data?.cart_items ? cartList?.data?.cart_items.reduce((total, item) => {
       return total + item.cost;
-    }, 0);
+    }, 0) : 0;
     const formattedTotalAmount = `₦${totalAmount?.toFixed(2)}`;
     return formattedTotalAmount;
   };
@@ -465,7 +465,6 @@ const OrderConfirmation: FC<IProps> = ({navigation}) => {
           const userEmail = result.data.email;
           const fullName = `${result?.data.first_name} ${result?.data.last_name}`;
           const getUserLga = result?.data.address.lga;
-          console.log('phone', result?.data.phone?.number);
           setRetrieveUserData({
             fullName: fullName,
             address: fullAddress,

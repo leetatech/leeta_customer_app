@@ -39,6 +39,7 @@ import {
   FeesResponse,
 } from '../../redux/slices/cart/types';
 import Fonts from '../../Constants/Fonts';
+import CustomLoader from '../../Components/Loader/CustomLoader';
 
 interface IProps {
   navigation: NavigationProp<ParamListBase>;
@@ -55,7 +56,7 @@ const Home: FC<IProps> = ({navigation}) => {
   const [weightInput, setWeightInput] = useState<number>(weightOptions[0]);
   const [cartItemCount, setCartItemCount] = useState(0);
 
-  const {productWeight, fee, productQuantity, productId} = useSelector(
+  const {productWeight, fee, productQuantity, productId,loading} = useSelector(
     (state: RootState) => state.cart,
   );
 
@@ -112,8 +113,9 @@ const Home: FC<IProps> = ({navigation}) => {
               dispatch(setCartItemId(item.id));
             });
           }
-          navigation.navigate('Cart');
           setopenGasWeightOptions(false);
+          navigation.navigate('Cart');
+          
         }
       })
       .catch(error => {
@@ -240,6 +242,8 @@ const Home: FC<IProps> = ({navigation}) => {
           />
         </View>
         <CustomModal visible={openGasWeightOptions}>
+          {loading && <CustomLoader />}
+        
           <View style={styles.modal_actions}>
             <TouchableOpacity
               onPress={() => handleInputWeight(weightOptions.length - 1)}>
