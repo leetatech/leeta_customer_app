@@ -17,8 +17,13 @@ const createStyles = () =>
       backgroundColor: colors.WHITE,
     },
     nav_card: {
+      flexDirection: 'row',
+      alignItems: 'flex-start',
+      justifyContent: 'space-between',
       backgroundColor: colors.WHITE,
-      paddingHorizontal: 15,
+      borderColor: colors.ORANGE,
+      borderBottomWidth: 0.5,
+      marginHorizontal: 15,
       ...Platform.select({
         ios: {
           shadowColor: colors.LGRAY,
@@ -33,8 +38,8 @@ const createStyles = () =>
     },
     nav_card2: {
       backgroundColor: colors.WHITE,
-      borderBottomWidth: 0.5,
-      borderColor: colors.ORANGE,
+      // borderBottomWidth: 0.5,
+      // borderColor: colors.ORANGE,
       paddingBottom: 5,
     },
     screen_title: {
@@ -70,7 +75,7 @@ const createStyles = () =>
       alignItems: 'flex-end',
     },
     pill_tag: {
-      backgroundColor: colors.ORANGE,
+      // backgroundColor: colors.ORANGE,
       marginTop: 2.4,
       flexDirection: 'row',
       fontSize: 12,
@@ -129,6 +134,23 @@ const createStyles = () =>
       marginTop: 10,
     },
     list: {flexDirection: 'row', justifyContent: 'space-between'},
+    all_orders_status_container: {
+      backgroundColor: colors.LEMON,
+      padding: 2,
+      flexDirection: 'row',
+      alignSelf: 'flex-start',
+    },
+    cancelled_orders_status_container: {
+      padding: 2,
+      flexDirection: 'row',
+      alignSelf: 'flex-start',
+    },
+    open_orders_status_container: {
+      backgroundColor: colors.ORANGE,
+      padding: 2,
+      flexDirection: 'row',
+      alignSelf: 'flex-start',
+    },
   });
 
 export default createStyles;

@@ -8,10 +8,17 @@ interface orderState {
     message: string;
     data: Record<string, any>[];
   };
+  orderDetails: {
+    loading: boolean;
+    error: boolean;
+    message: string;
+    data: Record<string, any>;
+  };
   loading: boolean;
   error: boolean;
   errorCode?: number;
   message?: string;
+  selectedOrderId: {id: number | null};
 }
 
 const initialState: orderState = {
@@ -21,16 +28,27 @@ const initialState: orderState = {
     message: '',
     data: [],
   },
+  orderDetails: {
+    loading: false,
+    error: false,
+    message: '',
+    data: {},
+  },
   loading: false,
   error: false,
   errorCode: 0,
   message: '',
+  selectedOrderId: {id: null},
 };
 
-export const cartSlice = createSlice({
-  name: 'cart',
+export const orderSlice = createSlice({
+  name: 'order',
   initialState,
-  reducers: {},
+  reducers: {
+    setSelectedOrderId: (state, action) => {
+      state.selectedOrderId = action.payload;
+    },
+  },
   extraReducers: builder => {
     builder
 
@@ -53,20 +71,23 @@ export const cartSlice = createSlice({
 
       //ORDER DETAILS
       .addCase(triggerOrderDetails.pending, state => {
-        state.loading = true;
-        state.error = false;
+        state.orderDetails.loading = true;
+        state.orderDetails.error = false;
+        state.orderDetails.data = {};
       })
       .addCase(triggerOrderDetails.fulfilled, (state, action) => {
-        state.loading = false;
-        state.error = false;
+        state.orderDetails.loading = false;
+        state.orderDetails.error = false;
+        state.orderDetails.data = action.payload;
       })
       .addCase(triggerOrderDetails.rejected, state => {
-        state.loading = false;
-        state.error = true;
+        state.orderDetails.loading = true;
+        state.orderDetails.error = false;
+        state.orderDetails.data = {};
       });
   },
 });
 
-export const {} = cartSlice.actions;
+export const {setSelectedOrderId} = orderSlice.actions;
 
-export default cartSlice.reducer;
+export default orderSlice.reducer;

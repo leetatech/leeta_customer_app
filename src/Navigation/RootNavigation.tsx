@@ -18,6 +18,7 @@ import {
   OrderConfirmation,
   AddAddress,
   Summary,
+  StatusHistory,
 } from '../Screens';
 import BottomNavigator from './BottomTab';
 
@@ -107,6 +108,11 @@ export default function RootNavigation({defaultRoute}: IProps) {
             <RootStack.Screen
               name="Summary"
               component={Summary}
+              options={screenDefaultOptions}
+            />
+            <RootStack.Screen
+              name="StatusHistory"
+              component={StatusHistory}
               options={screenDefaultOptions}
             />
           </RootStack.Group>

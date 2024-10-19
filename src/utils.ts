@@ -57,3 +57,45 @@ export const formattedDate = (timestamp: number) => {
   const options = {weekday: 'long', day: '2-digit', month: '2-digit'} as const;
   return `On ${date.toLocaleDateString('en-US', options).replace('/', ' - ')}`;
 };
+
+export const formatTimestamp = (
+  timestamp: number,
+): {date: string; time: string} => {
+  // Convert timestamp to milliseconds
+  const dateObj = new Date(timestamp * 1000);
+
+  // Options for formatting the date
+  const dateOptions: Intl.DateTimeFormatOptions = {
+    year: 'numeric',
+    month: 'short',
+    day: 'numeric',
+  };
+  const timeOptions: Intl.DateTimeFormatOptions = {
+    hour: 'numeric',
+    minute: 'numeric',
+    hour12: true,
+  };
+  const formattedDate = dateObj.toLocaleDateString('en-US', dateOptions);
+  const formattedTime = dateObj
+    .toLocaleTimeString('en-US', timeOptions)
+    .toLowerCase();
+
+  return {
+    date: formattedDate,
+    time: formattedTime,
+  };
+};
+
+export const getStatusValue = (status: string): string => {
+  const statusSet: Record<string, string> = {
+    pending: 'ORDER PLACED',
+    accepted: 'PENDING CONFIRMATION',
+    processed: 'WAITING TO BE SHIPPED',
+    shipped: 'OUT FOR DELIVERY',
+    completed: 'DELIVERED',
+    cancelled: 'CANCELLED',
+    rejected: 'REJECTED',
+  };
+
+  return statusSet[status?.toLowerCase()] || status;
+};
