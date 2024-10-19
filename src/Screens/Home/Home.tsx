@@ -1,5 +1,5 @@
-import React, {FC, useEffect, useMemo, useRef, useState} from 'react';
-import {NavigationProp, ParamListBase} from '@react-navigation/native';
+import React, {FC, useCallback, useEffect, useMemo, useRef, useState} from 'react';
+import {NavigationProp, ParamListBase, useFocusEffect} from '@react-navigation/native';
 import GoogleMap from '../GoogleMap/GoogleMap';
 import {View, Text, TextInput} from 'react-native';
 import createStyles from './style';
@@ -7,7 +7,7 @@ import Buttons from '../../Components/Buttons/Buttons';
 import CustomModal from '../../Components/Modal/CustomModal';
 import {SvgIcon} from '../../Components/icons';
 import {TouchableOpacity} from 'react-native-gesture-handler';
-import {CANCEL_ICON} from '../../Assets/svgImages';
+import {CANCEL_ICON, CART} from '../../Assets/svgImages';
 import {colors} from '../../Constants/Colors';
 import KeyboardAvoidingContainer from '../../Components/KeyboardAvoidingContainer';
 import {useDispatch, useSelector} from 'react-redux';
@@ -15,6 +15,8 @@ import {
   addTocart,
   productFee,
   productList,
+  triggerCartList,
+} from '../../redux/slices/order/orderServices';
 } from '../../redux/slices/cart/cartServices';
 import {
   setCartItemId,
@@ -25,6 +27,9 @@ import {RootState} from '../../redux/rootReducer';
 import {
   CartItemResponsePayload,
   FeesResponse,
+} from '../../redux/slices/order/types';
+import Fonts from '../../Constants/Fonts';
+import Cart from '../Cart/Cart';
 } from '../../redux/slices/cart/types';
 
 interface IProps {
@@ -40,6 +45,8 @@ const Home: FC<IProps> = ({navigation}) => {
   const inputRef = useRef<TextInput>(null);
   const dispatch = useDispatch();
   const [weightInput, setWeightInput] = useState<number>(weightOptions[0]);
+  const [cartItemCount, setCartItemCount] = useState(0); 
+
   const {productWeight, fee, productQuantity, productId} = useSelector(
     (state: RootState) => state.cart,
   );
@@ -80,7 +87,6 @@ const Home: FC<IProps> = ({navigation}) => {
       quantity: productQuantity!,
       weight: weight,
     };
-    console.log('payload', payload);
     dispatch(addTocart(payload))
       .then(response => {
         const result = response.payload as CartItemResponsePayload;
@@ -172,16 +178,52 @@ const Home: FC<IProps> = ({navigation}) => {
         console.error('Error getting fees:', error);
       });
   };
+  const listCart = () => {
+    const payload = {
+      paging: {
+        index: 0,
+        size: 10,
+      },
+    };
+    dispatch(triggerCartList(payload))
+      .then(response => {
+        const result = response.payload as any;
+        if (response && result && result.data && result.data.data.cart_items) {
+          const itemCount = result.data.data.cart_items.length; 
+          setCartItemCount(itemCount);
+        } else {
+          setCartItemCount(0);
+        }
+      })
+      .catch(error => {
+        console.error('Error getting Cart list:', error);
+      });
+  };
 
   useEffect(() => {
     getProductListing();
     getProductFee();
   }, []);
-
+  useFocusEffect(
+    useCallback(() => {
+      listCart();
+    }, []),
+  );
   return (
     <KeyboardAvoidingContainer>
       <View style={styles.mainContainer}>
         <GoogleMap />
+        <View style={styles.cart_icon}>
+          <TouchableOpacity onPress={() => navigation.navigate('Cart')}>
+            <Fonts
+            type="smallText"
+            style={styles.item_counter}>
+            {cartItemCount}
+          </Fonts>
+            <CART />
+          </TouchableOpacity>
+        </View>
+
         <View style={styles.button_container}>
           <Buttons
             title="Gas refill"

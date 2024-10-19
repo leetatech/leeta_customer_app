@@ -4,13 +4,17 @@ import {colors} from '../../Constants/Colors';
 const createStyles = () =>
   StyleSheet.create({
     mainContainer: {
-      justifyContent: 'center',
-      alignItems: 'center',
+      justifyContent: 'flex-start',
       flex: 1,
+      position: 'relative',
     },
     button_container: {
       position: 'absolute',
-      bottom:0
+      bottom: 0,
+      left: 0,
+      right: 0,
+      alignItems: 'center',
+      justifyContent: 'center',
     },
     modal_actions: {
       flexDirection: 'row',
@@ -57,6 +61,15 @@ const createStyles = () =>
     unit: {
       paddingTop: 8,
       fontWeight: '600',
+    },
+    cart_icon: {position: 'absolute', top: 50, right: 10, zIndex: 25},
+    item_counter: {
+      position: 'absolute',
+      top: 5,
+      right: 15,
+      fontWeight: 'bold',
+      color: colors.WHITE,
+      zIndex: 10,
     },
   });
 
