@@ -54,6 +54,119 @@ const StatusHistory: FC<IProps> = ({navigation}) => {
             <Fonts type="normalBoldText">Tuesday, 10 - 2 </Fonts>
           </View>
         </View>
+        <View style={styles.statusContainer}>
+          <View style={styles.historyBar}>
+            <TICK
+              width={styles.svgStyle.width}
+              height={styles.svgStyle.width}
+            />
+            <LINE />
+          </View>
+          <View style={styles.displayInfo}>
+            <View
+              // style={
+              //   data.status_history?.[data.status_history?.length - 1]
+              //     .status === 'COMPLETED'
+              //     ? styles.all_orders_status_container
+              //     : data.status_history?.[data.status_history?.length - 1]
+              //         .status === 'CANCELLED' ||
+              //       data.status_history?.[data.status_history?.length - 1]
+              //         .status === 'REJECTED'
+              //     ? styles.cancelled_orders_status_container
+              //     : styles.open_orders_status_container
+              // }
+              style={styles.open_orders_status_container}>
+              <Fonts style={styles.pill_tag}>PENDING CONFIRMATION</Fonts>
+            </View>
+            <Fonts type="normalBoldText">Tuesday, 10 - 2 </Fonts>
+          </View>
+        </View>
+
+        <View style={styles.statusContainer}>
+          <View style={styles.historyBar}>
+            <TICK
+              width={styles.svgStyle.width}
+              height={styles.svgStyle.width}
+            />
+            <LINE />
+          </View>
+          <View style={styles.displayInfo}>
+            <View
+              // style={
+              //   data.status_history?.[data.status_history?.length - 1]
+              //     .status === 'COMPLETED'
+              //     ? styles.all_orders_status_container
+              //     : data.status_history?.[data.status_history?.length - 1]
+              //         .status === 'CANCELLED' ||
+              //       data.status_history?.[data.status_history?.length - 1]
+              //         .status === 'REJECTED'
+              //     ? styles.cancelled_orders_status_container
+              //     : styles.open_orders_status_container
+              // }
+              style={styles.open_orders_status_container}>
+              <Fonts style={styles.pill_tag}>WAITING TO BE SHIPPED</Fonts>
+            </View>
+            <Fonts type="normalBoldText">Tuesday, 10 - 2 </Fonts>
+          </View>
+        </View>
+
+        <View style={styles.statusContainer}>
+          <View style={styles.historyBar}>
+            <TICK
+              width={styles.svgStyle.width}
+              height={styles.svgStyle.width}
+            />
+            <LINE />
+          </View>
+          <View style={styles.displayInfo}>
+            <View
+              // style={
+              //   data.status_history?.[data.status_history?.length - 1]
+              //     .status === 'COMPLETED'
+              //     ? styles.all_orders_status_container
+              //     : data.status_history?.[data.status_history?.length - 1]
+              //         .status === 'CANCELLED' ||
+              //       data.status_history?.[data.status_history?.length - 1]
+              //         .status === 'REJECTED'
+              //     ? styles.cancelled_orders_status_container
+              //     : styles.open_orders_status_container
+              // }
+              style={styles.open_orders_status_container}>
+              <Fonts style={styles.pill_tag}>OUT FOR DELIVERY</Fonts>
+            </View>
+            <Fonts type="normalBoldText">Tuesday, 10 - 2 </Fonts>
+          </View>
+        </View>
+
+        <View style={styles.statusContainer}>
+          <View style={styles.historyBar}>
+            <TICK
+              width={styles.svgStyle.width}
+              height={styles.svgStyle.width}
+            />
+          </View>
+          <View style={styles.displayInfo}>
+            <View
+              // style={
+              //   data.status_history?.[data.status_history?.length - 1]
+              //     .status === 'COMPLETED'
+              //     ? styles.all_orders_status_container
+              //     : data.status_history?.[data.status_history?.length - 1]
+              //         .status === 'CANCELLED' ||
+              //       data.status_history?.[data.status_history?.length - 1]
+              //         .status === 'REJECTED'
+              //     ? styles.cancelled_orders_status_container
+              //     : styles.open_orders_status_container
+              // }
+              style={styles.open_orders_status_container}>
+              <Fonts style={styles.pill_tag}>DELIVERED</Fonts>
+            </View>
+            <Fonts type="normalBoldText">Tuesday, 10 - 2 </Fonts>
+            <Fonts type="normalBoldText">
+              your item/ Order has been delivered.
+            </Fonts>
+          </View>
+        </View>
       </View>
     </View>
   );

@@ -76,6 +76,7 @@ const createStyles = () =>
     },
     displayInfo: {
       gap: 2,
+      paddingBottom: 2
     },
   });
 
