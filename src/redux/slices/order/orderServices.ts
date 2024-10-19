@@ -57,17 +57,19 @@ export const triggerOrderList = createAsyncThunk(
 
 export const triggerOrderDetails = createAsyncThunk(
   'order/order_details',
-  async (orderid, {rejectWithValue}) => {
+  async (orderid: number, {rejectWithValue}) => {
     try {
-      const url = apiUrl.getOrders + orderid;
+      const url = `${apiUrl.getOrders}/${orderid}`;
       const method = 'get';
       const token = await AsyncStorage.getItem('userToken');
       const headers = {
         Authorization: `Bearer ${token}`,
       };
-      const response = await apiCall(url, method, {}, headers);
-      return response;
+      const response = await apiCall(url, method, undefined, headers) as unknown as Record<string, any>;
+      console.log(JSON.stringify(response.data, null, 2), 'jkneflhverblfhifbfjkhw;ljf;lbwbfkjhr')
+      return response.data;
     } catch (error) {
+        console.log(error)
       if (axios.isAxiosError(error)) {
         return rejectWithValue(error.response?.data);
       } else if (error instanceof Error) {

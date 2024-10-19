@@ -6694,7 +6694,7 @@ react-native-geolocation-service@^5.3.1:
   resolved "https://registry.npmjs.org/react-native-geolocation-service/-/react-native-geolocation-service-5.3.1.tgz"
   integrity sha512-LTXPtPNmrdhx+yeWG47sAaCgQc3nG1z+HLLHlhK/5YfOgfLcAb9HAkhREPjQKPZOUx8pKZMIpdGFUGfJYtimXQ==
 
-react-native-gesture-handler@^2.17.1, "react-native-gesture-handler@> 1.0.0", "react-native-gesture-handler@>= 1.0.0":
+react-native-gesture-handler@^2.17.1, "react-native-gesture-handler@> 1.0.0", "react-native-gesture-handler@>= 1.0.0", react-native-gesture-handler@>=2.0.0:
   version "2.17.1"
   resolved "https://registry.npmjs.org/react-native-gesture-handler/-/react-native-gesture-handler-2.17.1.tgz"
   integrity sha512-pWfniN6NuVKUq40KACuD3NCMe+bWNQCpD3cmxL6aLSCTwPKYmf7l4Lp0/E/almpjvxhybJZtFLU0w4tmxnIKaA==
@@ -6753,7 +6753,12 @@ react-native-otp-entry@^1.2.0:
   resolved "https://registry.npmjs.org/react-native-otp-entry/-/react-native-otp-entry-1.2.0.tgz"
   integrity sha512-jH0iHNths34bOPvQnflxhqtMd+dyuucI2u7UVcAOvqoynVjrkamF7QpGFnEWV+d3VHTZmwsh1VPMKwIk8rEMSg==
 
-react-native-reanimated@^3.5.4, "react-native-reanimated@>= 1.0.0":
+react-native-reanimated-carousel@^3.5.1:
+  version "3.5.1"
+  resolved "https://registry.npmjs.org/react-native-reanimated-carousel/-/react-native-reanimated-carousel-3.5.1.tgz"
+  integrity sha512-9BBQV6JAYSQm2lV7MFtT4mzapXmW4IZO6s38gfiJL84Jg23ivGB1UykcNQauKgtHyhtW2NuZJzItb1s42lM+hA==
+
+react-native-reanimated@^3.5.4, "react-native-reanimated@>= 1.0.0", react-native-reanimated@>=3.0.0:
   version "3.5.4"
   resolved "https://registry.npmjs.org/react-native-reanimated/-/react-native-reanimated-3.5.4.tgz"
   integrity sha512-8we9LLDO1o4Oj9/DICeEJ2K1tjfqkJagqQUglxeUAkol/HcEJ6PGxIrpBcNryLqCDYEcu6FZWld/FzizBIw6bg==
@@ -6807,7 +6812,7 @@ react-native-vector-icons@^10.0.0:
     prop-types "^15.7.2"
     yargs "^16.1.1"
 
-react-native@*, "react-native@^0.0.0-0 || >=0.60 <1.0", "react-native@> 0.50.0", "react-native@>= 0.55.x", "react-native@>= 0.59", "react-native@>= 0.64.3", react-native@>=0.46, react-native@>=0.57.0, react-native@>=0.59, react-native@>=0.59.0, react-native@>=0.60, react-native@>=0.65.0, react-native@0.71.11:
+react-native@*, "react-native@^0.0.0-0 || >=0.60 <1.0", "react-native@> 0.50.0", "react-native@>= 0.55.x", "react-native@>= 0.59", "react-native@>= 0.64.3", react-native@>=0.46, react-native@>=0.57.0, react-native@>=0.59, react-native@>=0.59.0, react-native@>=0.6.0, react-native@>=0.60, react-native@>=0.65.0, react-native@0.71.11:
   version "0.71.11"
   resolved "https://registry.npmjs.org/react-native/-/react-native-0.71.11.tgz"
   integrity sha512-++8IxgUe4Ev+bTiFlLfJCdSoE5cReVP1DTpVJ8f/QtzaxA3h1008Y3Xah1Q5vsR4rZcYMO7Pn3af+wOshdQFug==

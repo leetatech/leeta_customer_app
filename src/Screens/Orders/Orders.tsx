@@ -20,7 +20,8 @@ import {useDispatch, useSelector} from 'react-redux';
 import {triggerOrderList} from '../../redux/slices/order/orderServices';
 import {TouchableOpacity} from 'react-native-gesture-handler';
 import CustomLoader from '../../Components/Loader/CustomLoader';
-import {formattedDate} from '../../utils';
+import {formattedDate, getStatusValue} from '../../utils';
+import {setSelectedOrderId} from '../../redux/slices/order/orderSlice';
 
 interface IProps {
   navigation: NavigationProp<ParamListBase>;
@@ -80,7 +81,11 @@ const Orders: FC<IProps> = ({navigation}) => {
       0,
     );
     return (
-      <TouchableOpacity onPress={() => navigation.navigate('Summary')}>
+      <TouchableOpacity
+        onPress={() => {
+          navigation.navigate('Summary', {id: item.id});
+          dispatch(setSelectedOrderId({id: item.id}));
+        }}>
         <Card>
           <View style={styles.order_container}>
             <CYLINDER />
@@ -100,7 +105,9 @@ const Orders: FC<IProps> = ({navigation}) => {
                     : styles.open_orders_status_container
                 }>
                 <Fonts type="normalBoldText" style={{color: colors.WHITE}}>
-                  {item.status_history[item.status_history.length - 1].status}
+                  {getStatusValue(
+                    item.status_history[item.status_history.length - 1].status,
+                  )}
                 </Fonts>
               </View>
               <Fonts type="normalBoldBlackText">{formattedDate(item.ts)}</Fonts>
