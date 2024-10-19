@@ -10,7 +10,7 @@ const createStyles = () =>
     },
     button_container: {
       position: 'absolute',
-      bottom: 0,
+      bottom: 15,
       left: 0,
       right: 0,
       alignItems: 'center',
