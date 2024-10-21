@@ -23,6 +23,7 @@ import {
   formatTimestamp,
   getStatusValue,
 } from '../../utils';
+import {setSelectedOrderId} from '../../redux/slices/order/orderSlice';
 import createStyles from './styles';
 
 interface IProps {
@@ -196,7 +197,9 @@ const Summary: FC<IProps> = ({navigation}) => {
                     disabled={false}
                     buttonStyle={styles.btn_style}
                     textStyle={[styles.btns_size, {color: colors.ORANGE}]}
-                    //   onPress={() => navigation.navigate('BottomNavigator')}
+                    onPress={() =>
+                      navigation.navigate('StatusHistory', {id: id})
+                    }
                   />
                   <ButtonsOutline
                     title="Download Receipt"
@@ -225,7 +228,10 @@ const Summary: FC<IProps> = ({navigation}) => {
                     disabled={false}
                     buttonStyle={undefined}
                     textStyle={styles.btns_size}
-                    onPress={() => navigation.navigate('StatusHistory')}
+                    onPress={() => {
+                      navigation.navigate('StatusHistory');
+                      dispatch(setSelectedOrderId({id: id}));
+                    }}
                   />
                 </>
               )}

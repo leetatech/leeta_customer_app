@@ -1,5 +1,5 @@
 import {PayloadAction, createSlice} from '@reduxjs/toolkit';
-import {triggerOrderList, triggerOrderDetails} from './orderServices';
+import {triggerOrderList, triggerOrderDetails, triggerOrderStatusHistory} from './orderServices';
 
 interface orderState {
   orderList: {
@@ -13,6 +13,12 @@ interface orderState {
     error: boolean;
     message: string;
     data: Record<string, any>;
+  };
+  orderStatusHistory: {
+    loading: boolean;
+    error: boolean;
+    message: string;
+    data: Record<string, any>[];
   };
   loading: boolean;
   error: boolean;
@@ -33,6 +39,12 @@ const initialState: orderState = {
     error: false,
     message: '',
     data: {},
+  },
+  orderStatusHistory: {
+    loading: false,
+    error: false,
+    message: '',
+    data: [],
   },
   loading: false,
   error: false,
@@ -84,7 +96,24 @@ export const orderSlice = createSlice({
         state.orderDetails.loading = true;
         state.orderDetails.error = false;
         state.orderDetails.data = {};
-      });
+      })
+
+       //ORDERS STATUS HISTORY
+      .addCase(triggerOrderStatusHistory.pending, state => {
+        state.orderStatusHistory.loading = true;
+        state.orderStatusHistory.error = false;
+        state.orderStatusHistory.data = [];
+      })
+      .addCase(triggerOrderStatusHistory.fulfilled, (state, action) => {
+        state.orderStatusHistory.loading = false;
+        state.orderStatusHistory.error = false;
+        state.orderStatusHistory.data = action.payload.data;
+      })
+      .addCase(triggerOrderStatusHistory.rejected, state => {
+        state.orderStatusHistory.loading = false;
+        state.orderStatusHistory.error = true;
+        state.orderStatusHistory.data = [];
+      })
   },
 });
 

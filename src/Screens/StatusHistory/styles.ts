@@ -61,10 +61,29 @@ const createStyles = () =>
       flexDirection: 'row',
       alignSelf: 'flex-start',
     },
+    orders_status_container: {
+      backgroundColor: colors.LGRAY,
+      padding: 2,
+      flexDirection: 'row',
+      alignSelf: 'flex-start',
+    },
+    all_orders_status_container: {
+      backgroundColor: colors.LEMON,
+      padding: 2,
+      flexDirection: 'row',
+      alignSelf: 'flex-start',
+    },
     statusContainer: {
       flexDirection: 'row',
       gap: 14,
-      marginBottom: 2,
+      marginBottom: 5,
+      opacity: 1,
+    },
+    statusContainerOpacity: {
+      flexDirection: 'row',
+      gap: 14,
+      marginBottom: 5,
+      opacity: 0.7,
     },
     historyBar: {
       alignItems: 'center',
