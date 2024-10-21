@@ -6,14 +6,17 @@ const isSmallDevice = screenWidth < 380;
 
 const createStyles = () =>
   StyleSheet.create({
+    safet_area: {
+      backgroundColor: colors.WHITE,
+      flex: 1,
+      paddingBottom: 20,
+    },
     container: {
       flexDirection: 'column',
       gap: 19,
     },
     mainContainer: {
       flex: 1,
-      paddingTop: 32,
-      //   paddingHorizontal: 15,
       backgroundColor: colors.WHITE,
     },
     navigation_arrow_container: {
@@ -58,9 +61,29 @@ const createStyles = () =>
       flexDirection: 'row',
       alignSelf: 'flex-start',
     },
+    orders_status_container: {
+      backgroundColor: colors.LGRAY,
+      padding: 2,
+      flexDirection: 'row',
+      alignSelf: 'flex-start',
+    },
+    all_orders_status_container: {
+      backgroundColor: colors.LEMON,
+      padding: 2,
+      flexDirection: 'row',
+      alignSelf: 'flex-start',
+    },
     statusContainer: {
       flexDirection: 'row',
       gap: 14,
+      marginBottom: 5,
+      opacity: 1,
+    },
+    statusContainerOpacity: {
+      flexDirection: 'row',
+      gap: 14,
+      marginBottom: 5,
+      opacity: 0.7,
     },
     historyBar: {
       alignItems: 'center',

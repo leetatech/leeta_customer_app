@@ -16,6 +16,7 @@ interface ApiUrls {
   user: string;
   guest: string;
   getOrders: string;
+  getOrderStatusHistory: string;
 }
 
 const BASE_URL = 'https://leetabackend-e6d948d15ae2.herokuapp.com/api/';
@@ -40,6 +41,7 @@ export const apiUrl: ApiUrls = {
 
   // Orders
   getOrders: `${BASE_URL}order`,
+  getOrderStatusHistory: `${BASE_URL}order/status/history`,
 };
 
 export const appUserType = 'customer';

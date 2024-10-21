@@ -23,6 +23,7 @@ import {
   formatTimestamp,
   getStatusValue,
 } from '../../utils';
+import {setSelectedOrderId} from '../../redux/slices/order/orderSlice';
 import createStyles from './styles';
 
 interface IProps {
@@ -44,19 +45,28 @@ const CustomCaro: FC<ICarousel> = ({data}) => {
         width={width}
         height={width / 2}
         autoPlay={true}
-        data={[...new Array(6).keys()]}
-        scrollAnimationDuration={1000}
-        onSnapToItem={index => console.log('current index:', index)}
+        data={[...data]}
+        scrollAnimationDuration={3000}
+        // onSnapToItem={index => console.log('current index:', index)}
         renderItem={({index}) => (
           <View style={styles.orders_container}>
             <CYLINDER />
             <View style={styles.description_container}>
               <Fonts style={styles.bold_txt}>Max Gas</Fonts>
-              <Fonts style={styles.gray_txt}>type: Refill</Fonts>
-              <Fonts style={styles.gray_txt}>weight: 10kg</Fonts>
+              <Fonts style={styles.gray_txt}>
+                category: {data?.[index]?.product_category}
+              </Fonts>
+              <Fonts style={styles.gray_txt}>
+                weight: {data?.[index]?.weight}kg
+              </Fonts>
+              <Fonts style={styles.gray_txt}>
+                quantity: {data?.[index]?.quantity}
+              </Fonts>
               <View style={styles.amount_container}>
                 <Fonts style={styles.gray_txt}>amount:</Fonts>
-                <Fonts style={styles.bold_txt}>₦6800</Fonts>
+                <Fonts style={styles.bold_txt}>
+                  ₦{Number(data?.[index]?.cost).toLocaleString()}
+                </Fonts>
               </View>
             </View>
           </View>
@@ -187,7 +197,9 @@ const Summary: FC<IProps> = ({navigation}) => {
                     disabled={false}
                     buttonStyle={styles.btn_style}
                     textStyle={[styles.btns_size, {color: colors.ORANGE}]}
-                    //   onPress={() => navigation.navigate('BottomNavigator')}
+                    onPress={() =>
+                      navigation.navigate('StatusHistory', {id: id})
+                    }
                   />
                   <ButtonsOutline
                     title="Download Receipt"
@@ -216,7 +228,10 @@ const Summary: FC<IProps> = ({navigation}) => {
                     disabled={false}
                     buttonStyle={undefined}
                     textStyle={styles.btns_size}
-                    onPress={() => navigation.navigate('StatusHistory')}
+                    onPress={() => {
+                      navigation.navigate('StatusHistory');
+                      dispatch(setSelectedOrderId({id: id}));
+                    }}
                   />
                 </>
               )}

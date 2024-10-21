@@ -55,7 +55,7 @@ export const formattedDate = (timestamp: number) => {
 
   // Get day of the week, day of the month, and month
   const options = {weekday: 'long', day: '2-digit', month: '2-digit'} as const;
-  return `On ${date.toLocaleDateString('en-US', options).replace('/', ' - ')}`;
+  return `${date.toLocaleDateString('en-US', options).replace('/', ' - ')}`;
 };
 
 export const formatTimestamp = (
