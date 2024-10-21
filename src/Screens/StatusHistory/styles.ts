@@ -6,14 +6,17 @@ const isSmallDevice = screenWidth < 380;
 
 const createStyles = () =>
   StyleSheet.create({
+    safet_area: {
+      backgroundColor: colors.WHITE,
+      flex: 1,
+      paddingBottom: 20,
+    },
     container: {
       flexDirection: 'column',
       gap: 19,
     },
     mainContainer: {
       flex: 1,
-      paddingTop: 32,
-      //   paddingHorizontal: 15,
       backgroundColor: colors.WHITE,
     },
     navigation_arrow_container: {
