@@ -93,6 +93,7 @@ const createStyles = () =>
     safet_area: {
       backgroundColor: colors.WHITE,
       flex: 1,
+      paddingBottom: 20
     },
     btns_content: {
       flexDirection: 'column',
