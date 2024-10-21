@@ -45,7 +45,7 @@ const CustomCaro: FC<ICarousel> = ({data}) => {
         height={width / 2}
         autoPlay={true}
         data={[...data]}
-        scrollAnimationDuration={1000}
+        scrollAnimationDuration={3000}
         // onSnapToItem={index => console.log('current index:', index)}
         renderItem={({index}) => (
           <View style={styles.orders_container}>

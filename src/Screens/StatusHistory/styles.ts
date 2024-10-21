@@ -61,6 +61,7 @@ const createStyles = () =>
     statusContainer: {
       flexDirection: 'row',
       gap: 14,
+      marginBottom: 2,
     },
     historyBar: {
       alignItems: 'center',
@@ -76,7 +77,6 @@ const createStyles = () =>
     },
     displayInfo: {
       gap: 2,
-      paddingBottom: 2
     },
   });
 
