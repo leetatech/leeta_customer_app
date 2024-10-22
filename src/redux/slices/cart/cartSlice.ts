@@ -182,6 +182,7 @@ export const cartSlice = createSlice({
         state.loading = false;
         state.error = false;
         state.cartData = action.payload as CartItemResponsePayload;
+        state.cartList = action.payload as CartItemResponsePayload;
       })
       .addCase(addTocart.rejected, (state, action: PayloadAction<any>) => {
         state.loading = false;

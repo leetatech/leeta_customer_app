@@ -25,6 +25,8 @@ import {
 } from '../../utils';
 import {setSelectedOrderId} from '../../redux/slices/order/orderSlice';
 import createStyles from './styles';
+import {addTocart} from '../../redux/slices/cart/cartServices';
+import {setProductWeight, setUserCart} from '../../redux/slices/cart/cartSlice';
 
 interface IProps {
   // route: RouteProp<{params: {id: number}}, 'params'>;
@@ -47,7 +49,6 @@ const CustomCaro: FC<ICarousel> = ({data}) => {
         autoPlay={true}
         data={[...data]}
         scrollAnimationDuration={3000}
-        // onSnapToItem={index => console.log('current index:', index)}
         renderItem={({index}) => (
           <View style={styles.orders_container}>
             <CYLINDER />
@@ -82,14 +83,67 @@ const Summary: FC<IProps> = ({navigation}) => {
   );
   const styles = useMemo(() => createStyles(), []);
   const dispatch = useDispatch();
+  const [refilling, setRefilling] = useState(false); // Loading state
+
   const {loading, data, message, error} = orderDetails;
   // const {id} = route.params;
   const {id} = selectedOrderId;
-  console.log(selectedOrderId);
   const totalMass = data?.orders?.reduce(
     (accum: any, gas: {weight: any}) => accum + gas.weight,
     0,
   );
+
+  const handleRefillAgain = () => {
+    setRefilling(true); // Start loading
+
+    // Array of data
+    const promises = data.orders.map(
+      (item: Record<string, string | number>) => {
+        const cartItems = {
+          weight: `${Number(item.weight)} Kg`,
+          amount: Number(item.cost),
+          quantity: Number(item.quantity),
+        };
+        dispatch(setProductWeight(Number(item.weight)));
+        dispatch(setUserCart(cartItems));
+        const payload = {
+          cost: Number(item.cost),
+          product_id: item.product_id as string,
+          quantity: Number(item.quantity),
+          weight: Number(item.weight),
+        };
+
+        // Wrap dispatch in a promise
+        return new Promise((resolve, reject) => {
+          try {
+            dispatch(addTocart(payload));
+            resolve('Success');
+          } catch (error) {
+            reject(error);
+          }
+        });
+      },
+    );
+
+    // Handle all dispatches with Promise.allSettled
+    Promise.allSettled(promises)
+      .then(results => {
+        const hasErrors = results.some(result => result.status === 'rejected');
+
+        if (!hasErrors) {
+          // All dispatches succeeded, navigate to another screen
+          navigation.navigate('Cart');
+        } else {
+          console.error('Some dispatches failed.');
+        }
+      })
+      .catch(error => {
+        console.error('Error handling dispatch:', error);
+      })
+      .finally(() => {
+        setRefilling(false);
+      });
+  };
 
   useFocusEffect(
     useCallback(() => {
@@ -105,7 +159,9 @@ const Summary: FC<IProps> = ({navigation}) => {
         ) : (
           <View style={styles.nav_card}>
             <View style={styles.nav_card2}>
-              <Fonts style={styles.gray_txt_sm}>Order No: #474849</Fonts>
+              <Fonts style={styles.gray_txt_sm}>
+                Order No: #{data.order_number}
+              </Fonts>
               <Fonts style={styles.gray_txt_sm}>
                 Date: {formatTimestamp(data.ts).date}
               </Fonts>
@@ -153,7 +209,6 @@ const Summary: FC<IProps> = ({navigation}) => {
                 )}
               </Fonts>
             </View>
-
             {data.orders?.length > 1 ? (
               <CustomCaro
                 data={data?.orders as Record<string, string | number>[]}
@@ -186,11 +241,13 @@ const Summary: FC<IProps> = ({navigation}) => {
               {data.status_history?.[data.status_history?.length - 1].status ===
               'COMPLETED' ? (
                 <>
+                  {refilling && <CustomLoader />}
                   <Buttons
                     title="Refill Again"
                     disabled={false}
                     buttonStyle={undefined}
                     textStyle={styles.btns_size}
+                    onPress={handleRefillAgain}
                   />
                   <ButtonsOutline
                     title="View Status History"
@@ -221,7 +278,7 @@ const Summary: FC<IProps> = ({navigation}) => {
                     disabled={false}
                     buttonStyle={styles.btn_style}
                     textStyle={[styles.btns_size, {color: colors.ORANGE}]}
-                    //   onPress={() => navigation.navigate('BottomNavigator')}
+                    // onPress={() => navigation.navigate('BottomNavigator')}
                   />
                   <Buttons
                     title="Track My Refill"
@@ -275,12 +332,12 @@ const Summary: FC<IProps> = ({navigation}) => {
                 <Fonts style={styles.text}>Delivered to</Fonts>
                 <Fonts style={styles.text}>{data.delivery_details?.name}</Fonts>
               </View>
-              <View style={styles.list}>
+              {/* <View style={styles.list}>
                 <Fonts style={styles.text}>Email</Fonts>
                 <Fonts style={styles.text}>
                   {data.delivery_details?.email}
                 </Fonts>
-              </View>
+              </View> */}
               <View style={styles.list}>
                 <Fonts style={styles.text}>Vendor</Fonts>
                 <Fonts style={styles.text}>Max Gas</Fonts>
