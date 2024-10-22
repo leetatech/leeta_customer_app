@@ -1,5 +1,6 @@
 import {StyleSheet, Dimensions, Platform} from 'react-native';
 import {colors} from '../../Constants/Colors';
+let screenHeight = Dimensions.get('window').height;
 let screenWidth = Dimensions.get('window').width;
 
 const isSmallDevice = screenWidth < 380;
@@ -24,6 +25,7 @@ const createStyles = () =>
       borderColor: colors.ORANGE,
       borderBottomWidth: 0.5,
       marginHorizontal: 15,
+      paddingTop: isSmallDevice ? 10 : 0,
       ...Platform.select({
         ios: {
           shadowColor: colors.LGRAY,
@@ -91,6 +93,7 @@ const createStyles = () =>
     safet_area: {
       backgroundColor: colors.WHITE,
       flex: 1,
+      paddingBottom: 20
     },
     btns_content: {
       flexDirection: 'column',

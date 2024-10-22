@@ -110,7 +110,7 @@ const Orders: FC<IProps> = ({navigation}) => {
                   )}
                 </Fonts>
               </View>
-              <Fonts type="normalBoldBlackText">{formattedDate(item.ts)}</Fonts>
+              <Fonts type="normalBoldBlackText">On {formattedDate(item.ts)}</Fonts>
             </View>
           </View>
         </Card>

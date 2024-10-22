@@ -1,5 +1,16 @@
-import React, {FC, useCallback, useEffect, useMemo, useRef, useState} from 'react';
-import {NavigationProp, ParamListBase, useFocusEffect} from '@react-navigation/native';
+import React, {
+  FC,
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
+import {
+  NavigationProp,
+  ParamListBase,
+  useFocusEffect,
+} from '@react-navigation/native';
 import GoogleMap from '../GoogleMap/GoogleMap';
 import {View, Text, TextInput} from 'react-native';
 import createStyles from './style';
@@ -43,7 +54,7 @@ const Home: FC<IProps> = ({navigation}) => {
   const inputRef = useRef<TextInput>(null);
   const dispatch = useDispatch();
   const [weightInput, setWeightInput] = useState<number>(weightOptions[0]);
-  const [cartItemCount, setCartItemCount] = useState(0); 
+  const [cartItemCount, setCartItemCount] = useState(0);
 
   const {productWeight, fee, productQuantity, productId,loading} = useSelector(
     (state: RootState) => state.cart,
@@ -188,7 +199,7 @@ const Home: FC<IProps> = ({navigation}) => {
       .then(response => {
         const result = response.payload as any;
         if (response && result && result.data && result.data.data.cart_items) {
-          const itemCount = result.data.data.cart_items.length; 
+          const itemCount = result.data.data.cart_items.length;
           setCartItemCount(itemCount);
         } else {
           setCartItemCount(0);
@@ -214,11 +225,9 @@ const Home: FC<IProps> = ({navigation}) => {
         <GoogleMap />
         <View style={styles.cart_icon}>
           <TouchableOpacity onPress={() => navigation.navigate('Cart')}>
-            <Fonts
-            type="smallText"
-            style={styles.item_counter}>
-            {cartItemCount}
-          </Fonts>
+            <Fonts type="smallText" style={styles.item_counter}>
+              {cartItemCount}
+            </Fonts>
             <CART />
           </TouchableOpacity>
         </View>
