@@ -48,7 +48,7 @@ export const capitalizeFirstLetter = (word: string) => {
 
 export const formattedDate = (timestamp: number) => {
   // Timestamp
-  timestamp = 1728400175 * 1000; // Multiply by 1000 to convert seconds to milliseconds
+  timestamp = timestamp * 1000; // Multiply by 1000 to convert seconds to milliseconds
 
   // Convert timestamp to a Date object
   const date = new Date(timestamp);

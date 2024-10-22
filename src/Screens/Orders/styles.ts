@@ -1,5 +1,9 @@
-import {StyleSheet} from 'react-native';
+import {StyleSheet, Dimensions} from 'react-native';
 import {colors} from '../../Constants/Colors';
+let screenHeight = Dimensions.get('window').height;
+let screenWidth = Dimensions.get('window').width;
+
+const isSmallDevice = screenWidth < 380;
 
 const createStyles = () =>
   StyleSheet.create({
@@ -9,17 +13,18 @@ const createStyles = () =>
     },
     scrollable_tabs_container: {
       flexDirection: 'row',
-      alignItems: 'flex-end'
-      // paddingVertical: 10,
+      alignItems: 'flex-end',
+      paddingVertical: 0,
       // height: 100,
     },
     order_description_container: {
       flexDirection: 'row',
       gap: 20,
-      paddingTop: 20,
+      paddingTop: 10,
       borderBottomColor: colors.LGRAY,
       borderBottomWidth: 1,
       paddingHorizontal: 10,
+      height: 35,
     },
     activeContainer: {
       borderColor: colors.ORANGE,
@@ -29,7 +34,6 @@ const createStyles = () =>
       borderColor: colors.TRANSPARENT,
       borderBottomWidth: 0,
     },
-
     order_container: {
       flexDirection: 'row',
       gap: 20,
@@ -53,16 +57,15 @@ const createStyles = () =>
     },
     order_desc_container: {gap: 3},
     scrollContainerEmpty: {
-      // paddingBottom: 300,
       justifyContent: 'center',
       alignItems: 'center',
       // flex: 1,
-      height: '89%',
+      height: isSmallDevice ? '92%' : '95%',
     },
     scrollContainer: {
       // paddingBottom: 60,
       // flex: 1,
-      height: '89%',
+      height: isSmallDevice ? '92%' : '94%',
     },
     empty_cart_container: {
       // flex: 1,
