@@ -27,7 +27,8 @@ const createStyles = () =>
     logout_container: {
       flexDirection: 'row',
       gap: 4,
-  width:'100%',
+      width: '100%',
+      alignItems: 'center',
     },
     logout: {
       fontWeight: '600',
@@ -56,6 +57,7 @@ const createStyles = () =>
     },
     btn: {
       backgroundColor: colors.RED,
+      marginTop: 20,
     },
     btn_text: {
       color: colors.WHITE,
@@ -65,16 +67,16 @@ const createStyles = () =>
     modal_container: {
       backgroundColor: colors.WHITE,
       paddingHorizontal: 15,
-      paddingVertical:15,
+      paddingVertical: 15,
       gap: 8,
-      borderTopEndRadius:15,
-      borderTopStartRadius:15
+      borderTopEndRadius: 15,
+      borderTopStartRadius: 15,
     },
     modal_title: {alignItems: 'center'},
-    line_height:{
+    line_height: {
       marginBottom: 14,
     },
-    btn_container:{paddingTop:28}
+    btn_container: {paddingTop: 28},
   });
 
 export default createStyles;

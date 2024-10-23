@@ -12,7 +12,7 @@ export {default as Home} from './Home/Home';
 export {default as Cart} from './Cart/Cart';
 export {default as OrderConfirmation} from './OrderConfirmation/OrderConfirmation';
 export {default as AddAddress} from './AddAddress/AddAddress';
-export {default as Settings} from './Seetings/Settings';
+export {default as Settings} from './Settings/Settings';
 export {default as Orders} from './Orders/Orders';
 export {default as Summary} from './Summary/Summary';
 export {default as StatusHistory} from './StatusHistory/StatusHistory';

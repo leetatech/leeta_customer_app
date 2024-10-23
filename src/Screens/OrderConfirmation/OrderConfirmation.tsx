@@ -234,10 +234,12 @@ const OrderConfirmation: FC<IProps> = ({navigation}) => {
     transform: [{rotate: spin}],
   };
 
-  const sumAllOrders = () => {    
-    const totalAmount = cartList?.data?.cart_items ? cartList?.data?.cart_items.reduce((total, item) => {
-      return total + item.cost;
-    }, 0) : 0;
+  const sumAllOrders = () => {
+    const totalAmount = cartList?.data?.cart_items
+      ? cartList?.data?.cart_items.reduce((total, item) => {
+          return total + item.cost;
+        }, 0)
+      : 0;
     const formattedTotalAmount = `₦${totalAmount?.toFixed(2)}`;
     return formattedTotalAmount;
   };
@@ -509,6 +511,7 @@ const OrderConfirmation: FC<IProps> = ({navigation}) => {
       getOrderSummary();
     }
   }, [orderDeliveryFee, orderServiceFee]);
+
 
   return (
     <>

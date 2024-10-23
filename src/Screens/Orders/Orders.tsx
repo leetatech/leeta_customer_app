@@ -91,7 +91,7 @@ const Orders: FC<IProps> = ({navigation}) => {
             <CYLINDER />
             <View style={styles.order_desc_container}>
               <Fonts type="extraSmallBlackText">{totalMass}Kg Gas Refill</Fonts>
-              <Fonts type="extraSmallBlackText">Order #12345678</Fonts>
+              <Fonts type="extraSmallBlackText">Order #{item.order_number}</Fonts>
               <View
                 style={
                   item.status_history[item.status_history.length - 1].status ===
@@ -110,7 +110,9 @@ const Orders: FC<IProps> = ({navigation}) => {
                   )}
                 </Fonts>
               </View>
-              <Fonts type="normalBoldBlackText">On {formattedDate(item.ts)}</Fonts>
+              <Fonts type="normalBoldBlackText">
+                On {formattedDate(item.ts)}
+              </Fonts>
             </View>
           </View>
         </Card>

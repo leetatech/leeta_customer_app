@@ -39,8 +39,6 @@ const StatusHistory: FC<IProps> = ({navigation}) => {
     }, []),
   );
 
-  console.log(data, id);
-
   return (
     <SafeAreaView style={styles.safet_area} edges={['top', 'left', 'right']}>
       <View style={styles.mainContainer}>

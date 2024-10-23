@@ -206,7 +206,6 @@ const AddAddress: FC<IProps> = ({navigation}) => {
 
   const updateGuestInformation = async () => {
     const deviceId = await DeviceInfo.getUniqueId();
-    console.log('Updating device information', deviceId);
     const payload: GuestData = {
       address: {
         address_type: 'customer_resident_address',

@@ -95,7 +95,6 @@ export const triggerOrderStatusHistory = createAsyncThunk(
         undefined,
         headers,
       )) as unknown as Record<string, any>;
-      console.log(response)
       return response;
     } catch (error) {
       if (axios.isAxiosError(error)) {

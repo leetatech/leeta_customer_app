@@ -1,4 +1,4 @@
-import React, {FC, useEffect, useMemo, useState} from 'react';
+import React, {FC, useCallback, useEffect, useMemo, useState} from 'react';
 import {Text, View, TouchableOpacity, ScrollView, Image} from 'react-native';
 import FormMainContainer from '../../Components/Layouts/PaddedLayout';
 import {
@@ -12,7 +12,11 @@ import createStyles from './styles';
 import {colors} from '../../Constants/Colors';
 import Buttons from '../../Components/Buttons/Buttons';
 import {LEFT_ARROW} from '../../Assets';
-import {NavigationProp, ParamListBase} from '@react-navigation/native';
+import {
+  NavigationProp,
+  ParamListBase,
+  useFocusEffect,
+} from '@react-navigation/native';
 import Modal from 'react-native-modal';
 import CustomToast from '../../Components/Toast/CustomToast';
 import {useDispatch, useSelector} from 'react-redux';
@@ -36,7 +40,9 @@ interface IProps {
 
 const Cart: FC<IProps> = ({navigation}) => {
   const styles = useMemo(() => createStyles(), []);
-  let {fee, loading, cartList} = useSelector((state: RootState) => state.cart);
+  let {fee, loading, cartList, cartData} = useSelector(
+    (state: RootState) => state.cart,
+  );
   const [showModal, setShowModal] = useState(false);
   const [showToastMsg, setshowToastMsg] = useState(false);
   const [selectedItem, setSelectedItem] = useState<string>('');
@@ -207,6 +213,12 @@ const Cart: FC<IProps> = ({navigation}) => {
     listCart();
   }, []);
 
+  useFocusEffect(
+    useCallback(() => {
+      listCart();
+      getServiceFee();
+    }, []),
+  );
   return (
     <>
       <FormMainContainer>
@@ -309,7 +321,7 @@ const Cart: FC<IProps> = ({navigation}) => {
       <Modal isVisible={showModal} propagateSwipe={true} style={{margin: 0}}>
         <View style={styles.modal_container}>
           <View style={styles.action}>
-          {loading && <CustomLoader />}
+            {loading && <CustomLoader />}
 
             <Text style={styles.modal_title}>Remove from cart</Text>
             <TouchableOpacity onPress={() => setShowModal(false)}>
@@ -337,7 +349,6 @@ const Cart: FC<IProps> = ({navigation}) => {
             textStyle={{color: colors.ORANGE, fontSize: 17}}
             onPress={() => handleDeleteItem()}
           />
-
         </View>
       </Modal>
       {showToastMsg && (
